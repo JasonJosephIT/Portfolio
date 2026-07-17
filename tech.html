@@ -24,57 +24,32 @@
     <p>Software built for clarity, from small tools to full-stack products.</p>
   </div>
 
-  <section class="projects wrap">
-    <h2>Projects</h2>
-    <div class="project-grid">
-      <!-- TODO: replace with real project -->
-      <article class="project-card">
-        <h3>Pulse</h3>
-        <p>A lightweight uptime monitor that pings your endpoints and texts you before your users notice.</p>
-        <div class="tech-tags">
-          <span>TypeScript</span>
-          <span>Node.js</span>
-          <span>SQL</span>
-        </div>
-        <a href="#" class="project-link">View project →</a>
-      </article>
-      <!-- TODO: replace with real project -->
-      <article class="project-card">
-        <h3>Ledger</h3>
-        <p>A self-hosted budgeting app with plain-text exports and no third-party data sharing.</p>
-        <div class="tech-tags">
-          <span>React</span>
-          <span>Python</span>
-          <span>SQL</span>
-        </div>
-        <a href="#" class="project-link">View project →</a>
-      </article>
-      <!-- TODO: replace with real project -->
-      <article class="project-card">
-        <h3>Waypoint</h3>
-        <p>A CLI for scripting deploy pipelines across providers with a single declarative config file.</p>
-        <div class="tech-tags">
-          <span>Go</span>
-          <span>Git</span>
-          <span>CLI</span>
-        </div>
-        <a href="#" class="project-link">View project →</a>
-      </article>
-    </div>
-  </section>
+  <!--
+    LAYOUT/DESIGN NOTES — projects + skills (content removed for now, CSS kept in styles.css):
 
-  <section class="skills wrap">
-    <h2>Skills</h2>
-    <div class="skill-pills">
-      <!-- TODO: replace with real skills -->
-      <span class="skill-pill">JavaScript</span>
-      <span class="skill-pill">TypeScript</span>
-      <span class="skill-pill">Python</span>
-      <span class="skill-pill">React</span>
-      <span class="skill-pill">Node.js</span>
-      <span class="skill-pill">SQL</span>
-      <span class="skill-pill">Git</span>
-    </div>
-  </section>
+    Projects section:
+      <section class="projects wrap">
+        <h2>Projects</h2>
+        <div class="project-grid">   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px
+          <article class="project-card">   background #141416, border-radius var(--radius), hover lift
+            <h3>Name</h3>
+            <p>One-sentence description.</p>
+            <div class="tech-tags"><span>Tag</span>...</div>   small outlined chips
+            <a href="..." class="project-link">View project →</a>   cool accent var(--accent-tech)
+          </article>
+          ... one card per real project
+        </div>
+      </section>
+
+    Skills section:
+      <section class="skills wrap">
+        <h2>Skills</h2>
+        <div class="skill-pills">   wrapping flex row
+          <span class="skill-pill">Skill</span>...   muted 1px border, border-radius 999px, small text
+        </div>
+      </section>
+
+    Full spec: docs/prd.md "Tech". All classes above are already styled in styles.css.
+  -->
 </body>
 </html>
