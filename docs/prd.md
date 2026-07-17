@@ -28,15 +28,15 @@ assets/         photos (photo-01..08.jpg) + hero.jpg (AI-generated split-lightin
 
 ### Home (`index.html`)
 - **Top nav**: site-wide, same markup on all 3 pages. Left: wordmark "JOSEPH" (links to index). Right: links Home / Art / Tech. Current page link visually distinct. Nav is a plain flex row, sticky top, translucent dark background with backdrop blur.
-- **Hero**: `assets/hero.jpg` — a portrait lit warm on the left half, cool on the right half. Displayed large and centered (max-height ~70vh, rounded). Headline above or overlaid: "Two sides. One lens." Subline: "Art & engineering, by Joseph."
-- **Duality CTAs**: directly under the hero, two large arrow links side by side:
+- **Hero** (full-bleed, reference: Mobbin/Adobe Express portfolio hero): a full-viewport section (100svh minus nav) with `assets/hero.jpg` as its background (a portrait lit warm on the left half, cool on the right half), `background-size: cover`, `background-position: center top`. Overlaid, centered vertically at ~55% height: the name "JOSEPH" in oversized type (`clamp(3.5rem, 14vw, 10rem)`, weight 700, letter-spacing 0.05em, white, subtle text-shadow for legibility). Beneath it, small-caps tagline: "Two sides. One lens." in muted text. A bottom gradient scrim (transparent → `#0a0a0b`) blends the hero into the page.
+- **Duality CTAs**: overlaid at the bottom of the hero (above the scrim), two large arrow links side by side with space between:
   - Left: "← Art" → `art.html`, warm accent color.
   - Right: "Tech →" → `tech.html`, cool accent color.
   - On hover each grows slightly and its arrow slides outward (CSS transition only).
-- Mobile (<700px): CTAs stack vertically, hero full-width.
+- Mobile (<700px): name type scales down via clamp; CTAs stack vertically.
 
 ### Art (`art.html`)
-- Same nav. Page title "Art" with warm accent underline, one-line intro.
+- Same nav. Small uppercase eyebrow label "GALLERY" in muted text (reference: Mobbin/Siena Film Foundation gallery), then page title "Art" with warm accent underline, one-line intro. Generous vertical whitespace — let the photos float in the dark.
 - Photo grid of `assets/photo-01.jpg` … `photo-08.jpg`: CSS `columns` masonry (3 cols desktop, 2 tablet, 1 mobile), 12px gaps, rounded images, subtle hover lift.
 - Each image wrapped in `<a href>` to the full file (native full view; no lightbox JS).
 - Meaningful alt text on every image.
