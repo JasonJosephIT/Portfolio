@@ -1,4 +1,4 @@
-# PRD — Joseph's Portfolio Site
+# PRD — Jason's Portfolio Site
 
 ## What this is
 A personal portfolio site with two halves reflecting the owner's duality: **art** (photography) and **tech** (software). Three pages, static, no backend.
@@ -27,8 +27,8 @@ assets/         photos (photo-01..08.jpg) + hero.jpg (AI-generated split-lightin
 ## Pages
 
 ### Home (`index.html`)
-- **Top nav**: site-wide, same markup on all 3 pages. Left: wordmark "JOSEPH" (links to index). Right: links Home / Art / Tech. Current page link visually distinct. Nav is a plain flex row, sticky top, translucent dark background with backdrop blur.
-- **Hero** (full-bleed, reference: Mobbin/Adobe Express portfolio hero): a full-viewport section (100svh minus nav) with `assets/hero.jpg` as its background (a portrait lit warm on the left half, cool on the right half), `background-size: cover`, `background-position: center top`. Overlaid, centered vertically at ~55% height: the name "JOSEPH" in oversized type (`clamp(3.5rem, 14vw, 10rem)`, weight 700, letter-spacing 0.05em, white, subtle text-shadow for legibility). Beneath it, small-caps tagline: "Man is not truly one, but truly two." in muted text. A bottom gradient scrim (transparent → `#0a0a0b`) blends the hero into the page.
+- **Top nav**: site-wide, same markup on all 3 pages. Left: wordmark "JASON" (links to index). Right: links Home / Art / Tech. Current page link visually distinct. Nav is a plain flex row, sticky top, translucent dark background with backdrop blur.
+- **Hero** (full-bleed, reference: Mobbin/Adobe Express portfolio hero): a full-viewport section (100svh minus nav) with `assets/hero.jpg` as its background (a portrait lit warm on the left half, cool on the right half), `background-size: cover`, `background-position: center top`. Overlaid, centered vertically at ~55% height: the name "JASON" in oversized type (`clamp(3.5rem, 14vw, 10rem)`, weight 700, letter-spacing 0.05em, white, subtle text-shadow for legibility). Beneath it, small-caps tagline: "Man is not truly one, but truly two." in muted text. A bottom gradient scrim (transparent → `#0a0a0b`) blends the hero into the page.
 - **Duality CTAs**: overlaid at the bottom of the hero (above the scrim), two large arrow links side by side with space between:
   - Left: "← Art" → `art.html`, warm accent color.
   - Right: "Tech →" → `tech.html`, cool accent color.
