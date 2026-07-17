@@ -119,7 +119,7 @@ body.tech .site-nav .nav-links a.current {
   min-height: calc(100svh - var(--nav-height));
   background-image: url("assets/hero.jpg");
   background-size: cover;
-  background-position: center top;
+  background-position: center 38%; /* keep the face in frame on wide viewports */
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
