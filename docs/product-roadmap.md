@@ -1,6 +1,6 @@
 # Product Roadmap — Joseph's Portfolio
 
-**Status:** 2/3 tasks complete
+**Status:** 3/3 tasks complete
 **Current Phase:** Phase 1 — Build
 
 Reference: `docs/prd.md` (whole file — it's short).
@@ -14,6 +14,6 @@ Goal: all three pages live, styled, linked, and passing the PRD acceptance check
 - [x] Task 2: Art page
   - Files: `art.html` (+ additions to `styles.css` only if needed)
   - Notes: Per PRD "Art". Reuse nav markup from index.html verbatim (adjust the current-page class). Photos are assets/photo-01.jpg … photo-08.jpg. Verify: grid reflows 3/2/1 columns at 1280/768/375px; every image loads and links to its file.
-- [ ] Task 3: Tech page
+- [x] Task 3: Tech page
   - Files: `tech.html` (+ additions to `styles.css` only if needed)
   - Notes: Per PRD "Tech". Reuse nav markup verbatim (adjust current-page class). Placeholder content carries TODO comments. Verify: cards reflow at breakpoints; pills wrap on mobile.
