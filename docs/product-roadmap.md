@@ -1,6 +1,6 @@
 # Product Roadmap — Joseph's Portfolio
 
-**Status:** 0/3 tasks complete
+**Status:** 1/3 tasks complete
 **Current Phase:** Phase 1 — Build
 
 Reference: `docs/prd.md` (whole file — it's short).
@@ -8,7 +8,7 @@ Reference: `docs/prd.md` (whole file — it's short).
 ## Phase 1 — Build
 Goal: all three pages live, styled, linked, and passing the PRD acceptance checks.
 
-- [ ] Task 1: Foundation + Home page
+- [x] Task 1: Foundation + Home page
   - Files: `index.html`, `styles.css`
   - Notes: Implement the design tokens, shared nav, hero (`assets/hero.jpg`), and duality CTAs per PRD "Home". styles.css must also carry the shared styles (nav, page title, tokens) the other two pages will reuse — but do NOT create art.html/tech.html. Verify: open index.html in a browser at 375/768/1280px; no horizontal scroll, hover states work, both CTAs link to art.html and tech.html (they will 404 until Tasks 2–3 — that's fine).
 - [ ] Task 2: Art page
