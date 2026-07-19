@@ -51,5 +51,9 @@
 
     Full spec: docs/prd.md "Tech". All classes above are already styled in styles.css.
   -->
+
+  <script type="module">
+    if (new URLSearchParams(location.search).has("edit")) import("./admin/edit.js");
+  </script>
 </body>
 </html>

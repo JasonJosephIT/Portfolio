@@ -34,5 +34,9 @@
   -->
   <section class="gallery wrap">
   </section>
+
+  <script type="module">
+    if (new URLSearchParams(location.search).has("edit")) import("./admin/edit.js");
+  </script>
 </body>
 </html>
