@@ -4,7 +4,8 @@ import "https://cdn.jsdelivr.net/npm/interactjs@1.10.27/dist/interact.min.js";
 
 const sb = getClient();
 const page = location.pathname.split("/").pop() || "index.html";
-const container = document.querySelector(page === "art.html" ? ".gallery" : ".projects .project-grid, .page-title");
+const grid = page === "art.html" ? null : document.querySelector(".projects .project-grid");
+const container = page === "art.html" ? document.querySelector(".gallery") : (grid ?? document.querySelector(".page-title"));
 const publicUrl = (p) => `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${p}`;
 
 const { data: { session } } = await sb.auth.getSession();
@@ -78,17 +79,18 @@ function placeOnPage(sub, thumb) {
     for (let i = 0; i < siblings.length; i++) {
       if (siblings[i].getBoundingClientRect().top <= iRect.top) after = i + 1;
     }
+    const containerSel = page === "art.html" ? ".gallery" : ".project-grid";
+    const usingFallback = page !== "art.html" && !grid;
     const spec = {
       page,
-      container: page === "art.html" ? ".gallery" : ".project-grid",
-      after_selector: after ? `${spec_container_sel()} > :nth-child(${after})` : null,
+      container: containerSel,
+      after_selector: usingFallback ? null : (after ? `${containerSel} > :nth-child(${after})` : null),
       x_pct: +(((dx) / cRect.width) * 100).toFixed(1),
       y_px: Math.round(dy),
       width_pct: +((iRect.width / cRect.width) * 100).toFixed(1),
       free_position: Math.abs(dx) > cRect.width * 0.1 || Math.abs(dy) > 80,
-      notes: "",
+      notes: usingFallback ? "project-grid absent at placement; offsets measured against .page-title" : "",
     };
-    function spec_container_sel() { return page === "art.html" ? ".gallery" : ".project-grid"; }
 
     const { error } = await sb.from("submissions")
       .update({ layout: spec, status: "ready_to_place" })
