@@ -1,6 +1,6 @@
 # Portfolio Submission & Agent Placement Pipeline — Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add a submission backend (Supabase) and a drag-to-place edit mode to Jason's static portfolio, plus a standing `/place-image` Claude Code command that orchestrates subagents to bake each placed image into the HTML/CSS with the exact size and position Jason chose.
 
@@ -29,7 +29,7 @@
 **Interfaces:**
 - Produces: git repo on branch `feat/submission-pipeline`; directory layout all later tasks rely on.
 
-- [ ] **Step 1: Initialize repo and branch**
+- [x] **Step 1: Initialize repo and branch**
 
 ```bash
 git init
@@ -37,7 +37,7 @@ git checkout -b feat/submission-pipeline
 mkdir -p admin scripts .claude/commands docs assets
 ```
 
-- [ ] **Step 2: Create `.gitignore`**
+- [x] **Step 2: Create `.gitignore`**
 
 ```gitignore
 .env
@@ -45,14 +45,14 @@ node_modules/
 .DS_Store
 ```
 
-- [ ] **Step 3: Commit the existing site**
+- [x] **Step 3: Commit the existing site**
 
 ```bash
 git add index.html art.html tech.html styles.css .gitignore
 git commit -m "chore: baseline static portfolio"
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run: `git log --oneline` → one commit; `ls admin scripts .claude/commands` → dirs exist.
 
@@ -66,7 +66,7 @@ Run: `git log --oneline` → one commit; `ls admin scripts .claude/commands` →
 **Interfaces:**
 - Produces: table `public.submissions` and public storage bucket `portfolio-inbox`. All later tasks use these exact names and columns.
 
-- [ ] **Step 1: Write `docs/supabase-schema.sql`**
+- [x] **Step 1: Write `docs/supabase-schema.sql`**
 
 ```sql
 create table if not exists public.submissions (
@@ -103,14 +103,14 @@ create policy "inbox auth write" on storage.objects
   for insert to authenticated with check (bucket_id = 'portfolio-inbox');
 ```
 
-- [ ] **Step 2: Apply it** via Supabase MCP `apply_migration` (name: `submissions_pipeline`) or SQL editor, verbatim.
+- [x] **Step 2: Apply it** via Supabase MCP `apply_migration` (name: `submissions_pipeline`) or SQL editor, verbatim.
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 Run (Supabase `execute_sql`): `select column_name from information_schema.columns where table_name='submissions' order by 1;`
 Expected: `created_at, description, id, image_path, kind, layout, link_url, status, tags, target_page, title`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add docs/supabase-schema.sql
@@ -128,7 +128,7 @@ git commit -m "feat: supabase submissions schema + inbox bucket"
 - Consumes: `submissions` table + `portfolio-inbox` bucket (Task 2).
 - Produces: `admin/config.js` exporting `getClient()` — reused verbatim by Task 4. Rows inserted with `status='submitted'`.
 
-- [ ] **Step 1: Write `admin/config.js`**
+- [x] **Step 1: Write `admin/config.js`**
 
 ```js
 // admin/config.js — shared Supabase client (anon key is safe to embed; RLS guards writes)
@@ -147,7 +147,7 @@ export function getClient() {
 
 (Implementer: fetch the real URL + anon key via Supabase MCP `get_project_url` / `get_publishable_keys` and paste them in.)
 
-- [ ] **Step 2: Write `admin/index.html`**
+- [x] **Step 2: Write `admin/index.html`**
 
 ```html
 <!DOCTYPE html>
@@ -197,7 +197,7 @@ export function getClient() {
 </html>
 ```
 
-- [ ] **Step 3: Write `admin/submit.js`**
+- [x] **Step 3: Write `admin/submit.js`**
 
 ```js
 import { getClient, BUCKET } from "./config.js";
@@ -250,12 +250,12 @@ $("submit-form").addEventListener("submit", async (e) => {
 });
 ```
 
-- [ ] **Step 4: Verify manually**
+- [x] **Step 4: Verify manually**
 
 Run: `python3 -m http.server 8080`, open `http://localhost:8080/admin/`, sign in, submit a test photo.
 Expected: row in `submissions` with `status='submitted'` (check via Supabase `execute_sql`: `select id, title, status, image_path from submissions;`) and object in `portfolio-inbox`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add admin/
@@ -289,7 +289,7 @@ git commit -m "feat: admin submit page with magic-link auth and storage upload"
 
 `after_selector` = the existing child the image was dropped after (`null` = first). `x_pct`/`y_px` = offset of the dropped image from where normal flow would put it; `width_pct` = width relative to the container. `free_position: true` means Jason dragged it well outside normal flow and wants an absolute/offset treatment.
 
-- [ ] **Step 1: Add the loader guard** to `art.html` and `tech.html`, immediately before `</body>`:
+- [x] **Step 1: Add the loader guard** to `art.html` and `tech.html`, immediately before `</body>`:
 
 ```html
   <script type="module">
@@ -297,7 +297,7 @@ git commit -m "feat: admin submit page with magic-link auth and storage upload"
   </script>
 ```
 
-- [ ] **Step 2: Write `admin/edit.js`**
+- [x] **Step 2: Write `admin/edit.js`**
 
 ```js
 // admin/edit.js — drag-to-place overlay. Loaded only via ?edit=1.
@@ -401,16 +401,16 @@ function placeOnPage(sub, thumb) {
 }
 ```
 
-- [ ] **Step 3: Verify manually**
+- [x] **Step 3: Verify manually**
 
 Serve locally, open `http://localhost:8080/art.html?edit=1` (after signing in at `/admin/`). Drag/resize the pending image, click save.
 Expected: `select layout, status from submissions where status='ready_to_place';` shows the spec JSON.
 
-- [ ] **Step 4: Verify guard is inert for visitors**
+- [x] **Step 4: Verify guard is inert for visitors**
 
 Run: `curl -s http://localhost:8080/art.html | grep -c "edit.js"` → `1` (the guard only; no network fetch of edit.js happens without `?edit=1` — confirm in DevTools Network tab).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add admin/edit.js art.html tech.html
@@ -428,14 +428,14 @@ git commit -m "feat: drag-to-place edit mode writing layout specs to supabase"
 - Consumes: rows with `status='ready_to_place'` and the layout spec shape from Task 4.
 - Produces: `scripts/fetch-pending.mjs` prints JSON `[{id, kind, title, description, tags, link_url, image_path, layout, local_image}]` and downloads each image to `assets/`; `scripts/mark-placed.mjs <id>` flips status to `'placed'`. The slash command is the orchestration contract Claude Code follows at runtime.
 
-- [ ] **Step 1: Write `.env.example`**
+- [x] **Step 1: Write `.env.example`**
 
 ```bash
 SUPABASE_URL=https://YOURPROJECT.supabase.co
 SUPABASE_SERVICE_KEY=service-role-key-here
 ```
 
-- [ ] **Step 2: Write `scripts/fetch-pending.mjs`**
+- [x] **Step 2: Write `scripts/fetch-pending.mjs`**
 
 ```js
 // Usage: node scripts/fetch-pending.mjs
@@ -468,7 +468,7 @@ for (const r of rows) {
 console.log(JSON.stringify(out, null, 2));
 ```
 
-- [ ] **Step 3: Write `scripts/mark-placed.mjs`**
+- [x] **Step 3: Write `scripts/mark-placed.mjs`**
 
 ```js
 // Usage: node scripts/mark-placed.mjs <submission-id>
@@ -483,7 +483,7 @@ const res = await fetch(`${URL_}/rest/v1/submissions?id=eq.${id}`, {
 console.log(res.ok ? `placed: ${id}` : `failed: ${res.status}`);
 ```
 
-- [ ] **Step 4: Write `.claude/commands/place-image.md`** — the runtime orchestration contract:
+- [x] **Step 4: Write `.claude/commands/place-image.md`** — the runtime orchestration contract:
 
 ```markdown
 # /place-image — bake pending placements into the site
@@ -521,12 +521,12 @@ SAME page run sequentially.
 7. Report: table of title → page → commit hash, and anything skipped.
 ```
 
-- [ ] **Step 5: Verify scripts**
+- [x] **Step 5: Verify scripts**
 
 Run: `cp .env.example .env` (fill real values), then `node scripts/fetch-pending.mjs`.
 Expected: JSON array with the Task 4 test row, image file in `assets/`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/ .claude/commands/place-image.md .env.example
@@ -544,19 +544,19 @@ git commit -m "feat: place-image orchestration command and supabase scripts"
 - Consumes: everything above.
 - Produces: proof the whole loop works; the Task 4 test submission rendered on the live page.
 
-- [ ] **Step 1: Run the loop**
+- [x] **Step 1: Run the loop**
 
 In Claude Code: `/place-image`. Expected: subagent dispatched, image inserted, status flipped to `placed`, commit created.
 
-- [ ] **Step 2: Visual check**
+- [x] **Step 2: Visual check**
 
 Serve locally, open the target page with no query params. Expected: image appears at the saved size/position, hover lift works, no admin UI visible.
 
-- [ ] **Step 3: Confirm idempotence**
+- [x] **Step 3: Confirm idempotence**
 
 Run `/place-image` again. Expected: "nothing to place".
 
-- [ ] **Step 4: Merge**
+- [x] **Step 4: Merge**
 
 Use superpowers:finishing-a-development-branch to merge `feat/submission-pipeline`.
 
