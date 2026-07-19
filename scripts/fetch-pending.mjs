@@ -12,7 +12,7 @@ const rows = await (await fetch(
 )).json();
 
 const existing = await readdir("assets").catch(() => []);
-let n = existing.filter((f) => /^photo-\d+\.jpg$/.test(f))
+let n = existing.filter((f) => /^photo-(\d+)\.\w+$/.test(f))
   .reduce((m, f) => Math.max(m, +f.match(/\d+/)[0]), 0);
 
 const out = [];
@@ -22,6 +22,10 @@ for (const r of rows) {
     ? `assets/photo-${String(++n).padStart(2, "0")}.${ext}`
     : `assets/project-${r.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.${ext}`;
   const img = await fetch(`${URL_}/storage/v1/object/public/portfolio-inbox/${r.image_path}`);
+  if (!img.ok) {
+    console.error(`Skipping submission ${r.id} (${r.title}): download failed with HTTP ${img.status}`);
+    continue;
+  }
   await writeFile(local, Buffer.from(await img.arrayBuffer()));
   out.push({ ...r, local_image: local });
 }
