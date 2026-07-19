@@ -1,3 +1,6 @@
 .DS_Store
 .superpowers/
-.claude/
+.claude/*
+!.claude/commands/
+.env
+node_modules/
