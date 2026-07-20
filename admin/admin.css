@@ -1,0 +1,232 @@
+/* Shared admin styles — tokens come from ../styles.css */
+
+.admin-wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 calc(var(--space) * 3) calc(var(--space) * 8);
+}
+
+/* Top bar */
+.admin-nav {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space) * 3);
+  height: var(--nav-height);
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 calc(var(--space) * 3);
+}
+
+.admin-nav .wordmark {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  margin-right: auto;
+}
+
+.admin-nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+}
+
+.admin-nav a:hover {
+  color: var(--text);
+}
+
+.admin-nav a.current {
+  color: var(--text);
+  border-bottom-color: var(--accent-art);
+}
+
+.admin-nav button {
+  background: none;
+  border: 1px solid var(--muted);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.admin-nav button:hover {
+  color: var(--text);
+  border-color: var(--text);
+}
+
+/* Forms */
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 1.5);
+  margin-top: calc(var(--space) * 3);
+}
+
+.admin-form input,
+.admin-form textarea,
+.admin-form select {
+  background: #141416;
+  color: var(--text);
+  border: 1px solid var(--muted);
+  border-radius: var(--radius);
+  padding: 10px;
+  font: inherit;
+}
+
+.admin-form button {
+  background: var(--accent-art);
+  color: #000;
+  border: 0;
+  border-radius: var(--radius);
+  padding: 12px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-status {
+  color: var(--muted);
+  min-height: 1.5em;
+}
+
+/* Dashboard cards */
+.admin-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: calc(var(--space) * 2);
+  margin-top: calc(var(--space) * 3);
+}
+
+.admin-card {
+  display: block;
+  background: #141416;
+  border-radius: var(--radius);
+  padding: calc(var(--space) * 3);
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.admin-card:hover {
+  transform: translateY(-4px);
+}
+
+.admin-card h2 {
+  margin: 0 0 var(--space);
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+
+.admin-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Kind toggle */
+.kind-toggle {
+  display: flex;
+  gap: var(--space);
+  margin: calc(var(--space) * 3) 0 calc(var(--space) * 2);
+}
+
+.kind-toggle button {
+  background: none;
+  border: 1px solid var(--muted);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.kind-toggle button.active {
+  color: #000;
+  background: var(--accent-art);
+  border-color: var(--accent-art);
+}
+
+.kind-toggle button.active[data-kind="project"] {
+  background: var(--accent-tech);
+  border-color: var(--accent-tech);
+}
+
+/* Submission list */
+.sub-list {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 1.5);
+}
+
+.sub-row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space) * 2);
+  background: #141416;
+  border-radius: var(--radius);
+  padding: calc(var(--space) * 1.5);
+}
+
+.sub-row img,
+.sub-row .no-thumb {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: calc(var(--radius) / 2);
+  flex-shrink: 0;
+}
+
+.sub-row .no-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1c1c1f;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.sub-row .sub-meta {
+  min-width: 0;
+}
+
+.sub-row h3 {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.sub-row p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sub-row .badge {
+  margin-left: auto;
+  flex-shrink: 0;
+  border: 1px solid var(--muted);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+}
+
+.sub-row .badge.ready_to_place {
+  color: var(--accent-art);
+  border-color: var(--accent-art);
+}
+
+.sub-row .badge.placed {
+  color: var(--accent-tech);
+  border-color: var(--accent-tech);
+}
+
+.sub-empty {
+  color: var(--muted);
+  padding: calc(var(--space) * 3) 0;
+}

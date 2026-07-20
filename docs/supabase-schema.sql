@@ -15,8 +15,10 @@ create table if not exists public.submissions (
 
 alter table public.submissions enable row level security;
 
-create policy "public read" on public.submissions
-  for select using (true);
+-- Reads require sign-in (tightened 2026-07-20, migration submissions_read_authenticated;
+-- originally "public read"). The service-role key used by scripts/ bypasses RLS.
+create policy "authenticated read" on public.submissions
+  for select to authenticated using (true);
 create policy "authenticated insert" on public.submissions
   for insert to authenticated with check (true);
 create policy "authenticated update" on public.submissions

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Jason — Submissions</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="../admin.css">
+</head>
+<body>
+  <nav class="admin-nav">
+    <a href="../../index.html" class="wordmark">JASON</a>
+    <a href="../dashboard/">Dashboard</a>
+    <a href="./" class="current">Submissions</a>
+    <a href="../assets/">Assets</a>
+    <a href="../projects/">Projects</a>
+    <button id="signout">Sign out</button>
+  </nav>
+
+  <div class="page-title">
+    <span class="eyebrow">Admin</span>
+    <h1>Submissions</h1>
+    <p>Add a photo or project to the inbox, then place it on the page with ?edit=1.</p>
+  </div>
+
+  <div class="admin-wrap">
+    <form class="admin-form" id="submit-form">
+      <select id="kind">
+        <option value="photo">Photo (Art)</option>
+        <option value="project">Project (Tech)</option>
+      </select>
+      <input type="text" id="title" placeholder="Title" required>
+      <textarea id="description" rows="2" placeholder="Description"></textarea>
+      <input type="text" id="tags" placeholder="tags, comma, separated">
+      <input type="url" id="link_url" placeholder="Project link (projects only)">
+      <input type="file" id="image" accept="image/*">
+      <button type="submit">Submit</button>
+      <p class="admin-status" id="status"></p>
+    </form>
+
+    <div id="list-root">
+      <div class="kind-toggle">
+        <button type="button" data-kind="photo">Photos</button>
+        <button type="button" data-kind="project">Projects</button>
+      </div>
+      <div class="sub-list"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { requireAuth, signOut } from "../auth.js";
+    import { createList } from "../list.js";
+    import "../submit.js";
+    await requireAuth();
+    document.getElementById("signout").addEventListener("click", () => signOut());
+
+    const list = createList(document.getElementById("list-root"), { kind: "photo" });
+    document.addEventListener("submission:created", () => list.refresh());
+  </script>
+</body>
+</html>

@@ -10,7 +10,7 @@ const publicUrl = (p) => `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${p
 
 const { data: { session } } = await sb.auth.getSession();
 if (!session) {
-  alert("Not signed in. Open /admin/ first, sign in, then reload with ?edit=1.");
+  alert("Not signed in. Sign in at /admin/login/ first, then reload with ?edit=1.");
   throw new Error("no session");
 }
 

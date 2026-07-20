@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Jason — Admin Dashboard</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="../admin.css">
+</head>
+<body>
+  <nav class="admin-nav">
+    <a href="../../index.html" class="wordmark">JASON</a>
+    <a href="./" class="current">Dashboard</a>
+    <a href="../submissions/">Submissions</a>
+    <a href="../assets/">Assets</a>
+    <a href="../projects/">Projects</a>
+    <button id="signout">Sign out</button>
+  </nav>
+
+  <div class="page-title">
+    <span class="eyebrow">Admin</span>
+    <h1>Dashboard</h1>
+    <p id="summary">Loading…</p>
+  </div>
+
+  <div class="admin-wrap">
+    <div class="admin-cards">
+      <a class="admin-card" href="../submissions/">
+        <h2>Submissions</h2>
+        <p>Submit a new photo or project, and browse everything in the inbox.</p>
+      </a>
+      <a class="admin-card" href="../assets/">
+        <h2>Assets</h2>
+        <p>Photos submitted for the Art page.</p>
+      </a>
+      <a class="admin-card" href="../projects/">
+        <h2>Projects</h2>
+        <p>Projects submitted for the Tech page.</p>
+      </a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { requireAuth, signOut } from "../auth.js";
+    import { getClient } from "../config.js";
+    await requireAuth();
+    document.getElementById("signout").addEventListener("click", () => signOut());
+
+    const { data: rows, error } = await getClient()
+      .from("submissions").select("kind,status");
+    const el = document.getElementById("summary");
+    if (error || !rows) {
+      el.textContent = "Couldn't load counts.";
+    } else {
+      const photos = rows.filter((r) => r.kind === "photo").length;
+      const projects = rows.filter((r) => r.kind === "project").length;
+      const pending = rows.filter((r) => r.status !== "placed").length;
+      el.textContent = `${photos} photo${photos === 1 ? "" : "s"} · ${projects} project${projects === 1 ? "" : "s"} · ${pending} awaiting placement`;
+    }
+  </script>
+</body>
+</html>

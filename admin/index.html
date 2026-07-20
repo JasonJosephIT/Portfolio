@@ -3,43 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jason — Submit</title>
+  <meta name="robots" content="noindex">
+  <title>Jason — Admin</title>
   <link rel="stylesheet" href="../styles.css">
-  <style>
-    .admin-form { max-width: 480px; margin: 0 auto; padding: 24px;
-      display: flex; flex-direction: column; gap: 12px; }
-    .admin-form input, .admin-form textarea, .admin-form select {
-      background:#141416; color:var(--text); border:1px solid var(--muted);
-      border-radius:var(--radius); padding:10px; font:inherit; }
-    .admin-form button { background:var(--accent-art); color:#000; border:0;
-      border-radius:var(--radius); padding:12px; font-weight:700; cursor:pointer; }
-    #status { color: var(--muted); min-height: 1.5em; }
-  </style>
+  <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-  <div class="page-title">
-    <span class="eyebrow">Admin</span>
-    <h1>Submit</h1>
-    <p>Add a photo or project to the inbox, then place it with ?edit=1.</p>
+  <div class="admin-wrap">
+    <p class="admin-status">Redirecting…</p>
   </div>
-
-  <form class="admin-form" id="submit-form">
-    <div id="auth-block">
-      <input type="email" id="email" placeholder="you@email.com">
-      <button type="button" id="send-link">Send magic link</button>
-    </div>
-    <select id="kind">
-      <option value="photo">Photo (Art)</option>
-      <option value="project">Project (Tech)</option>
-    </select>
-    <input type="text" id="title" placeholder="Title" required>
-    <textarea id="description" rows="2" placeholder="Description"></textarea>
-    <input type="text" id="tags" placeholder="tags, comma, separated">
-    <input type="url" id="link_url" placeholder="Project link (projects only)">
-    <input type="file" id="image" accept="image/*">
-    <button type="submit">Submit</button>
-    <p id="status"></p>
-  </form>
-  <script type="module" src="submit.js"></script>
+  <script type="module">
+    import { getClient } from "./config.js";
+    const { data: { session } } = await getClient().auth.getSession();
+    location.replace(session ? "dashboard/" : "login/");
+  </script>
 </body>
 </html>

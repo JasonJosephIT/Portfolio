@@ -1,28 +1,15 @@
+// admin/submit.js — submit-form handler. The page that includes this is
+// already auth-gated (requireAuth); the session check here is a backstop.
 import { getClient, BUCKET } from "./config.js";
 
 const sb = getClient();
 const $ = (id) => document.getElementById(id);
 const status = (msg) => ($("status").textContent = msg);
 
-async function refreshAuth() {
-  const { data: { session } } = await sb.auth.getSession();
-  $("auth-block").style.display = session ? "none" : "block";
-  return session;
-}
-refreshAuth();
-sb.auth.onAuthStateChange(refreshAuth);
-
-$("send-link").addEventListener("click", async () => {
-  const { error } = await sb.auth.signInWithOtp({
-    email: $("email").value,
-    options: { emailRedirectTo: location.href },
-  });
-  status(error ? error.message : "Magic link sent — check your email.");
-});
-
 $("submit-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-  if (!(await refreshAuth())) return status("Sign in first.");
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return status("Session expired — sign in again at /admin/login/.");
 
   const kind = $("kind").value;
   const file = $("image").files[0];
@@ -44,5 +31,8 @@ $("submit-form").addEventListener("submit", async (e) => {
     link_url: $("link_url").value || null,
   });
   status(error ? `Insert failed: ${error.message}` : "Submitted ✓ — open the page with ?edit=1 to place it.");
-  if (!error) e.target.reset();
+  if (!error) {
+    e.target.reset();
+    document.dispatchEvent(new CustomEvent("submission:created"));
+  }
 });
