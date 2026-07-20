@@ -295,11 +295,6 @@ body.tech .site-nav .nav-links a.current {
   }
 }
 
-/* Photo-01: wide variant. CSS columns constraint prevents exceeding column width; width set to 100% (column-fill). */
-.gallery .photo-01 {
-  width: 100%;
-}
-
 /* ==========================================================================
    Projects & Skills (tech.html)
    ========================================================================== */
