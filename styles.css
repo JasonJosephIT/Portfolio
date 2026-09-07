@@ -76,10 +76,42 @@ button:focus-visible {
 }
 
 .site-nav .wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
   font-weight: 700;
   letter-spacing: -0.02em;
   text-decoration: none;
   font-size: 1.1rem;
+}
+
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: grayscale(1) brightness(0) invert(1);
+}
+
+/* Decorative texture sits behind content, never over photographs or controls. */
+body.patterned {
+  background: #000;
+  min-height: 100svh;
+  position: relative;
+  isolation: isolate;
+}
+
+body.patterned::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("assets/wave-pattern.svg");
+  background-repeat: repeat;
+  background-size: 552px 304px;
+  filter: grayscale(1) brightness(0) invert(1);
+  opacity: 0.04;
 }
 
 .site-nav .nav-links {
