@@ -153,6 +153,20 @@ rendered), `technologies` (non-blank, no duplicates), `liveUrl`,
 must be unique within its own list. The transforms keep each list renumbered
 `0..n-1`.
 
+**`moveCurated`'s `index` addresses the order-sorted list, not the stored
+array position.** Before indexing, `moveCurated` sorts the collection's
+entries by their stored `order` value (ascending), and `index` is a position
+into *that* sorted sequence — the same order `publishedPortfolio` and a
+rendered curated list would show. It is not `Array.prototype.indexOf` on the
+document's `artFavorites`/`techStarred` array as stored on disk. On a
+document whose stored array happens to already be in ascending `order`
+sequence the two coincide, but on a hand-edited document where the stored
+array order and the `order` field have drifted apart, `document.artFavorites
+.indexOf(entry)` addresses the wrong row. A caller must compute `index` from
+the same order-sorted view it is displaying (for example, the index of the
+target entry after sorting the collection by `order`), never from the raw
+stored array position.
+
 ### Styles
 
 `{ id, name, description? }`. Ids follow the record id rules and are unique
@@ -191,13 +205,56 @@ would break subdirectory hosting), backslashes, dotfiles such as `.env`, and
 anything a browser could read as a scheme. Importers and editors must produce
 paths in that form.
 
+The character class is exhaustive, not illustrative: a local path may contain
+**only** those characters, in those positions. That silently excludes some
+things a naive path might contain, and it is fail-closed on purpose rather
+than an oversight:
+
+- **No query string or fragment.** `assets/foo.jpg?v=2` and `assets/foo.jpg#a`
+  both return `null`, because `?` and `#` are not in the allowed character
+  set. Cache-busting or anchor-style suffixes on a local asset path do not
+  work here; if a version needs expressing, put it in the filename itself
+  (`assets/foo.v2.jpg`).
+- **ASCII only, no spaces.** `assets/Foo Bar.jpg` and `assets/café.jpg` both
+  return `null` — the space and the accented `é` are outside the allowed
+  character set. A local asset path must be pure ASCII with no whitespace.
+
+Consequence for Task 3: the importer must never pass a filename through to a
+local asset path unchanged. It must ASCII-slugify any filename that contains
+spaces, accented or non-ASCII characters, or a query string/fragment (for
+example `Café Bar.jpg` → `cafe-bar.jpg`) before writing it into `src`,
+otherwise `safeUrl` rejects the record and the image is dropped from the
+published projection rather than rendered.
+
 **Prototype-pollution keys** — `__proto__`, `constructor`, `prototype` — are
 rejected as ids, slugs and style ids, are reported by `validatePortfolio`
 wherever they appear as an object key in the document, and are stripped by the
 clone that every transform and the published projection perform.
 
-Validation is not an HTML escaper. Titles, captions, summaries, sections and
-`about` are arbitrary text and **must** be escaped by the renderer.
+Validation is not an HTML escaper. The rule for the renderer is structural,
+not a list of field names: **every string field in `publishedPortfolio`'s
+output must be treated as arbitrary, unescaped text and HTML-escaped before
+it is rendered, except `id`, `slug`, `src` (on an image and on each entry of
+`sources`), `liveUrl` and `repositoryUrl`** — those are already constrained
+by the id/slug patterns or by `safeUrl`, so they are safe to place in `href`,
+`src` or route-building code as-is. Numeric fields (`width`, `height`,
+`order`, `focalPoint.x`, `focalPoint.y`) are constrained to numbers and never
+need escaping. Do not special-case this list by field name in the renderer;
+treat it as "escape every string except the six named above," because it is
+easy for a new free-text field to be added later and be missed by an
+enumeration. That currently includes, but is not limited to: `title`,
+`caption`, `summary`, `about`, `sections[].title`, `sections[].body`,
+`technologies[]`, `contacts[].label`, `styles[].name`,
+`styles[].description`, `medium`, `dimensions`, `year`, `role`, and
+`image.alt` (on a piece's `image`, a project's `cover`, and each of a tech
+project's `screenshots`).
+
+`alt` needs particular care: unlike every other free-text field, which
+typically lands inside an HTML element's text content, `alt` is rendered
+inside an HTML **attribute** (`<img alt="…">`). A bare `"` in an unescaped
+`alt` value breaks out of the attribute, so `alt` must be escaped with an
+attribute-safe escaper (one that also encodes `"` and `'`, not just `<`,
+`>` and `&`), not merely the escaper used for element text content.
 
 ## Publication, membership and curation rules
 

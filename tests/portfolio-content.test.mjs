@@ -333,6 +333,21 @@ describe('validatePortfolio: drafts', () => {
  * ------------------------------------------------------------------ */
 
 describe('validatePortfolio: publication requirements', () => {
+  it('passes markup in title and alt through unchanged: validation is not an escaper', () => {
+    // FIXTURE — deliberately hostile-looking strings, never rendered by this test.
+    const markupTitle = '<script>alert(1)</script>';
+    const markupAlt = 'Fixture: </p><img onerror=x> a doorway with markup baked into the alt text';
+    const document = doc({
+      artPieces: [fixturePiece({ title: markupTitle, image: fixtureImage({ alt: markupAlt }) })],
+    });
+
+    assertNoErrors(errorsFor(document));
+
+    const view = publishedPortfolio(document);
+    assert.equal(view.artPieces[0].title, markupTitle);
+    assert.equal(view.artPieces[0].image.alt, markupAlt);
+  });
+
   it('requires width and height on published images so layouts reserve space', () => {
     const errors = errorsFor(doc({
       artPieces: [fixturePiece({ image: { src: 'assets/fixture-doorway.jpg', alt: 'Fixture: a lit doorway' } })],
@@ -559,6 +574,17 @@ describe('validatePortfolio: curation', () => {
     );
   });
 
+  it('rejects a techStarred entry carrying a type that disagrees with the collection', () => {
+    const tech = fixtureTechProject();
+    assertError(
+      errorsFor(doc({ techProjects: [tech], techStarred: [{ type: 'piece', id: tech.id, order: 0 }] })),
+      /type/i,
+    );
+    assertNoErrors(
+      errorsFor(doc({ techProjects: [tech], techStarred: [{ type: 'tech-project', id: tech.id, order: 0 }] })),
+    );
+  });
+
   it('validates contacts and rejects unsafe destinations', () => {
     assertNoErrors(errorsFor(doc({
       contacts: [
@@ -738,6 +764,20 @@ describe('setPublication', () => {
     assert.throws(() => setPublication(source, 'piece', 'piece-missing', 'draft'), /not found|unknown/i);
     assert.throws(() => setPublication(source, 'photo', 'piece-fixture-1', 'draft'), /type/i);
     assert.throws(() => setPublication(source, 'piece', 'piece-fixture-1', 'archived'), /state/i);
+  });
+
+  it('wraps a cyclic document clone failure in an explanatory Error, not a raw TypeError', () => {
+    const cyclic = doc({ artPieces: [fixturePiece()] });
+    cyclic.self = cyclic;
+    assert.throws(
+      () => setPublication(cyclic, 'piece', 'piece-fixture-1', 'draft'),
+      (err) => {
+        assert.ok(err instanceof Error);
+        assert.equal(err instanceof TypeError, false, 'must not leak the raw JSON.stringify TypeError');
+        assert.match(err.message, /circular|clone/i);
+        return true;
+      },
+    );
   });
 });
 
