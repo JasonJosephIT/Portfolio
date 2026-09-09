@@ -1,6 +1,6 @@
 # Launch Checklist — Jason's Portfolio
 
-**What you're launching:** a 3-page portfolio site (Home / Art / Tech) built as plain HTML and CSS — no build step, no frameworks — plus a private admin pipeline (Supabase + the `/place-image` command) that only you use to add photos and projects.
+**What you're launching:** a 3-page portfolio site (Home / Art / Tech) built as plain HTML and CSS — no build step, no frameworks — plus a private admin pipeline (Supabase for sign-in and submissions, and a browser-based content editor) that only you use to add photos and projects. The editor runs in your browser and can't write to your repository — you export a file from it and save or import that file yourself, then regenerate the pages.
 
 **Recommended path:** GitHub Pages (free static hosting built into GitHub, where your code already lives), with an optional custom domain later.
 
@@ -17,20 +17,20 @@
 
 ## Phase 1 — Content (the real launch blocker)
 
-Your site's plumbing is done, but the shelves are nearly empty: the Art gallery has one test photo and the Tech page has no projects or skills yet. A portfolio launches on its content.
+Your site's plumbing is done, but the shelves are nearly empty: the Art gallery has one test photo and the Tech page has no projects yet. A portfolio launches on its content.
 
 - [ ] 🧑 **Decide on "Soul Study I"** (5 min). The photo currently in the gallery was placed as an end-to-end test (it's a downscaled copy of your hero image). Keep it if you like it there.
   > If you want it removed, tell your agent: *"Revert commit db1a467 (the Soul Study I test placement) and delete assets/photo-01.jpg."*
   **You'll know it worked when...** art.html shows the gallery you intend, with no accidental duplicates of the hero image.
 
-- [ ] 🤝 **Add your real photos** (30–60 min, fun part). Two ways — pick either:
-  - *The pipeline you built:* serve the site locally, sign in at `/admin/` with a magic link (a sign-in email with a one-time link — no password), submit each photo, then open `art.html?edit=1`, drag it where you want, save, and tell your agent: *"Run /place-image"*. This also doubles as your pipeline's first real test (Phase 4).
-  - *The direct way:* put photos in `assets/` as `photo-02.jpg`, `photo-03.jpg`, … and tell your agent: *"Add these photos to the art.html gallery per the layout notes in the HTML comment."*
-  **You'll know it worked when...** the gallery reflows nicely at desktop, tablet, and phone widths with your actual work.
+- [ ] 🤝 **Add your real photos** (30–60 min, fun part). `art.html` is generated from `content/portfolio.json` (a JSON file listing every piece) — there's no more dragging a photo into place. Two ways to get one in:
+  - *The pipeline you built:* serve the site locally, sign in at `/admin/` with a magic link (a sign-in email with a one-time link — no password), and submit each photo as before. Then open the **Content** editor (`/admin/content/`, linked from the Dashboard): under **Inbox**, pick the submission, press **Write draft**, fill in the title and alt text yourself, **Save proposal to submission**, then **Export proposal file** to download it. Tell your agent: *"Import this proposal file and rebuild the site"* — it runs `node scripts/import-portfolio.mjs --input <file> --download` (adds the photo as a **draft**) and `node scripts/build-portfolio.mjs` (regenerates the pages). It's still private until you publish it: reopen the Content editor, use **Open a content file** to load your local `content/portfolio.json`, mark the piece published, **Export content file**, and save that download over `content/portfolio.json` yourself — the editor can't touch your repository, only you can. Then rebuild once more. This also doubles as your pipeline's first real test (Phase 5).
+  - *The direct way:* tell your agent to add the photo as a published entry directly in `content/portfolio.json` (following the schema in `docs/portfolio-content.md`) and run `node scripts/build-portfolio.mjs` to regenerate the pages.
+  **You'll know it worked when...** the gallery reflows nicely at desktop, tablet, and phone widths with your actual work, and `node scripts/build-portfolio.mjs --check` reports "Generated pages are up to date."
 
-- [ ] 🤝 **Fill in the Tech page** (20–40 min). The page has a hidden note describing exactly how projects and skills should look, but no content. Gather: project names, one-sentence descriptions, tags, and links.
-  > Tell your agent: *"Add my projects and skills to tech.html following the layout spec in its HTML comment"* — then paste your list.
-  **You'll know it worked when...** tech.html shows real project cards and a skills row instead of a blank page.
+- [ ] 🤝 **Fill in the Tech page** (20–40 min). `tech.html` is generated too, so projects go into `content/portfolio.json`, not the page itself. Gather: project names, one-sentence summaries, a cover image for each, technologies/tags, and links.
+  > Tell your agent: *"Add these tech projects to content/portfolio.json as published techProjects, following the schema in docs/portfolio-content.md, then run node scripts/build-portfolio.mjs"* — then paste your list. (You can also add them one at a time through the Content editor's Inbox, the same way as photos above, if you'd rather submit and review each one first.)
+  **You'll know it worked when...** tech.html shows real project cards instead of a blank page.
 
 ---
 
@@ -84,9 +84,9 @@ Skip this entirely if `jasonjosephit.github.io/Portfolio` is fine for now — yo
 
 The site isn't launched until this passes on the **live** URL, not localhost.
 
-- [ ] 🧑 **As a visitor** (10 min): on your phone and a desktop browser, open the live Home, Art, and Tech pages. Check: no horizontal scrolling at any size, every photo loads, hover-lift works on desktop, nav highlights the current page, and **no admin controls are visible anywhere** (the edit overlay must only ever appear when you add `?edit=1` yourself).
-- [ ] 🧑 **As the admin — one full loop on the live site** (15 min): request a magic link at `/admin/`, sign in, submit a test photo → open `art.html?edit=1`, drag and save → tell your agent *"Run /place-image"* → agent commits and pushes → confirm the photo appears on the live page for a normal visitor. This is the one flow that has never been human-tested end to end (everything downstream of it has been verified by agents).
-  **You'll know it worked when...** the loop completes without touching the Supabase dashboard, and running `/place-image` again reports "nothing to place".
+- [ ] 🧑 **As a visitor** (10 min): on your phone and a desktop browser, open the live Home, Art, and Tech pages. Check: no horizontal scrolling at any size, every photo loads, Art gallery photos shift from grayscale to colour on hover (desktop), nav highlights the current page, and **no admin controls are visible anywhere** — there's no more on-page edit overlay at all; even a bookmarked `?edit=1` link just redirects to the sign-in-gated Content editor.
+- [ ] 🧑 **As the admin — one full loop on the live site** (20 min): request a magic link at `/admin/`, sign in, submit a test photo → in the Content editor, write and save its draft under Inbox, export the proposal file → tell your agent to import it (`node scripts/import-portfolio.mjs --input <file> --download`) and rebuild (`node scripts/build-portfolio.mjs`) → back in the Content editor, open your local `content/portfolio.json`, publish the piece, export it, and save that export over `content/portfolio.json` yourself (this is the one step the editor genuinely cannot do for you) → rebuild once more → push and deploy → confirm the photo appears on the live page for a normal visitor. This is the one flow that has never been human-tested end to end (everything downstream of it has been verified by agents).
+  **You'll know it worked when...** the loop completes without ever touching the Supabase dashboard, and `node scripts/build-portfolio.mjs --check` reports "Generated pages are up to date."
 
 ---
 
