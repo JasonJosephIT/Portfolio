@@ -45,10 +45,10 @@
     </div>
   </div>
   <script type="module" src="gallery.js"></script>
-  <script type="module">
-    // Owner hook. Public visitors never load an admin module; Task 3 replaces
-    // this with a redirect to the structured editor.
-    if (new URLSearchParams(location.search).get("edit") === "1") import("./admin/edit.js");
+  <script>
+    if (new URLSearchParams(location.search).get("edit") === "1") {
+      location.replace(new URL("admin/content/?page=art.html", location.href));
+    }
   </script>
 </body>
 </html>

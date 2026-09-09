@@ -15,7 +15,10 @@ The design authority for the behaviour described here is
 | `content/portfolio.json` | Jason, via the owner editor or a deliberate local edit | Canonical source. Contains drafts. **Never deployed.** |
 | `lib/portfolio-content.mjs` | Task 1 | Schema, validation, published projection, routes, transforms. Dependency-free. |
 | `tests/portfolio-content.test.mjs` | Task 1 | Behavioural tests. All content in it is fixture data. |
-| `docs/portfolio-content.md` | Task 1 (Task 3 appends the owner workflow) | This document. |
+| `admin/content/`, `admin/content.js` | Task 3 | The owner editor. Auth-gated, browser-only. Edits a copy; cannot write the repository. |
+| `admin/content-model.mjs` | Task 3 | Editor and importer data transforms on top of the library. Dependency-free, runs in both the browser and Node. |
+| `scripts/import-portfolio.mjs` | Task 3 | The only thing in the workflow that writes `content/portfolio.json` from the inbox. Reads nothing but its `--input` file. |
+| `docs/portfolio-content.md` | Task 1, plus Task 3's owner workflow below | This document. |
 | Generated public pages (`art.html`, `tech.html`, `art/…`, `tech/…`) | Task 2's build | Generated output. Do not hand-edit; re-run the build. |
 
 The repository currently ships an **empty** canonical document: no pieces, no
@@ -367,6 +370,169 @@ directory instead, and the page loads without styling and with broken links.
 Configure the not-found handler as a root-relative rewrite to `/404.html` (the
 default on Netlify, Cloudflare Pages, GitHub Pages and S3 static hosting).
 
+## The owner workflow
+
+There is no single button that takes a photo from the inbox to a public page,
+and there should not be. A browser cannot write to a git repository, so the loop
+crosses that boundary once, deliberately, with a file the owner carries across
+it. Every step below says what it does and — as importantly — what it does not.
+
+### 1. Submit to the inbox
+
+`admin/submissions/` is unchanged: it uploads the original file to the
+`portfolio-inbox` bucket and inserts a `submissions` row with
+`status: 'submitted'`. The uploaded bytes are never rewritten after this point,
+by anything downstream.
+
+### 2. Write a structured draft for it
+
+Open `admin/content/` (Content in the admin navigation, or `?edit=1` on a
+gallery page, which now redirects here). Sign-in is checked before any of the
+editor is shown and before any Supabase call is made.
+
+Under **Inbox**, choose a submission and press **Write draft**. Pick the record
+type, then supply the title, the alt text and any metadata **yourself**:
+
+- Nothing is derived from the filename.
+- A submission's tags are shown for reference. **Tags are not styles.** Styles
+  are a separate vocabulary you define under Styles, and they are assigned to a
+  piece after import, not at import time.
+
+**Save proposal to submission** writes the draft back onto that submission's own
+`layout` column as
+`{ schemaVersion: 1, mode: 'structured', record: { …, state: 'draft' }, replaces }`
+and moves the row to `status: 'ready_to_place'`. Any non-structured layout the
+column already held is kept under `replaces` rather than discarded.
+
+The record is written `state: 'draft'` whatever the form said, the row is never
+set to `placed`, and no public page changes. Nothing here publishes anything.
+
+### 3. Export the proposal file
+
+**Export proposal file** collects every `ready_to_place` row that carries a
+structured layout and hands the browser
+`submission-proposals.json`. That is a download to your machine. It is not a
+commit, not a publication and not a deployment.
+
+### 4. Import it, deliberately, in the repository
+
+```sh
+node scripts/import-portfolio.mjs --input ~/Downloads/submission-proposals.json --download
+```
+
+The importer reads **only that file**. It never queries Supabase, never lists
+the inbox, and never marks a submission placed. Deciding what to import is your
+job; the proposal file is the record of that decision.
+
+- **Idempotent by `sourceSubmissionId`.** A submission already represented in the
+  document is skipped, so a re-import cannot duplicate a record, renumber an id,
+  overwrite a local edit or disturb a curated reference.
+- **Everything arrives as a draft**, whatever the proposal claims.
+- **All-or-nothing.** A proposal that cannot be read, an image that is not where
+  it was promised, a failed download, or a result that does not validate: any of
+  those and `content/portfolio.json` is left exactly as it was, with no
+  half-written file and no orphaned asset.
+- **A legacy drag placement is refused, never reinterpreted.** A layout carrying
+  `x_pct`, `y_px`, `width_pct`, `free_position`, `after_selector` or `container`
+  describes a page that no longer exists. Turning those offsets into structured
+  content would invent a placement nobody chose, so the importer stops and asks
+  you to re-save the proposal from the content editor.
+- **`projectId` cannot be set at import time.** Import the piece, then assign it
+  to a project in the editor, where membership is kept honest in both
+  directions.
+
+Media, in preference order:
+
+| Source | Behaviour |
+| --- | --- |
+| `local_image` on the proposal | Preferred. The bytes are already in the working tree; nothing is fetched. The path must be a safe repo-relative asset path and the file must exist, or the import is refused. |
+| `image_url` with `--download` | Fetched to `assets/<slugified name>-<submission id>.<ext>` — an immutable, ASCII-only filename, so a re-import lands on the same path. The bytes are written verbatim and the write is verified before the canonical document is touched. |
+| Neither | The record keeps whatever `src` the proposal carried. |
+
+That last row has a sharp edge worth knowing: the editor prefills a proposal's
+image path with the local path the asset *would* get, so importing without
+`--download` and without `local_image` produces a draft naming a file that is
+not in the working tree yet. The record is still a draft and the built page
+degrades to the "Image unavailable" state rather than breaking, but the file has
+to arrive before that record is published. Pass `--download`, or supply
+`local_image`, unless you are deliberately going to put the file there yourself.
+
+`--content PATH` points the importer at a different canonical document and
+`--root DIR` at a different working tree; both exist for tests and neither is
+part of the normal loop.
+
+### 5. Edit the canonical file locally
+
+Back in `admin/content/`, **Open a content file** and choose your local
+`content/portfolio.json`. The editor never reads content from the public site
+and never loads drafts from a server — you hand it the file.
+
+From there: create, edit and delete records; publish and return to draft;
+assign pieces to projects and order them; add and remove Art Favorites and
+Starred projects and reorder them with **Move up** / **Move down**; define
+styles; write About and contacts. Every rule comes from
+`lib/portfolio-content.mjs`, so the editor refuses exactly what a build would.
+**Checks** shows the current `validatePortfolio` output at all times, and a
+message that names a field is shown beside that field.
+
+**Export content file** downloads `portfolio.json`. **Save it over
+`content/portfolio.json` yourself.** The editor cannot do that, does not claim
+to, and exporting is neither publishing nor deploying.
+
+### 6. Validate, render, review
+
+```sh
+node scripts/build-portfolio.mjs --check   # are the committed pages current?
+node scripts/build-portfolio.mjs           # regenerate them in place
+```
+
+Fix every error the build reports, then look at the result in a browser.
+
+### 7. Deploy, separately
+
+Deployment is its own decision and its own step. Nothing in this workflow
+performs it, and nothing in this workflow should be read as having performed it.
+
+### The canonical file never ships
+
+`content/portfolio.json` holds your drafts. `node scripts/build-portfolio.mjs
+--out DIR` builds from an explicit allowlist — `index.html`, `styles.css`,
+`gallery.css`, `gallery.js`, `assets/`, `admin/`, `lib/`, plus the rendered
+pages — so `content/`, `tests/`, `docs/`, `scripts/` and `.env` are all absent
+from the output by construction. Shipping the canonical JSON would publish every
+draft.
+
+`admin/` and `lib/` are in that allowlist on purpose: the deployed site carries
+the editor and the schema module so you can run the workflow above against the
+live inbox. Both are behind the same Supabase sign-in as the rest of `admin/`,
+and no public page imports either of them.
+
+### The retired placement pipeline
+
+The drag-to-place overlay is gone. `admin/edit.js` is now a redirect to this
+editor, kept only so a bookmarked `?edit=1` link lands somewhere useful, and no
+gallery page imports an admin module any more.
+
+Three pieces of the old pipeline are still in the repository and still work.
+None of them runs on its own, and nothing in the structured workflow invokes
+them:
+
+- **`scripts/fetch-pending.mjs`** queries every `ready_to_place` row with the
+  service-role key and downloads each image into `assets/`. Its output shape —
+  the submission row plus a `local_image` path — is exactly what
+  `scripts/import-portfolio.mjs --input` accepts, so it remains a usable way to
+  get inbox bytes into the working tree in bulk. Two cautions: it names files
+  `photo-NN.<ext>` sequentially rather than by immutable submission id, so its
+  paths are not stable across runs; and it fetches the whole pending set rather
+  than the submissions you chose. **Run it only when you mean to.** It is never
+  run automatically, and the importer will not reach for it.
+- **`scripts/mark-placed.mjs`** sets a row to `status: 'placed'`. Nothing in the
+  structured workflow marks a submission placed — not the editor, not the
+  importer — because only you know when the work is actually live. Run it
+  yourself, after deploying, if you want the inbox to reflect that.
+- **The `/place-image` command** belongs to the retired pipeline. It edits pages
+  directly, which the structured system does not do.
+
 ## Fixture examples
 
 The record below is **fixture data invented for documentation**. It is not
@@ -425,7 +591,17 @@ page, or into any public output. The same applies to every value in
 ## Tests
 
 ```sh
-node --test tests/portfolio-content.test.mjs
+node --test tests/*.test.mjs
 ```
+
+`node --test tests/` does **not** work: Node resolves `tests` as a module
+specifier rather than a directory. Use the glob.
+
+| Suite | Covers |
+| --- | --- |
+| `tests/portfolio-content.test.mjs` | The schema, validation, the projection and the curation transforms. |
+| `tests/portfolio-render.test.mjs` | The static renderer and the build CLI. |
+| `tests/portfolio-editor.test.mjs` | The editor's data transforms in `admin/content-model.mjs`, and that the public build carries the editor. |
+| `tests/portfolio-import.test.mjs` | The importer end to end against a throwaway working tree, with `fetch` injected so the suite stays offline. |
 
 Node 22, no dependencies, no `package.json`.

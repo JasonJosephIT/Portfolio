@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Jason — Content</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="../admin.css">
+</head>
+<body class="admin-content">
+  <a class="admin-skip" href="#main">Skip to content</a>
+
+  <nav class="admin-nav" aria-label="Admin">
+    <a href="../../index.html" class="wordmark">JASON</a>
+    <a href="../dashboard/">Dashboard</a>
+    <a href="./" class="current" aria-current="page">Content</a>
+    <a href="../submissions/">Submissions</a>
+    <a href="../assets/">Assets</a>
+    <a href="../projects/">Projects</a>
+    <button id="signout" type="button">Sign out</button>
+  </nav>
+
+  <div class="page-title">
+    <span class="eyebrow">Admin</span>
+    <h1>Content</h1>
+    <p>Edit the Art and Tech galleries: records, favorites, styles, About and contacts.</p>
+  </div>
+
+  <main class="admin-wrap admin-editor" id="main">
+    <section class="admin-section" aria-labelledby="file-title">
+      <h2 id="file-title">Content file</h2>
+      <p class="admin-note">
+        This editor works on a copy of <code>content/portfolio.json</code> held in this browser.
+        It cannot write to the repository. Open the file, make your changes, export it, and save
+        the exported file over <code>content/portfolio.json</code> yourself. Exporting is not
+        publishing and not deploying.
+      </p>
+      <div class="admin-actions">
+        <label class="admin-file">
+          <span>Open a content file</span>
+          <input type="file" id="open-file" accept="application/json,.json">
+        </label>
+        <button type="button" id="start-empty">Start an empty file</button>
+        <button type="button" id="export-file" disabled>Export content file</button>
+      </div>
+      <p class="admin-status" id="file-status" role="status"></p>
+    </section>
+
+    <section class="admin-section" aria-labelledby="checks-title">
+      <h2 id="checks-title">Checks</h2>
+      <div id="checks" role="status"></div>
+    </section>
+
+    <section class="admin-section" aria-labelledby="records-title">
+      <h2 id="records-title">Records</h2>
+      <div id="records"></div>
+    </section>
+
+    <section class="admin-section" aria-labelledby="editor-title" id="record-editor" hidden>
+      <h2 id="editor-title">Edit record</h2>
+      <div id="record-form-host"></div>
+    </section>
+
+    <section class="admin-section" aria-labelledby="curated-title">
+      <h2 id="curated-title">Selected works and starred projects</h2>
+      <div id="curated"></div>
+    </section>
+
+    <section class="admin-section" aria-labelledby="styles-title">
+      <h2 id="styles-title">Styles</h2>
+      <p class="admin-note">
+        Styles are your own vocabulary for Explore by Style. A style is not a medium, a camera
+        format or a submission tag.
+      </p>
+      <div id="styles"></div>
+    </section>
+
+    <section class="admin-section" aria-labelledby="about-title">
+      <h2 id="about-title">About and contacts</h2>
+      <div id="about"></div>
+    </section>
+
+    <section class="admin-section" aria-labelledby="inbox-title">
+      <h2 id="inbox-title">Inbox</h2>
+      <p class="admin-note">
+        Write a structured draft for a submission and save it back to that submission row. Saving
+        sets the row's status to <code>ready_to_place</code>, the inbox's existing word for
+        &ldquo;ready to import&rdquo;. It publishes nothing and changes no uploaded file. To bring
+        these drafts into your content file, export the proposals here, then run
+        <code>node scripts/import-portfolio.mjs --input FILE --download</code> in the repository.
+      </p>
+      <div id="inbox-root">
+        <div class="kind-toggle" role="group" aria-label="Submission kind">
+          <button type="button" data-kind="photo" aria-pressed="true">Photos</button>
+          <button type="button" data-kind="project" aria-pressed="false">Projects</button>
+        </div>
+        <div class="admin-actions">
+          <button type="button" id="export-proposals">Export proposal file</button>
+        </div>
+        <p class="admin-status" id="inbox-status" role="status"></p>
+        <div class="sub-list"></div>
+      </div>
+      <div id="proposal-host"></div>
+    </section>
+  </main>
+
+  <script type="module" src="../content.js"></script>
+</body>
+</html>

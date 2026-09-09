@@ -12,6 +12,7 @@
   <nav class="admin-nav">
     <a href="../../index.html" class="wordmark">JASON</a>
     <a href="./" class="current">Dashboard</a>
+    <a href="../content/">Content</a>
     <a href="../submissions/">Submissions</a>
     <a href="../assets/">Assets</a>
     <a href="../projects/">Projects</a>
@@ -26,6 +27,10 @@
 
   <div class="admin-wrap">
     <div class="admin-cards">
+      <a class="admin-card" href="../content/">
+        <h2>Content</h2>
+        <p>Edit the Art and Tech galleries: records, favorites, styles, About and contacts.</p>
+      </a>
       <a class="admin-card" href="../submissions/">
         <h2>Submissions</h2>
         <p>Submit a new photo or project, and browse everything in the inbox.</p>
@@ -56,7 +61,7 @@
       const photos = rows.filter((r) => r.kind === "photo").length;
       const projects = rows.filter((r) => r.kind === "project").length;
       const pending = rows.filter((r) => r.status !== "placed").length;
-      el.textContent = `${photos} photo${photos === 1 ? "" : "s"} · ${projects} project${projects === 1 ? "" : "s"} · ${pending} awaiting placement`;
+      el.textContent = `${photos} photo${photos === 1 ? "" : "s"} · ${projects} project${projects === 1 ? "" : "s"} · ${pending} awaiting import`;
     }
   </script>
 </body>
