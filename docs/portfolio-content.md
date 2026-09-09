@@ -337,6 +337,36 @@ Consequences for drafts:
 5. Review the built site, then deploy separately. Building is not deploying,
    and exporting from the owner editor is neither.
 
+### Building into `--out DIR`
+
+`node scripts/build-portfolio.mjs --out DIR` writes and never deletes. It copies
+the allowlisted files and writes every rendered page, but it prunes nothing:
+recursively deleting a directory the caller named is not a risk this script
+takes, so a detail page that has since been unpublished would survive a rebuild
+into a directory that already holds it.
+
+**Build into a fresh or cleared directory.** Delete `DIR` yourself first, or
+point `--out` somewhere new. The in-repository build (`node
+scripts/build-portfolio.mjs`, no flags) is the one that cleans up after itself,
+from `content/generated-pages.json`.
+
+`DIR` must also sit outside the repository. `--out .` from the root would copy
+every file over its own source, and a nested output directory would be swept
+into the next build's copy step; the build refuses both with an error.
+
+### Hosting requirements
+
+`404.html` is written for the site root and every reference in it — the
+stylesheets, the navigation, the Art and Tech links — is relative. This keeps it
+consistent with every other generated page, which is what lets the same markup
+serve from any depth. The consequence is that the host must **serve `404.html`
+from the site root**: a host that serves the file's own body for a deep path such
+as `/art/pieces/missing/` resolves those relative references against that
+directory instead, and the page loads without styling and with broken links.
+
+Configure the not-found handler as a root-relative rewrite to `/404.html` (the
+default on Netlify, Cloudflare Pages, GitHub Pages and S3 static hosting).
+
 ## Fixture examples
 
 The record below is **fixture data invented for documentation**. It is not

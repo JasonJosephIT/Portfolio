@@ -27,8 +27,16 @@
   --gallery-section-gap: 64px;
   --gallery-radius: 8px;
 
-  background: var(--gallery-bg);
   color: var(--gallery-text);
+}
+
+/* styles.css paints `body.patterned` black at (0,1,1), which would otherwise
+   beat `.gallery-page` (0,1,0) and make the Art canvas black by coincidence
+   rather than by token. `html body.gallery-page` is (0,1,2), so --gallery-bg
+   stays the single authority for the page background — change the token and the
+   page changes — without editing the stylesheet Home and admin share. */
+html body.gallery-page {
+  background: var(--gallery-bg);
 }
 
 @media (min-width: 700px) {
@@ -58,6 +66,17 @@
 /* ==========================================================================
    Shared primitives
    ========================================================================== */
+
+/* The progressive-enhancement controls ship with the `hidden` attribute and are
+   revealed by gallery.js. An author-origin `display` (`.control` is
+   inline-flex, `.filters` is flex) always beats the UA stylesheet's
+   `[hidden] { display: none }` regardless of specificity, so without this
+   override a visitor without JavaScript would see inert controls. `!important`
+   is deliberate: `hidden` must win over every rule in this file, including the
+   ones gallery.js toggles on filtered cards. */
+.gallery-page [hidden] {
+  display: none !important;
+}
 
 .gallery-page .skip-link {
   position: absolute;
@@ -106,11 +125,11 @@
   scroll-margin-top: 24px;
 }
 
-.section + .section {
+.gallery-page .section + .section {
   margin-top: var(--gallery-section-gap);
 }
 
-.section__title {
+.gallery-page .section__title {
   margin: 0 0 var(--gallery-grid-gap);
   font-size: clamp(1.75rem, 3vw, 2.5rem);
   font-weight: 600;
@@ -120,13 +139,13 @@
   overflow-wrap: anywhere;
 }
 
-.section__title--page {
+.gallery-page .section__title--page {
   font-size: clamp(2.5rem, 5vw, 4.5rem);
   line-height: 1.08;
   letter-spacing: -0.02em;
 }
 
-.empty-state {
+.gallery-page .empty-state {
   margin: 0;
   max-width: 55ch;
   color: var(--gallery-muted);
@@ -134,11 +153,11 @@
   line-height: 1.6;
 }
 
-.prose {
+.gallery-page .prose {
   max-width: 65ch;
 }
 
-.prose p {
+.gallery-page .prose p {
   margin: 0 0 1em;
   font-size: 1.0625rem;
   line-height: 1.6;
@@ -146,12 +165,12 @@
   overflow-wrap: anywhere;
 }
 
-.prose p:last-child {
+.gallery-page .prose p:last-child {
   margin-bottom: 0;
 }
 
 /* Controls have a real boundary and a 44px target, and never rely on colour. */
-.control {
+.gallery-page .control {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -168,11 +187,11 @@
   cursor: pointer;
 }
 
-.control:hover {
+.gallery-page .control:hover {
   border-color: var(--gallery-text);
 }
 
-.control[aria-pressed='true'] {
+.gallery-page .control[aria-pressed='true'] {
   /* Black on the accent fill: light text on an accent is forbidden here. */
   background: var(--gallery-accent);
   border-color: var(--gallery-accent);
@@ -180,24 +199,24 @@
   font-weight: 600;
 }
 
-.color-toggle,
-.expand {
+.gallery-page .color-toggle,
+.gallery-page .expand {
   margin-top: var(--gallery-grid-gap);
 }
 
-.color-toggle {
+.gallery-page .color-toggle {
   margin-top: 0;
   margin-bottom: var(--gallery-grid-gap);
 }
 
-.filters {
+.gallery-page .filters {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 16px;
 }
 
-.filter-status {
+.gallery-page .filter-status {
   margin: 0 0 var(--gallery-grid-gap);
   min-height: 1.5em;
   color: var(--gallery-muted);
@@ -208,7 +227,7 @@
    Grids and cards
    ========================================================================== */
 
-.grid {
+.gallery-page .grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--gallery-grid-gap);
@@ -232,24 +251,24 @@
   }
 }
 
-.grid.is-collapsed .card[data-overflow='true'] {
+.gallery-page .grid.is-collapsed .card[data-overflow='true'] {
   display: none;
 }
 
 /* Quiet container: no fill, border or shadow. The image is the surface. */
-.card {
+.gallery-page .card {
   min-width: 0;
 }
 
-.card__link {
+.gallery-page .card__link {
   display: grid;
   gap: 12px;
   color: inherit;
   text-decoration: none;
 }
 
-.card__frame,
-.detail__frame {
+.gallery-page .card__frame,
+.gallery-page .detail__frame {
   display: block;
   position: relative;
   overflow: hidden;
@@ -257,8 +276,8 @@
   border-radius: var(--gallery-radius);
 }
 
-.card__image,
-.detail__image {
+.gallery-page .card__image,
+.gallery-page .detail__image {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -266,16 +285,16 @@
 
 /* Project and tech covers share a 4:3 preview frame. Art is contained so the
    work is never cropped; a tech cover may use its editorial focal point. */
-.card__frame--cover .card__image {
+.gallery-page .card__frame--cover .card__image {
   object-fit: contain;
 }
 
-.card__frame--focal .card__image {
+.gallery-page .card__frame--focal .card__image {
   object-fit: cover;
   object-position: var(--focal-x, 50%) var(--focal-y, 50%);
 }
 
-.image-fallback {
+.gallery-page .image-fallback {
   position: absolute;
   inset: 0;
   display: none;
@@ -288,29 +307,29 @@
 }
 
 /* Set by gallery.js when an image fails: the frame keeps its reserved size. */
-.is-missing .image-fallback {
+.gallery-page .is-missing .image-fallback {
   display: flex;
 }
 
-.is-missing .card__image,
-.is-missing .detail__image {
+.gallery-page .is-missing .card__image,
+.gallery-page .is-missing .detail__image {
   visibility: hidden;
 }
 
-.card__body {
+.gallery-page .card__body {
   display: grid;
   gap: 4px;
   max-width: 60ch;
 }
 
-.card__kind {
+.gallery-page .card__kind {
   color: var(--gallery-muted);
   font-size: 0.875rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.card__title {
+.gallery-page .card__title {
   font-size: 1.125rem;
   font-weight: 500;
   line-height: 1.35;
@@ -318,8 +337,8 @@
   overflow-wrap: anywhere;
 }
 
-.card__summary,
-.card__meta {
+.gallery-page .card__summary,
+.gallery-page .card__meta {
   color: var(--gallery-muted);
   font-size: 0.9375rem;
   line-height: 1.5;
@@ -327,8 +346,8 @@
   overflow-wrap: anywhere;
 }
 
-.card__link:hover .card__title,
-.card__link:focus-visible .card__title {
+.gallery-page .card__link:hover .card__title,
+.gallery-page .card__link:focus-visible .card__title {
   text-decoration: underline;
   text-underline-offset: 0.2em;
   text-decoration-thickness: from-font;
@@ -368,11 +387,11 @@
    Art: rail and gallery column
    ========================================================================== */
 
-.art-shell {
+.gallery-page .art-shell {
   padding-inline: var(--gallery-gutter);
 }
 
-.art-rail {
+.gallery-page .art-rail {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -380,7 +399,7 @@
   padding-block: 20px;
 }
 
-.art-rail__brand {
+.gallery-page .art-rail__brand {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -392,8 +411,8 @@
   color: var(--gallery-text);
 }
 
-.art-rail__nav ul,
-.art-rail__switch ul {
+.gallery-page .art-rail__nav ul,
+.gallery-page .art-rail__switch ul {
   display: flex;
   flex-wrap: wrap;
   gap: 0 24px;
@@ -402,7 +421,7 @@
   list-style: none;
 }
 
-.art-rail a:not(.art-rail__brand) {
+.gallery-page .art-rail a:not(.art-rail__brand) {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -411,24 +430,24 @@
   font-size: 0.9375rem;
 }
 
-.art-rail a:not(.art-rail__brand):hover {
+.gallery-page .art-rail a:not(.art-rail__brand):hover {
   color: var(--gallery-text);
   text-decoration: underline;
   text-underline-offset: 0.25em;
 }
 
-.art-content {
+.gallery-page .art-content {
   min-width: 0;
   padding-block: 24px 0;
 }
 
-.art-content > .gallery-footer {
+.gallery-page .art-content > .gallery-footer {
   max-width: none;
   padding-inline: 0;
 }
 
 @media (min-width: 1100px) {
-  .art-shell {
+  .gallery-page .art-shell {
     display: grid;
     grid-template-columns: 200px minmax(0, 1fr);
     column-gap: 48px;
@@ -437,26 +456,26 @@
     margin-inline: auto;
   }
 
-  .art-rail {
+  .gallery-page .art-rail {
     display: block;
     padding-block: 48px 0;
   }
 
-  .art-rail__nav {
+  .gallery-page .art-rail__nav {
     margin-top: 32px;
   }
 
-  .art-rail__switch {
+  .gallery-page .art-rail__switch {
     margin-top: 24px;
   }
 
-  .art-rail__nav ul,
-  .art-rail__switch ul {
+  .gallery-page .art-rail__nav ul,
+  .gallery-page .art-rail__switch ul {
     flex-direction: column;
     gap: 0;
   }
 
-  .art-content {
+  .gallery-page .art-content {
     padding-block: 48px 0;
   }
 }
@@ -464,7 +483,7 @@
 /* Stick the rail only when the viewport is tall enough to show every link;
    otherwise it scrolls with the document rather than clipping. */
 @media (min-width: 1100px) and (min-height: 640px) {
-  .art-rail {
+  .gallery-page .art-rail {
     position: sticky;
     top: 48px;
   }
@@ -474,22 +493,22 @@
    Tech page
    ========================================================================== */
 
-.tech-main,
-.gallery-footer {
+.gallery-page .tech-main,
+.gallery-page .gallery-footer {
   max-width: var(--gallery-max-width);
   margin-inline: auto;
   padding-inline: var(--gallery-gutter);
 }
 
-.tech-main {
+.gallery-page .tech-main {
   padding-block: 40px 0;
 }
 
-.page-head {
+.gallery-page .page-head {
   margin-bottom: var(--gallery-section-gap);
 }
 
-.page-head__intro {
+.gallery-page .page-head__intro {
   margin: 16px 0 0;
   max-width: 65ch;
   color: var(--gallery-muted);
@@ -498,7 +517,7 @@
   text-wrap: pretty;
 }
 
-.anchor-nav ul {
+.gallery-page .anchor-nav ul {
   display: flex;
   flex-wrap: wrap;
   gap: 0 24px;
@@ -507,7 +526,7 @@
   list-style: none;
 }
 
-.anchor-nav a {
+.gallery-page .anchor-nav a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -517,7 +536,7 @@
   font-size: 0.9375rem;
 }
 
-.anchor-nav a:hover {
+.gallery-page .anchor-nav a:hover {
   color: var(--gallery-text);
 }
 
@@ -525,18 +544,18 @@
    Detail views
    ========================================================================== */
 
-.detail {
+.gallery-page .detail {
   max-width: var(--gallery-max-width);
   margin-inline: auto;
   padding: 24px var(--gallery-gutter) 0;
 }
 
-.detail__body {
+.gallery-page .detail__body {
   max-width: 1000px;
   margin-top: 24px;
 }
 
-.back-link {
+.gallery-page .back-link {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -546,11 +565,11 @@
   text-underline-offset: 0.25em;
 }
 
-.back-link:hover {
+.gallery-page .back-link:hover {
   color: var(--gallery-text);
 }
 
-.detail__title {
+.gallery-page .detail__title {
   margin: 0 0 8px;
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 600;
@@ -560,8 +579,8 @@
   overflow-wrap: anywhere;
 }
 
-.detail__summary,
-.detail__count {
+.gallery-page .detail__summary,
+.gallery-page .detail__count {
   margin: 0 0 24px;
   max-width: 65ch;
   color: var(--gallery-muted);
@@ -570,16 +589,16 @@
   text-wrap: pretty;
 }
 
-.detail__frame {
+.gallery-page .detail__frame {
   margin-bottom: 24px;
 }
 
-.detail__project {
+.gallery-page .detail__project {
   margin: 24px 0 0;
 }
 
-.detail__project a,
-.link-list a {
+.gallery-page .detail__project a,
+.gallery-page .link-list a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -588,11 +607,11 @@
   text-underline-offset: 0.2em;
 }
 
-.detail__section {
+.gallery-page .detail__section {
   margin-top: var(--gallery-section-gap);
 }
 
-.detail__section h2 {
+.gallery-page .detail__section h2 {
   margin: 0 0 16px;
   font-size: clamp(1.375rem, 2.5vw, 1.75rem);
   font-weight: 600;
@@ -600,32 +619,32 @@
   text-wrap: balance;
 }
 
-.meta {
+.gallery-page .meta {
   display: grid;
   gap: 8px;
   margin: 24px 0 0;
   font-size: 0.9375rem;
 }
 
-.meta__row {
+.gallery-page .meta__row {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 16px;
 }
 
-.meta dt {
+.gallery-page .meta dt {
   min-width: 8ch;
   color: var(--gallery-muted);
 }
 
-.meta dd {
+.gallery-page .meta dd {
   margin: 0;
   overflow-wrap: anywhere;
 }
 
-.contact-list,
-.tag-list,
-.link-list {
+.gallery-page .contact-list,
+.gallery-page .tag-list,
+.gallery-page .link-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 20px;
@@ -634,11 +653,11 @@
   list-style: none;
 }
 
-.link-list {
+.gallery-page .link-list {
   margin-top: 24px;
 }
 
-.contact-list a {
+.gallery-page .contact-list a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -648,13 +667,13 @@
   overflow-wrap: anywhere;
 }
 
-.tag-list li {
+.gallery-page .tag-list li {
   color: var(--gallery-muted);
   font-size: 0.9375rem;
   overflow-wrap: anywhere;
 }
 
-.collection {
+.gallery-page .collection {
   display: grid;
   gap: 48px;
   margin: 32px 0 0;
@@ -662,21 +681,21 @@
   list-style: none;
 }
 
-.collection__link {
+.gallery-page .collection__link {
   display: grid;
   gap: 12px;
   color: inherit;
   text-decoration: none;
 }
 
-.collection__title {
+.gallery-page .collection__title {
   font-size: 1.125rem;
   font-weight: 500;
   overflow-wrap: anywhere;
 }
 
-.collection__link:hover .collection__title,
-.collection__link:focus-visible .collection__title {
+.gallery-page .collection__link:hover .collection__title,
+.gallery-page .collection__link:focus-visible .collection__title {
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -685,11 +704,11 @@
    Footer
    ========================================================================== */
 
-.gallery-footer {
+.gallery-page .gallery-footer {
   padding-block: var(--gallery-section-gap) 48px;
 }
 
-.gallery-footer__top {
+.gallery-page .gallery-footer__top {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -699,6 +718,6 @@
   text-underline-offset: 0.25em;
 }
 
-.gallery-footer__top:hover {
+.gallery-page .gallery-footer__top:hover {
   color: var(--gallery-text);
 }

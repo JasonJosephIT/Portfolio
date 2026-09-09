@@ -13,10 +13,14 @@
  * The `--out` directory is built from an explicit allowlist, so the canonical
  * JSON (which contains drafts), tests, docs, build scripts and dotfiles such as
  * `.env` cannot leak into a public deploy.
+ *
+ * `--out` writes and never deletes: it prunes no stale page, because recursively
+ * removing a directory the caller named is not a risk this script takes. Build
+ * into a fresh or cleared directory. It must also sit outside the repository.
  */
 
 import { mkdir, readFile, writeFile, readdir, rm, rmdir, copyFile, stat } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { validatePortfolio } from '../lib/portfolio-content.mjs';
@@ -34,6 +38,20 @@ const PUBLIC_ENTRIES = ['index.html', 'styles.css', 'gallery.css', 'gallery.js',
 const ROUTE_DIRS = ['art/pieces', 'art/projects', 'tech/projects'];
 
 const toSystemPath = (root, relative) => join(root, ...relative.split('/'));
+
+/**
+ * Is `target` a path strictly beneath `base`?
+ *
+ * `join` happily resolves `..` segments, so a relative path that looks contained
+ * ("art/pieces/../../../elsewhere/index.html") can land anywhere on disk. Every
+ * place that deletes a file or chooses an output directory compares resolved
+ * paths through this helper rather than trusting the string it was given.
+ */
+const isInside = (base, target) => {
+  const from = resolve(base);
+  const to = resolve(target);
+  return to !== from && to.startsWith(from.endsWith(sep) ? from : `${from}${sep}`);
+};
 
 const readIfPresent = async (path) => {
   try {
@@ -88,15 +106,19 @@ async function readManifest(root) {
 /**
  * Remove a page this build previously generated and no longer renders.
  *
- * Two guards keep the cleanup honest: the path must be a detail route the build
- * owns and must appear in the manifest, and the file on disk must still carry
- * the generated marker. A hand-edited page is left alone.
+ * Three guards keep the cleanup honest: the path must be a detail route the
+ * build owns and must appear in the manifest, it must still resolve inside the
+ * root once `..` segments are applied, and the file on disk must still carry the
+ * generated marker. A hand-edited page is left alone.
  */
 async function removeStale(root, stale) {
   const removed = [];
   for (const relative of stale) {
     if (!ROUTE_DIRS.some((dir) => relative.startsWith(`${dir}/`)) || !relative.endsWith('/index.html')) continue;
     const target = toSystemPath(root, relative);
+    // The manifest is a file on disk; a traversing entry must never delete
+    // outside the root just because its prefix and suffix look right.
+    if (!isInside(root, target)) continue;
     const body = await readIfPresent(target);
     if (body === null || !body.includes(GENERATED_MARKER)) continue;
     await rm(target);
@@ -117,6 +139,20 @@ async function removeStale(root, stale) {
 }
 
 /**
+ * Why `--out DIR` may not point inside the repository, or `null` when it may.
+ *
+ * `--out .` from the root would copy every file onto itself, and a nested output
+ * directory would be swept into the next build's own copy step. The CLI checks
+ * this before it starts, so the message reads as a usage error; `buildSite`
+ * checks it again for programmatic callers.
+ */
+const outputContainmentError = (root, out) =>
+  resolve(out) === resolve(root) || isInside(root, out)
+    ? `--out ${resolve(out)} is inside the repository ${resolve(root)}. ` +
+      'Choose a directory outside it, so the build cannot write the site over its own source.'
+    : null;
+
+/**
  * Render, and either write the pages, compare them, or produce a public site.
  *
  * @param {object} options
@@ -127,6 +163,12 @@ async function removeStale(root, stale) {
  */
 export async function buildSite({ root = DEFAULT_ROOT, out = null, check = false } = {}) {
   const result = { ok: false, errors: [], written: [], removed: [], drift: [] };
+
+  const containment = out === null ? null : outputContainmentError(root, out);
+  if (containment !== null) {
+    result.errors.push(containment);
+    return result;
+  }
 
   const raw = await readIfPresent(toSystemPath(root, 'content/portfolio.json'));
   if (raw === null) {
@@ -208,6 +250,10 @@ function parseArguments(argv) {
     else throw new Error(`Unknown option ${argument}.`);
   }
   if (options.check && options.out !== null) throw new Error('--check and --out cannot be combined.');
+  if (options.out !== null) {
+    const containment = outputContainmentError(DEFAULT_ROOT, options.out);
+    if (containment !== null) throw new Error(containment);
+  }
   return options;
 }
 

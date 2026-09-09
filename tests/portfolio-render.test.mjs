@@ -9,11 +9,12 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, readFile, readdir, rm } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { renderPortfolio, escapeHtml } from '../lib/portfolio-render.mjs';
+import { renderPortfolio, escapeHtml, GENERATED_MARKER } from '../lib/portfolio-render.mjs';
 import { buildSite } from '../scripts/build-portfolio.mjs';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
@@ -105,6 +106,22 @@ const populatedArt = () =>
       { type: 'piece', id: 'piece-fixture-1', order: 1 },
     ],
   });
+
+/** The first opening tag matching `pattern`, so an assertion names one element. */
+const openingTag = (html, pattern) => {
+  const match = html.match(pattern);
+  assert.ok(match !== null, `no element matching ${pattern}`);
+  return match[0];
+};
+
+/**
+ * Does this opening tag carry a real `hidden` attribute?
+ *
+ * Quoted values are blanked first, so a class such as "hidden-thing" can never
+ * satisfy the check. Asserting on the element rather than on the whole page is
+ * the point: a page-wide alternation would pass on markup that hides nothing.
+ */
+const hasHiddenAttribute = (tag) => /\shidden(?=[\s>])/.test(tag.replace(/="[^"]*"/g, '=""'));
 
 const listFiles = async (dir, prefix = '') => {
   const found = [];
@@ -258,6 +275,22 @@ describe('renderPortfolio — the empty canonical document', () => {
     assert.match(notFound, /href="tech\.html"/);
     assert.match(notFound, /href="index\.html"/);
   });
+
+  it('ends every page with exactly one trailing newline', () => {
+    for (const [path, html] of pages) {
+      assert.match(html, /<\/html>\n$/, path);
+      assert.equal(html.endsWith('\n\n'), false, path);
+    }
+  });
+
+  it('gives the listing pages a self-referencing canonical link with no query', () => {
+    assert.match(pages.get('art.html'), /<link rel="canonical" href="art\.html">/);
+    assert.match(pages.get('tech.html'), /<link rel="canonical" href="tech\.html">/);
+    for (const [path, html] of pages) {
+      const canonical = html.match(/<link rel="canonical"[^>]*>/);
+      if (canonical !== null) assert.equal(canonical[0].includes('?'), false, path);
+    }
+  });
 });
 
 /* ------------------------------------------------------------------ *
@@ -313,6 +346,12 @@ describe('renderPortfolio — published Art', () => {
     assert.match(explore, /Explore by Style/);
   });
 
+  it('ships the style filter bar hidden, for JavaScript to reveal', () => {
+    const bar = openingTag(art, /<div[^>]*class="filters"[^>]*>/);
+    assert.ok(hasHiddenAttribute(bar), bar);
+    assert.match(bar, /data-filters="explore-grid"/);
+  });
+
   it('exposes style filters with state, a status region and no duplicate cards', () => {
     const explore = art.slice(art.indexOf('id="explore"'), art.indexOf('id="about"'));
     assert.match(explore, /aria-pressed="true"[^>]*data-style="all"|data-style="all"[^>]*aria-pressed="true"/);
@@ -359,9 +398,11 @@ describe('renderPortfolio — published Art', () => {
     assert.ok(art.indexOf('loading="eager"') < art.indexOf('loading="lazy"'));
   });
 
-  it('offers the Show original colors toggle, default off', () => {
-    assert.match(art, /aria-pressed="false"[^>]*>Show original colors|Show original colors/);
-    assert.match(art, /data-color-toggle/);
+  it('offers the Show original colors toggle, default off and hidden for JavaScript to reveal', () => {
+    const toggle = openingTag(art, /<button[^>]*data-color-toggle[^>]*>/);
+    assert.match(toggle, /aria-pressed="false"/);
+    assert.ok(hasHiddenAttribute(toggle), toggle);
+    assert.match(art, />Show original colors</);
   });
 });
 
@@ -400,9 +441,11 @@ describe('renderPortfolio — curated expansion', () => {
   });
 
   it('ships the expansion control hidden, for JavaScript to reveal', () => {
-    assert.match(art, /hidden[^>]*>Show all selected works|Show all selected works/);
-    assert.match(art, /data-expand="selected-works-grid"/);
-    assert.match(art, /aria-expanded="false"/);
+    const button = openingTag(art, /<button[^>]*data-expand="selected-works-grid"[^>]*>/);
+    assert.ok(hasHiddenAttribute(button), button);
+    assert.match(button, /aria-expanded="false"/);
+    assert.match(button, /aria-controls="selected-works-grid"/);
+    assert.match(art, />Show all selected works</);
   });
 
   it('omits the control entirely when four or fewer entries are curated', () => {
@@ -472,6 +515,17 @@ describe('renderPortfolio — image sources', () => {
     assert.equal(art.includes('card__frame--focal'), false);
     assert.match(art, /card__frame--cover/);
   });
+
+  it('emits no frame modifier that gallery.css does not define', () => {
+    // A piece frame takes its aspect ratio from the inline style, so it carries
+    // the base class alone rather than a modifier that styles nothing.
+    const art = renderPortfolio(populatedArt()).get('art.html');
+    assert.equal(art.includes('card__frame--natural'), false);
+    const stylesheet = readFileSync(join(repoRoot, 'gallery.css'), 'utf8');
+    for (const modifier of art.match(/card__frame--[a-z-]+/g) ?? []) {
+      assert.ok(stylesheet.includes(`.${modifier}`), `${modifier} is emitted but never styled`);
+    }
+  });
 });
 
 /* ------------------------------------------------------------------ *
@@ -482,7 +536,11 @@ describe('renderPortfolio — hostile content is escaped', () => {
   const hostile = () =>
     documentWith({
       about: 'Fixture bio </p><script>alert(1)</script>',
-      contacts: [{ label: 'Fixture "label" & <em>', url: 'https://example.com/fixture' }],
+      contacts: [
+        // The query carries `&` followed by a named-entity-like sequence and a
+        // quote: unescaped, `&copy;` would render as © and change the link.
+        { label: 'Fixture "label" & <em>', url: 'https://example.com/fixture?a=1&copy;b=2&x="><em>' },
+      ],
       styles: [{ id: 'style-fixture-x', name: 'Fixture <img src=x onerror=alert(1)>' }],
       artPieces: [
         fixturePiece({
@@ -522,6 +580,14 @@ describe('renderPortfolio — hostile content is escaped', () => {
     const art = pages.get('art.html');
     assert.equal(art.includes('onmouseover="alert(1)'), false);
     assert.match(art, /Fixture &quot; onmouseover=&quot;alert\(1\)/);
+  });
+
+  it('escapes a contact url into its href, so an ampersand cannot become an entity', () => {
+    const art = pages.get('art.html');
+    assert.match(art, /<a href="https:\/\/example\.com\/fixture\?a=1&amp;copy;b=2&amp;x=%22%3E%3Cem%3E">/);
+    // The bare `&copy;` would render as © and send the visitor to a different
+    // address; the raw sequence must not survive into the attribute.
+    assert.equal(art.includes('&copy;b=2'), false);
   });
 
   it('escapes the biography, the contact label and the style name', () => {
@@ -696,6 +762,32 @@ describe('buildSite — writing the checked-in pages', () => {
     }
   });
 
+  it('never follows a manifest entry that traverses out of the route directories', async () => {
+    const root = await makeRoot(populatedArt());
+    // A sibling of the root, reachable only by climbing out of art/pieces.
+    const escapee = join(dirname(root), `portfolio-escape-${basename(root)}`);
+    const victim = join(escapee, 'index.html');
+    try {
+      await mkdir(escapee, { recursive: true });
+      // The marker is the only guard that would otherwise stand between a
+      // traversing manifest entry and an unlink outside the root.
+      await writeFile(victim, `<!doctype html>\n${GENERATED_MARKER}\nFIXTURE outside the root`);
+      const traversal = `art/pieces/../../../${basename(escapee)}/index.html`;
+      await writeFile(
+        join(root, 'content', 'generated-pages.json'),
+        `${JSON.stringify({ pages: [traversal] }, null, 2)}\n`,
+      );
+
+      const result = await buildSite({ root });
+      assert.equal(result.ok, true, result.errors.join('\n'));
+      assert.equal(result.removed.includes(traversal), false);
+      assert.equal(await readFile(victim, 'utf8').then(() => true), true, 'the outside file survives');
+    } finally {
+      await cleanup(root);
+      await cleanup(escapee);
+    }
+  });
+
   it('never deletes a file it did not generate', async () => {
     const root = await makeRoot(populatedArt());
     try {
@@ -777,6 +869,25 @@ describe('buildSite — the public --out directory', () => {
     } finally {
       await cleanup(root);
       await cleanup(out);
+    }
+  });
+
+  it('refuses an output directory inside the repository', async () => {
+    const root = await makeRoot(populatedArt());
+    try {
+      for (const out of [root, join(root, 'public'), join(root, 'assets', 'nested')]) {
+        const result = await buildSite({ root, out });
+        assert.equal(result.ok, false, out);
+        assert.equal(result.written.length, 0, out);
+        assert.ok(
+          result.errors.some((error) => error.includes('--out') && error.includes('inside the repository')),
+          result.errors.join('\n'),
+        );
+      }
+      // Nothing was created by the refusal.
+      assert.equal((await listFiles(root)).some((file) => file.startsWith('public/')), false);
+    } finally {
+      await cleanup(root);
     }
   });
 
