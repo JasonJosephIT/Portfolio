@@ -1,0 +1,704 @@
+/* ==========================================================================
+   Gallery styles — Art, Tech and the static detail views.
+
+   Everything here is scoped under `.gallery-page` (plus `--art` / `--tech`
+   variants) so Home and the admin pages keep the styling they already have.
+   styles.css still supplies the reset, the shared top navigation and the
+   decorative wave layer; this file adds the gallery system on top of it.
+
+   Values come from docs/portfolio-design-brief.md and .tastemaker/style-lock.md.
+   ========================================================================== */
+
+.gallery-page {
+  /* Palette. Contrast on the Art canvas (#000): text 18.73, muted 8.49,
+     art accent 8.14, tech accent 10.57 — measured, all above the 4.5 floor. */
+  --gallery-bg: #0a0a0b;
+  --gallery-surface: #141416;
+  --gallery-text: #f2f2f0;
+  --gallery-muted: #a5a5a0;
+  --gallery-art-accent: #ff7a4d;
+  --gallery-tech-accent: #4dc3ff;
+  --gallery-accent: var(--gallery-tech-accent);
+  --gallery-hairline: #6f6f6c; /* 4.17 on black, 3.68 on the surface */
+
+  --gallery-max-width: 1200px;
+  --gallery-gutter: 20px;
+  --gallery-grid-gap: 24px;
+  --gallery-section-gap: 64px;
+  --gallery-radius: 8px;
+
+  background: var(--gallery-bg);
+  color: var(--gallery-text);
+}
+
+@media (min-width: 700px) {
+  .gallery-page {
+    --gallery-gutter: 32px;
+    --gallery-grid-gap: 32px;
+    --gallery-section-gap: 80px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .gallery-page {
+    --gallery-gutter: 48px;
+    --gallery-grid-gap: 40px;
+    --gallery-section-gap: 112px;
+  }
+}
+
+/* Art canvas: plain black, square image edges, warm accent, wider gallery. */
+.gallery-page--art {
+  --gallery-bg: #000000;
+  --gallery-radius: 0px;
+  --gallery-accent: var(--gallery-art-accent);
+  --gallery-max-width: 1400px;
+}
+
+/* ==========================================================================
+   Shared primitives
+   ========================================================================== */
+
+.gallery-page .skip-link {
+  position: absolute;
+  inset-inline-start: -9999px;
+  top: 0;
+}
+
+.gallery-page .skip-link:focus {
+  position: fixed;
+  inset-inline-start: 12px;
+  top: 12px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  background: var(--gallery-text);
+  color: #000;
+  border-radius: var(--gallery-radius);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.gallery-page a:focus-visible,
+.gallery-page button:focus-visible {
+  outline: 2px solid var(--gallery-text);
+  /* The offset keeps the indicator on the page background rather than on an
+     accent fill, where white would only reach 2.3:1. */
+  outline-offset: 3px;
+}
+
+/* A current page needs a cue beyond colour. */
+.gallery-page .site-nav .nav-links a.current {
+  font-weight: 600;
+}
+
+.gallery-page .section,
+.gallery-page [id] {
+  scroll-margin-top: calc(var(--nav-height) + 16px);
+}
+
+/* The Art gallery has no sticky bar of its own; its detail views use the shared
+   top navigation and keep the larger offset above. */
+.gallery-page--art .art-content .section,
+.gallery-page--art .art-content [id] {
+  scroll-margin-top: 24px;
+}
+
+.section + .section {
+  margin-top: var(--gallery-section-gap);
+}
+
+.section__title {
+  margin: 0 0 var(--gallery-grid-gap);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.section__title--page {
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.empty-state {
+  margin: 0;
+  max-width: 55ch;
+  color: var(--gallery-muted);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+.prose {
+  max-width: 65ch;
+}
+
+.prose p {
+  margin: 0 0 1em;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.prose p:last-child {
+  margin-bottom: 0;
+}
+
+/* Controls have a real boundary and a 44px target, and never rely on colour. */
+.control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 18px;
+  background: transparent;
+  color: var(--gallery-text);
+  border: 1px solid var(--gallery-hairline);
+  border-radius: var(--gallery-radius);
+  font: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.control:hover {
+  border-color: var(--gallery-text);
+}
+
+.control[aria-pressed='true'] {
+  /* Black on the accent fill: light text on an accent is forbidden here. */
+  background: var(--gallery-accent);
+  border-color: var(--gallery-accent);
+  color: #000;
+  font-weight: 600;
+}
+
+.color-toggle,
+.expand {
+  margin-top: var(--gallery-grid-gap);
+}
+
+.color-toggle {
+  margin-top: 0;
+  margin-bottom: var(--gallery-grid-gap);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.filter-status {
+  margin: 0 0 var(--gallery-grid-gap);
+  min-height: 1.5em;
+  color: var(--gallery-muted);
+  font-size: 0.9375rem;
+}
+
+/* ==========================================================================
+   Grids and cards
+   ========================================================================== */
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gallery-grid-gap);
+}
+
+/* Art uses two generous columns everywhere from 700px, one below. */
+@media (min-width: 700px) {
+  .gallery-page--art .grid,
+  .gallery-page--tech .grid--starred {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gallery-page--tech .grid--projects {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .gallery-page--tech .grid--projects {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.grid.is-collapsed .card[data-overflow='true'] {
+  display: none;
+}
+
+/* Quiet container: no fill, border or shadow. The image is the surface. */
+.card {
+  min-width: 0;
+}
+
+.card__link {
+  display: grid;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.card__frame,
+.detail__frame {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: var(--gallery-surface);
+  border-radius: var(--gallery-radius);
+}
+
+.card__image,
+.detail__image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Project and tech covers share a 4:3 preview frame. Art is contained so the
+   work is never cropped; a tech cover may use its editorial focal point. */
+.card__frame--cover .card__image {
+  object-fit: contain;
+}
+
+.card__frame--focal .card__image {
+  object-fit: cover;
+  object-position: var(--focal-x, 50%) var(--focal-y, 50%);
+}
+
+.image-fallback {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  color: var(--gallery-muted);
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+/* Set by gallery.js when an image fails: the frame keeps its reserved size. */
+.is-missing .image-fallback {
+  display: flex;
+}
+
+.is-missing .card__image,
+.is-missing .detail__image {
+  visibility: hidden;
+}
+
+.card__body {
+  display: grid;
+  gap: 4px;
+  max-width: 60ch;
+}
+
+.card__kind {
+  color: var(--gallery-muted);
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card__title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.card__summary,
+.card__meta {
+  color: var(--gallery-muted);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.card__link:hover .card__title,
+.card__link:focus-visible .card__title {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: from-font;
+}
+
+/* --------------------------------------------------------------------------
+   Monochrome Art previews, original colour on interaction.
+   Listing images only: never text, controls, the whole page, or a detail view.
+   -------------------------------------------------------------------------- */
+
+.gallery-page--art .card__image {
+  filter: grayscale(1);
+  transition: filter 240ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gallery-page--art .card__link:hover .card__image {
+    filter: grayscale(0);
+  }
+}
+
+.gallery-page--art .card__link:focus-visible .card__image {
+  filter: grayscale(0);
+}
+
+.gallery-page--art.show-color .card__image {
+  filter: grayscale(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-page--art .card__image {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Art: rail and gallery column
+   ========================================================================== */
+
+.art-shell {
+  padding-inline: var(--gallery-gutter);
+}
+
+.art-rail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 28px;
+  padding-block: 20px;
+}
+
+.art-rail__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  color: var(--gallery-text);
+}
+
+.art-rail__nav ul,
+.art-rail__switch ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.art-rail a:not(.art-rail__brand) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--gallery-muted);
+  text-decoration: none;
+  font-size: 0.9375rem;
+}
+
+.art-rail a:not(.art-rail__brand):hover {
+  color: var(--gallery-text);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.art-content {
+  min-width: 0;
+  padding-block: 24px 0;
+}
+
+.art-content > .gallery-footer {
+  max-width: none;
+  padding-inline: 0;
+}
+
+@media (min-width: 1100px) {
+  .art-shell {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    column-gap: 48px;
+    align-items: start;
+    max-width: var(--gallery-max-width);
+    margin-inline: auto;
+  }
+
+  .art-rail {
+    display: block;
+    padding-block: 48px 0;
+  }
+
+  .art-rail__nav {
+    margin-top: 32px;
+  }
+
+  .art-rail__switch {
+    margin-top: 24px;
+  }
+
+  .art-rail__nav ul,
+  .art-rail__switch ul {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .art-content {
+    padding-block: 48px 0;
+  }
+}
+
+/* Stick the rail only when the viewport is tall enough to show every link;
+   otherwise it scrolls with the document rather than clipping. */
+@media (min-width: 1100px) and (min-height: 640px) {
+  .art-rail {
+    position: sticky;
+    top: 48px;
+  }
+}
+
+/* ==========================================================================
+   Tech page
+   ========================================================================== */
+
+.tech-main,
+.gallery-footer {
+  max-width: var(--gallery-max-width);
+  margin-inline: auto;
+  padding-inline: var(--gallery-gutter);
+}
+
+.tech-main {
+  padding-block: 40px 0;
+}
+
+.page-head {
+  margin-bottom: var(--gallery-section-gap);
+}
+
+.page-head__intro {
+  margin: 16px 0 0;
+  max-width: 65ch;
+  color: var(--gallery-muted);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.anchor-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 24px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.anchor-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--gallery-muted);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  font-size: 0.9375rem;
+}
+
+.anchor-nav a:hover {
+  color: var(--gallery-text);
+}
+
+/* ==========================================================================
+   Detail views
+   ========================================================================== */
+
+.detail {
+  max-width: var(--gallery-max-width);
+  margin-inline: auto;
+  padding: 24px var(--gallery-gutter) 0;
+}
+
+.detail__body {
+  max-width: 1000px;
+  margin-top: 24px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--gallery-muted);
+  font-size: 0.9375rem;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.back-link:hover {
+  color: var(--gallery-text);
+}
+
+.detail__title {
+  margin: 0 0 8px;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.detail__summary,
+.detail__count {
+  margin: 0 0 24px;
+  max-width: 65ch;
+  color: var(--gallery-muted);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.detail__frame {
+  margin-bottom: 24px;
+}
+
+.detail__project {
+  margin: 24px 0 0;
+}
+
+.detail__project a,
+.link-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--gallery-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.detail__section {
+  margin-top: var(--gallery-section-gap);
+}
+
+.detail__section h2 {
+  margin: 0 0 16px;
+  font-size: clamp(1.375rem, 2.5vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.meta {
+  display: grid;
+  gap: 8px;
+  margin: 24px 0 0;
+  font-size: 0.9375rem;
+}
+
+.meta__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.meta dt {
+  min-width: 8ch;
+  color: var(--gallery-muted);
+}
+
+.meta dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.contact-list,
+.tag-list,
+.link-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link-list {
+  margin-top: 24px;
+}
+
+.contact-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--gallery-text);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  overflow-wrap: anywhere;
+}
+
+.tag-list li {
+  color: var(--gallery-muted);
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.collection {
+  display: grid;
+  gap: 48px;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.collection__link {
+  display: grid;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.collection__title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.collection__link:hover .collection__title,
+.collection__link:focus-visible .collection__title {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.gallery-footer {
+  padding-block: var(--gallery-section-gap) 48px;
+}
+
+.gallery-footer__top {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--gallery-muted);
+  font-size: 0.9375rem;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.gallery-footer__top:hover {
+  color: var(--gallery-text);
+}
