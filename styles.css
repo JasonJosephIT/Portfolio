@@ -182,9 +182,19 @@ svg { display: inline-block; vertical-align: middle; }
 }
 
 .site-nav .wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
   font-size: 0.9rem;
   letter-spacing: 0.24em;
   text-decoration: none;
+}
+
+/* The brand mark: the painted drummer, paper white on the board */
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  flex: none;
 }
 
 .site-nav .nav-links {
