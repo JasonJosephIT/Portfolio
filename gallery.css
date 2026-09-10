@@ -128,8 +128,7 @@
 .gallery-page .tag-list li,
 .gallery-page .meta dt,
 .gallery-page .back-link,
-.gallery-page .anchor-nav a,
-.gallery-page .art-rail a:not(.art-rail__brand),
+.gallery-page .rail a:not(.rail__brand),
 .gallery-page .contact-list a,
 .gallery-page .link-list a,
 .gallery-page .detail__project a,
@@ -182,7 +181,7 @@
 
 /* Display: page titles only. Pale ink on the board, one soft cast. */
 .gallery-page .section__title--page,
-.gallery-page .art-rail__brand {
+.gallery-page .rail__brand {
   font-weight: 800;
   font-stretch: 125%;
   color: #d9d4c8;
@@ -291,10 +290,12 @@
   scroll-margin-top: calc(var(--nav-height) + 16px);
 }
 
-/* The Art gallery has no sticky bar of its own; its detail views use the shared
-   top navigation and keep the larger offset above. */
-.gallery-page--art .art-content .section,
-.gallery-page--art .art-content [id] {
+/* A rail page has no sticky bar over its content — above 1100px the rail is a
+   column beside it, below that a block that scrolls away with the document — so
+   an anchor there needs only its own breathing room. The detail views still use
+   the shared sticky top navigation and keep the larger offset above. */
+.gallery-page .rail-content .section,
+.gallery-page .rail-content [id] {
   scroll-margin-top: 24px;
 }
 
@@ -629,14 +630,18 @@
 }
 
 /* ==========================================================================
-   Art: rail and gallery column
+   The identity rail and the column beside it
+
+   Shared by Art, Tech and the not-found page. Above 1100px it is a 100px
+   column; below that it collapses to the visible wrapping top bar the brief
+   requires — no drawer, no offscreen sidebar, no horizontal scrolling.
    ========================================================================== */
 
-.gallery-page .art-shell {
+.gallery-page .rail-shell {
   padding-inline: var(--gallery-gutter);
 }
 
-.gallery-page .art-rail {
+.gallery-page .rail {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -645,7 +650,7 @@
   border-bottom: 1px solid var(--hairline);
 }
 
-.gallery-page .art-rail__brand {
+.gallery-page .rail__brand {
   display: inline-flex;
   align-items: center;
   gap: 12px;
@@ -656,8 +661,8 @@
   text-shadow: none;
 }
 
-.gallery-page .art-rail__nav ul,
-.gallery-page .art-rail__switch ul {
+.gallery-page .rail__nav ul,
+.gallery-page .rail__switch ul {
   display: flex;
   flex-wrap: wrap;
   gap: 0 24px;
@@ -666,7 +671,7 @@
   list-style: none;
 }
 
-.gallery-page .art-rail a:not(.art-rail__brand) {
+.gallery-page .rail a:not(.rail__brand) {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -676,57 +681,78 @@
   transition: color 0.25s ease, border-color 0.25s ease;
 }
 
-.gallery-page .art-rail a:not(.art-rail__brand):hover {
+.gallery-page .rail a:not(.rail__brand):hover {
   color: var(--text);
   border-bottom-color: var(--accent);
 }
 
-.gallery-page .art-content {
+.gallery-page .rail-content {
   min-width: 0;
   padding-block: 24px 0;
 }
 
-.gallery-page .art-content > .gallery-footer {
+/* Inside the rail the column owns the measure and the gutter, so the blocks
+   that centre themselves on a rail-less page — the footer everywhere, the
+   not-found article — stand down rather than inset themselves twice. */
+.gallery-page .rail-content > .gallery-footer,
+.gallery-page .rail-content > .detail {
   max-width: none;
+  margin-inline: 0;
   padding-inline: 0;
 }
 
 @media (min-width: 1100px) {
-  .gallery-page .art-shell {
+  .gallery-page .rail-shell {
     display: grid;
-    grid-template-columns: 200px minmax(0, 1fr);
+    /* 100px, narrowed from the brief's 200px at Jason's request, 2026-09-10.
+       The pencil register is not shrunk to make it fit: the widest link,
+       "About Me", measures 82px and holds one line with 9px either side. A
+       label wider than the column — "Starred Projects" — wraps onto a second
+       line inside the same 44px target rather than being abbreviated away
+       from the heading it points at. */
+    grid-template-columns: 100px minmax(0, 1fr);
     column-gap: 48px;
     align-items: start;
     max-width: var(--gallery-max-width);
     margin-inline: auto;
   }
 
-  .gallery-page .art-rail {
+  .gallery-page .rail {
     display: block;
     padding-block: 48px 0;
     border-bottom: 0;
   }
 
-  .gallery-page .art-rail__nav {
+  /* The lockup is 131px laid out in a row — 36px mark, 12px gap, 83px
+     wordmark — so it cannot stand across a 100px column. Stacking the mark
+     over the name keeps both elements at their locked sizes; the wordmark's
+     83px is the piece that has to fit, and it does. */
+  .gallery-page .rail__brand {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .gallery-page .rail__nav {
     margin-top: 32px;
   }
 
-  .gallery-page .art-rail__switch {
+  .gallery-page .rail__switch {
     margin-top: 24px;
   }
 
-  .gallery-page .art-rail__nav ul,
-  .gallery-page .art-rail__switch ul {
+  .gallery-page .rail__nav ul,
+  .gallery-page .rail__switch ul {
     flex-direction: column;
     gap: 0;
   }
 
-  .gallery-page .art-rail a:not(.art-rail__brand) {
+  .gallery-page .rail a:not(.rail__brand) {
     display: flex;
     justify-content: flex-start;
   }
 
-  .gallery-page .art-content {
+  .gallery-page .rail-content {
     padding-block: 48px 0;
   }
 }
@@ -734,7 +760,7 @@
 /* Stick the rail only when the viewport is tall enough to show every link;
    otherwise it scrolls with the document rather than clipping. */
 @media (min-width: 1100px) and (min-height: 640px) {
-  .gallery-page .art-rail {
+  .gallery-page .rail {
     position: sticky;
     top: 48px;
   }
@@ -744,15 +770,10 @@
    Tech page
    ========================================================================== */
 
-.gallery-page .tech-main,
 .gallery-page .gallery-footer {
   max-width: var(--gallery-max-width);
   margin-inline: auto;
   padding-inline: var(--gallery-gutter);
-}
-
-.gallery-page .tech-main {
-  padding-block: 40px 0;
 }
 
 /* The diptych's page header: display title and lede side by side, the bevel
@@ -778,34 +799,6 @@
   margin: 0 0 0.4em;
   max-width: 44ch;
   font-size: 1.05rem;
-}
-
-.gallery-page .anchor-nav {
-  grid-column: 1 / -1;
-}
-
-.gallery-page .anchor-nav ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 24px;
-  margin: 16px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.gallery-page .anchor-nav a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--muted);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: color 0.25s ease, border-color 0.25s ease;
-}
-
-.gallery-page .anchor-nav a:hover {
-  color: var(--text);
-  border-bottom-color: var(--accent);
 }
 
 @media (max-width: 700px) {
