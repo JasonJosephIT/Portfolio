@@ -66,9 +66,11 @@ All Art browsing images (Selected Works, project covers, and Explore) appear bla
 
 ### Selected brand assets: Bard logo and repeating wave
 
-Jason has selected `assets/bard.svg` as the logo and `assets/wave-pattern.svg` (supplied as “Painted Wave Stroke Pattern.svg”) as the repeating Art background. These choices supersede the plain-black-only instruction and the hold on implementing a background asset below. Keep the black canvas underneath.
+Jason has selected a Bard logo and `assets/wave-pattern.svg` (supplied as “Painted Wave Stroke Pattern.svg”) as the repeating Art background. These choices supersede the plain-black-only instruction and the hold on implementing a background asset below. Keep the black canvas underneath.
 
-Use Bard beside JASON in the shared navigation and future Art rail. Render at 40px square with preserved aspect ratio, in white on black. The adjacent name supplies the link’s accessible name, so the logo image has empty alt text. Preserve the supplied source asset.
+**Logo asset, updated 2026-09-10.** The mark is `assets/bard-mark.png`. It replaced the original `assets/bard.svg`, which Jason had removed: that file was 1,000,965 bytes — a base64 raster plus C2PA metadata wrapped in SVG — and every generated page paid it to draw a 36px figure. `bard-mark.png` is 23,918 bytes, already bone-coloured for the dark board, and is what Home was using. The old file is recoverable from git history if it is ever needed.
+
+Use Bard beside JASON in the shared navigation and the Art rail. Render at 36px square with preserved aspect ratio, with the intrinsic `width`/`height` attributes matching that rendered size. The adjacent name supplies the link’s accessible name, so the logo image has empty alt text.
 
 Tile the wave at an initial 552×304px, in white/silver at 4% opacity, behind Art content only. Use a decorative, noninteractive background layer; never overlay it on photographs or apply its opacity to text. Keep the hero and Tech backgrounds unchanged. Check tile joins and visibility in the final gallery composition; do not claim that the supplied artwork is seamless without visual verification. Tune scale/opacity conservatively if needed for readability.
 

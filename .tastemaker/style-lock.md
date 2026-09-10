@@ -19,7 +19,7 @@ Tech: compact global nav, Tech intro, Starred Projects/Projects anchors, curated
 No card fill/border/shadow by default; image-only surface; square Art,8px Tech. Control minimum44px with distinct borders/zone. Card captions beneath image. Selected curation up to4 with enhancement expansion, all entries readable without JS.
 
 ## Assets and motion
-Preserve assets/bard.svg and assets/wave-pattern.svg. Bard40x40 white logo beside JASON with empty alt. Wave552x304 repeating behind Art only, white at4%, no overlay onto media. Visual tile joins still pending check; no cultural provenance claims. Home hero untouched. No external photographs or illustrations.
+Preserve assets/wave-pattern.svg. Bard mark is assets/bard-mark.png at 36x36 beside JASON with empty alt, intrinsic attributes matching the rendered size (updated 2026-09-10: this replaced assets/bard.svg, which Jason removed — it cost 1,000,965 bytes per page to draw a 36px figure; recoverable from git history). Wave552x304 repeating behind Art only, white at4%, no overlay onto media. Tile joins checked 2026-09-10: the supplied artwork is NOT seamless (faint horizontal seams and specks visible when boosted to 50%), but invisible at the locked 4% on near-black — do not tune the opacity to compensate. No cultural provenance claims. Home hero untouched. No external photographs or illustrations.
 Art preview image filter grayscale(1), hover-capable card hover and keyboard focus restore grayscale(0), 240ms ease. Show original colors button toggles aria-pressed. Touch first tap navigates; details always source color. Reduced motion immediate. No lifting, scaling, parallax, scroll snapping or reveal delays.
 
 ## Memory
