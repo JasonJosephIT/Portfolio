@@ -4,9 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jason — Art</title>
+  <meta name="description" content="Self-portraits by Jason, shot in available light, chasing the line between figure and shadow.">
+  <meta name="theme-color" content="#08090b">
+  <link rel="preload" href="assets/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="art">
   <nav class="site-nav">
     <div class="wrap">
       <a href="index.html" class="wordmark">JASON</a>
@@ -18,21 +21,52 @@
     </div>
   </nav>
 
-  <div class="page-title">
-    <span class="eyebrow">Gallery</span>
+  <header class="page-title">
     <h1>Art</h1>
     <p>Self-portraits shot in available light, chasing the line between figure and shadow.</p>
-  </div>
+  </header>
 
   <!--
-    LAYOUT/DESIGN NOTES — gallery (content removed for now, CSS kept in styles.css):
-    <section class="gallery wrap"> holding 8+ items, each:
-      <a href="assets/photo-NN.jpg"><img src="assets/photo-NN.jpg" alt="..." loading="lazy"></a>
-    Masonry via CSS columns: 3 cols >=1024px, 2 cols >=700px, 1 below; 12px gaps;
-    images width:100%, border-radius var(--radius), hover lift translateY(-4px).
-    Full spec: docs/prd.md "Art". Re-add photos to assets/ and restore the anchors above.
+    Gallery contract (admin/edit.js and /place-image depend on it):
+    <section class="gallery"> holds <a href="assets/photo-NN.jpg"><img src="assets/photo-NN.jpg" alt="..." loading="lazy"></a>
+    as direct children. Optional data-title on the <a> prints after the plate number.
+    Masonry via CSS columns: 3 cols >=1024px, 2 cols >=700px, 1 below. Full spec: docs/prd.md "Art".
+
+    PLACEHOLDERS: photo-01..09 are synthetic studies (crops of the two hero portraits and
+    generated light studies). Replace each file and its alt/data-title with real work,
+    or submit real photos through /admin/ and run /place-image.
   -->
-  <section class="gallery wrap">
+  <section class="gallery wrap" aria-label="Plates">
+    <a href="assets/photo-01.jpg" data-title="Placeholder, warm study"><img src="assets/photo-01.jpg" alt="Placeholder plate 01: warm-toned crop of the eyes from the split-lit portrait. Replace with your photograph." width="1400" height="883" loading="lazy"></a>
+    <a href="assets/photo-02.jpg" data-title="Placeholder, warm half"><img src="assets/photo-02.jpg" alt="Placeholder plate 02: crop of the warm-lit half of a portrait. Replace with your photograph." width="1000" height="1250" loading="lazy"></a>
+    <a href="assets/photo-03.jpg" data-title="Placeholder, light study"><img src="assets/photo-03.jpg" alt="Placeholder plate 03: a soft amber beam of light across black board. Replace with your photograph." width="1000" height="1250" loading="lazy"></a>
+    <a href="assets/photo-04.jpg" data-title="Placeholder, mono"><img src="assets/photo-04.jpg" alt="Placeholder plate 04: black and white crop of the mouth and chin. Replace with your photograph." width="1400" height="1004" loading="lazy"></a>
+    <a href="assets/photo-05.jpg" data-title="Placeholder, cool half"><img src="assets/photo-05.jpg" alt="Placeholder plate 05: crop of the cool-lit half of a portrait. Replace with your photograph." width="1000" height="1250" loading="lazy"></a>
+    <a href="assets/photo-06.jpg" data-title="Placeholder, the hinge"><img src="assets/photo-06.jpg" alt="Placeholder plate 06: square crop across the center line of the face. Replace with your photograph." width="1200" height="1207" loading="lazy"></a>
+    <a href="assets/photo-07.jpg" data-title="Placeholder, light study"><img src="assets/photo-07.jpg" alt="Placeholder plate 07: a soft cyan beam of light across black board. Replace with your photograph." width="1400" height="933" loading="lazy"></a>
+    <a href="assets/photo-08.jpg" data-title="Placeholder, warm eye"><img src="assets/photo-08.jpg" alt="Placeholder plate 08: warm crop of an eye. Replace with your photograph." width="1200" height="1223" loading="lazy"></a>
+    <a href="assets/photo-09.jpg" data-title="Placeholder, mono"><img src="assets/photo-09.jpg" alt="Placeholder plate 09: black and white crop of the jaw and shoulder. Replace with your photograph." width="1400" height="933" loading="lazy"></a>
   </section>
+
+  <footer class="frame-back">
+    <div class="wrap frame-back-inner">
+      <div>
+        <p class="frame-name">JASON</p>
+        <p class="frame-medium">Photography &middot; Software</p>
+      </div>
+      <nav class="frame-links" aria-label="Footer">
+        <a href="index.html">Home</a>
+        <a href="art.html">Art</a>
+        <a href="tech.html">Tech</a>
+        <!-- TODO: replace the placeholder address with your real contact, then remove the note -->
+        <a href="mailto:hello@example.com">Get in touch <span class="note">address pending</span></a>
+      </nav>
+      <p class="frame-copy">&copy; 2026 Jason. Man is not truly one, but truly two.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    if (new URLSearchParams(location.search).has("edit")) import("./admin/edit.js");
+  </script>
 </body>
 </html>

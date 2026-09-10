@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Jason — Submitted Assets</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="../admin.css">
+</head>
+<body>
+  <nav class="admin-nav">
+    <a href="../../index.html" class="wordmark">JASON</a>
+    <a href="../dashboard/">Dashboard</a>
+    <a href="../submissions/">Submissions</a>
+    <a href="./" class="current">Assets</a>
+    <a href="../projects/">Projects</a>
+    <button id="signout">Sign out</button>
+  </nav>
+
+  <div class="page-title">
+    <span class="eyebrow">Admin</span>
+    <h1>Assets</h1>
+    <p>Everything submitted to the inbox — toggle between photos and projects.</p>
+  </div>
+
+  <div class="admin-wrap">
+    <div id="list-root">
+      <div class="kind-toggle">
+        <button type="button" data-kind="photo">Photos</button>
+        <button type="button" data-kind="project">Projects</button>
+      </div>
+      <div class="sub-list"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { requireAuth, signOut } from "../auth.js";
+    import { createList } from "../list.js";
+    await requireAuth();
+    document.getElementById("signout").addEventListener("click", () => signOut());
+    createList(document.getElementById("list-root"), { kind: "photo" });
+  </script>
+</body>
+</html>
