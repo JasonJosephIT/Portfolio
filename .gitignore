@@ -4,3 +4,7 @@
 !.claude/commands/
 .env
 node_modules/
+.impeccable/review/
+.impeccable/questions/
+.impeccable/build/
+.impeccable/mocks/

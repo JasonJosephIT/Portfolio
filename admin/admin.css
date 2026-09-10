@@ -6,6 +6,23 @@
   padding: 0 calc(var(--space) * 3) calc(var(--space) * 8);
 }
 
+/* Eyebrow label above admin page titles (moved here from styles.css; admin-only) */
+.page-title .eyebrow {
+  grid-column: 1 / -1;
+  display: block;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  margin-bottom: calc(var(--space) * 2);
+}
+
+/* Admin titles stay a working size; the public pages own the big display cut */
+.page-title h1 {
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  letter-spacing: 0.04em;
+}
+
 /* Top bar */
 .admin-nav {
   display: flex;
