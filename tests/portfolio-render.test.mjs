@@ -143,7 +143,12 @@ async function makeRoot(document) {
   await writeFile(join(root, 'gallery.css'), '/* FIXTURE gallery css */');
   await writeFile(join(root, 'gallery.js'), '// FIXTURE gallery js');
   await mkdir(join(root, 'assets'), { recursive: true });
-  await writeFile(join(root, 'assets', 'bard.svg'), '<svg xmlns="http://www.w3.org/2000/svg"></svg>');
+  // A 1x1 PNG: the build copies assets byte for byte, so the fixture only has to
+  // be a real file of the right name and type.
+  await writeFile(
+    join(root, 'assets', 'bard-mark.png'),
+    Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64'),
+  );
   await mkdir(join(root, 'admin'), { recursive: true });
   await writeFile(join(root, 'admin', 'edit.js'), '// FIXTURE admin runtime');
   await mkdir(join(root, 'lib'), { recursive: true });
@@ -294,7 +299,7 @@ describe('renderPortfolio — the empty canonical document', () => {
     }
     assert.equal(new URL('/styles.css', served).href, 'https://example.invalid/styles.css');
     assert.match(notFound, /src="\/gallery\.js"/);
-    assert.match(notFound, /src="\/assets\/bard\.svg"/);
+    assert.match(notFound, /src="\/assets\/bard-mark\.png"/);
   });
 
   it('writes the not-found page against a project-site base when one is given', () => {
@@ -949,7 +954,7 @@ describe('buildSite — the public --out directory', () => {
         'styles.css',
         'gallery.css',
         'gallery.js',
-        'assets/bard.svg',
+        'assets/bard-mark.png',
         'admin/edit.js',
         'lib/portfolio-content.mjs',
         'art/pieces/fixture-doorway/index.html',
@@ -1028,7 +1033,7 @@ describe('buildSite — the public --out directory', () => {
       assert.equal(result.ok, true, result.errors.join('\n'));
       const files = await listFiles(out);
       assert.ok(files.includes('art.html'));
-      assert.ok(files.includes('assets/bard.svg'));
+      assert.ok(files.includes('assets/bard-mark.png'));
       assert.ok(files.includes('assets/wave-pattern.svg'));
       assert.equal(
         files.some((file) => file.startsWith('content/') || file.startsWith('docs/') || file.startsWith('tests/')),
