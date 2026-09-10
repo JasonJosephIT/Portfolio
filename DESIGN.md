@@ -258,7 +258,7 @@ Square-cut throughout. Mats, windows, prints, cards, and the hinge are all right
 There are no buttons or form fields on the public pages; every call to action is a text link in the label register. The admin area is out of scope and only inherits token names.
 
 ### Navigation
-- **Style:** 72px bar on the backing board with a hairline beneath; sticky on inner pages, absolute and transparent over the wall on the home page. Wordmark left, three links right with a `clamp(18px, 3vw, 36px)` gap.
+- **Style:** 72px bar on the backing board with a hairline beneath; sticky on inner pages, absolute and transparent over the wall on the home page. Brand mark and wordmark left (the painted drummer `assets/bard-mark.png` at 36px, paper white on the board, 12px before the wordmark), three links right with a `clamp(18px, 3vw, 36px)` gap.
 - **Links:** label register, graphite at rest, paper white on hover (0.25s ease). The current page is paper white with a 1px accent underline drawn as a bottom border (padding `8px 0 6px`).
 - **Mobile:** no collapse; three short labels fit at 390px.
 
