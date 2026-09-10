@@ -115,9 +115,11 @@ describe('createEmptyPortfolio', () => {
 });
 
 describe('content/portfolio.json', () => {
-  it('is the empty canonical document and validates clean', async () => {
+  // Deliberately not compared against `createEmptyPortfolio()`: this file is
+  // Jason's real content, and the first piece he adds is the system working,
+  // not a regression. What has to hold for ever is that it validates.
+  it('validates clean, whatever it holds', async () => {
     const onDisk = JSON.parse(await readFile(canonicalFile, 'utf8'));
-    assert.deepStrictEqual(onDisk, createEmptyPortfolio());
     assertNoErrors(validatePortfolio(onDisk));
   });
 });

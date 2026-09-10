@@ -498,18 +498,44 @@ function closeRecord(message) {
   if (message) fileStatus(message);
 }
 
+/**
+ * The image keys this form actually renders an input for.
+ *
+ * Everything else on an image — `sources` today, whatever the schema grows
+ * tomorrow — has no input here, so the form cannot carry it and must not be
+ * read as having deleted it. Anything in this set is the form's to own: a
+ * cleared focal point really is a cleared focal point.
+ */
+const FORM_IMAGE_KEYS = new Set(["src", "alt", "width", "height", "focalPoint"]);
+
 function saveRecord(type, id, body, { form, errorBox }) {
   const kind = kindOf(type);
   const existing = id === null ? null : (state.doc[kind.collection] ?? []).find((record) => record.id === id);
+  const submittedSlug = body.slug || body.title || kind.idPrefix;
   const record = {
     ...body,
     id: existing?.id ?? nextRecordId(state.doc, kind.idPrefix),
     state: existing?.state ?? "draft",
-    slug: uniqueSlug(state.doc, type, body.slug || body.title || kind.idPrefix, existing?.id ?? null),
+    slug: uniqueSlug(state.doc, type, submittedSlug, existing?.id ?? null),
   };
   if (existing?.sourceSubmissionId) record.sourceSubmissionId = existing.sourceSubmissionId;
   if (existing?.projectId) record.projectId = existing.projectId;
   if (type === "art-project") record.pieceIds = existing?.pieceIds ?? [];
+
+  // Keep the parts of the image the form never showed. `sources` (the
+  // responsive srcset candidates) has no input, so without this one save
+  // through the form would silently delete it. Screenshot rows already survive
+  // because the form clones whole rows; this gives the single image the same
+  // treatment. An image cleared away entirely takes its extras with it.
+  const submittedImage = body[kind.imageField];
+  if (submittedImage !== undefined) {
+    const previous = existing?.[kind.imageField];
+    const carried =
+      previous && typeof previous === "object" && !Array.isArray(previous)
+        ? Object.fromEntries(Object.entries(previous).filter(([key]) => !FORM_IMAGE_KEYS.has(key)))
+        : {};
+    record[kind.imageField] = { ...carried, ...submittedImage };
+  }
 
   const next = upsertRecord(state.doc, type, record);
   const problems = recordErrors(next, type, record.id);
@@ -524,11 +550,18 @@ function saveRecord(type, id, body, { form, errorBox }) {
   // is left is real, so the status line says so and the Checks panel names it.
   const elsewhere = validatePortfolio(next).length;
 
+  // `uniqueSlug` tidies and de-duplicates, so the stored slug is not always the
+  // one that was typed — and the slug is the public detail address. Saying so
+  // is the difference between a link the owner chose and one they discover.
+  const slugChanged = record.slug !== submittedSlug;
+
   state.editing = { type, id: record.id };
   state.focus = "record-submit";
   commit(
     next,
     `Saved ${kind.label.toLowerCase()} “${record.title ?? record.slug}”. Export the file to keep the change.${
+      slugChanged ? ` Its address is “${record.slug}”, not “${submittedSlug}” — that slug was taken or not URL-safe.` : ""
+    }${
       elsewhere === 0
         ? ""
         : ` ${elsewhere} problem${elsewhere === 1 ? " remains" : "s remain"} elsewhere in this document; see Checks.`

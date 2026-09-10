@@ -265,12 +265,36 @@ describe('runImport — atomicity', () => {
     }
   });
 
-  it('leaves no temporary file behind after a refusal', async () => {
+  it('leaves no temporary file behind when the last write fails', async () => {
     const root = await makeRoot();
+    const canonical = join(root, 'content', 'portfolio.json');
     try {
-      const input = await writeInput(root, { id: 'fixture-submission-1', layout: {} });
-      await runImport({ root, input, fetchImpl: forbiddenFetch });
-      assert.equal(await exists(join(root, 'content', 'portfolio.json.tmp')), false);
+      const input = await writeInput(root, fixtureProposal({ image_url: 'https://example.invalid/fixture.jpg' }));
+      // Every refusal a proposal can cause happens before the temporary file
+      // exists, so a bad proposal never exercises this cleanup at all. The
+      // fetch — the last thing that runs before the document is written — puts
+      // a directory where the canonical file was, so the temporary file really
+      // is written and the rename that would publish it fails.
+      const fetchImpl = async () => {
+        await rm(canonical);
+        await mkdir(canonical);
+        return new Response(FIXTURE_BYTES, { status: 200 });
+      };
+      const result = await runImport({ root, input, download: true, fetchImpl });
+
+      assert.equal(result.ok, false);
+      // Only a throw from the write or the rename produces this message, so it
+      // is the proof that the run got past writing the temporary file.
+      assert.ok(
+        result.errors.some((error) => error.includes('rolled back')),
+        result.errors.join('\n'),
+      );
+      assert.equal(await exists(`${canonical}.tmp`), false, 'the temporary file is cleaned up');
+      assert.equal(
+        await exists(join(root, 'assets', 'cafe-bar-fixture-submission-1.jpg')),
+        false,
+        'and so is the asset the failed run downloaded',
+      );
     } finally {
       await cleanup(root);
     }
@@ -303,6 +327,54 @@ describe('runImport — image handling', () => {
       const result = await runImport({ root, input, fetchImpl: forbiddenFetch });
       assert.equal(result.ok, false);
       assert.ok(result.errors.some((error) => error.includes('assets/absent.jpg')), result.errors.join('\n'));
+    } finally {
+      await cleanup(root);
+    }
+  });
+
+  it('warns when it imports a record whose image is nowhere in the working tree', async () => {
+    const root = await makeRoot();
+    try {
+      // No local_image and no --download: the record still imports, carrying a
+      // src nobody has put a file at. Silence here means the first sign of it
+      // is the "Image unavailable" frame on a page.
+      const input = await writeInput(root, fixtureProposal());
+      const result = await runImport({ root, input, fetchImpl: forbiddenFetch });
+      assert.equal(result.ok, true, result.errors.join('\n'));
+      assert.ok(
+        result.warnings.some((warning) => warning.includes('fixture-submission-1') && warning.includes('local_image')),
+        result.warnings.join('\n'),
+      );
+    } finally {
+      await cleanup(root);
+    }
+  });
+
+  it('refuses to fetch an image_url that is not a safe http address', async () => {
+    const root = await makeRoot();
+    try {
+      for (const url of ['javascript:alert(1)', 'data:image/svg+xml,<svg onload=alert(1)>', 'file:///etc/passwd']) {
+        const input = await writeInput(root, fixtureProposal({ image_url: url }));
+        const result = await runImport({ root, input, download: true, fetchImpl: forbiddenFetch });
+        assert.equal(result.ok, false, url);
+        assert.ok(result.errors.some((error) => error.includes('not a safe http or https address')), url);
+      }
+    } finally {
+      await cleanup(root);
+    }
+  });
+
+  it('refuses to download an SVG, which would be a scriptable same-origin document', async () => {
+    const root = await makeRoot();
+    try {
+      const input = await writeInput(
+        root,
+        fixtureProposal({ image_path: 'photo/badge.svg', image_url: 'https://example.invalid/badge.svg' }),
+      );
+      const result = await runImport({ root, input, download: true, fetchImpl: forbiddenFetch });
+      assert.equal(result.ok, false);
+      assert.ok(result.errors.some((error) => /SVG/.test(error)), result.errors.join('\n'));
+      assert.equal(await exists(join(root, 'assets', 'badge-fixture-submission-1.svg')), false);
     } finally {
       await cleanup(root);
     }

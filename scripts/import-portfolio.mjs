@@ -71,14 +71,43 @@ async function resolveImage(entry, { root, download, fetchImpl, created }) {
     return { src: entry.localImage };
   }
 
-  if (!download) return { src: null };
-  if (entry.imageUrl === null) return { src: null };
+  // No local bytes and no download: the record keeps whatever `src` the
+  // proposal carried, which is a path nobody has put a file at. The CLI prints
+  // this to stderr — it is the only signal before a visitor meets the quiet
+  // "Image unavailable" frame.
+  if (!download || entry.imageUrl === null) {
+    return {
+      src: null,
+      warning:
+        `${where} has no local_image${entry.imageUrl === null ? '' : ' and --download was not passed'}. ` +
+        'Its image path names a file that is not in the working tree; add the file yourself before publishing.',
+    };
+  }
+
+  // The one hop in this pipeline that fetches bytes from outside. `safeUrl`
+  // gates it the same way it gates every stored `src`, so a `javascript:`,
+  // `data:` or `file:` URL in a proposal never reaches fetch.
+  const remote = safeUrl(entry.imageUrl, { image: true });
+  if (remote === null || !/^https?:\/\//i.test(remote)) {
+    return {
+      error: `${where}: image_url ${JSON.stringify(entry.imageUrl)} is not a safe http or https address, so nothing was fetched.`,
+    };
+  }
 
   const kind = kindOf(entry.type);
   const supplied = entry.record?.[kind.imageField]?.src;
   const local = inboxAssetPath(entry.imagePath ?? entry.imageUrl ?? supplied ?? '', entry.sourceSubmissionId);
   if (local === null) {
     return { error: `${where}: cannot derive a safe asset filename from ${JSON.stringify(entry.imagePath ?? entry.imageUrl)}.` };
+  }
+  // A downloaded `.svg` would be a same-origin document that runs its own
+  // script on direct navigation, written from bytes a remote server chose. An
+  // SVG already in the working tree is fine — Jason put it there — but this
+  // hop never creates one.
+  if (local.toLowerCase().endsWith('.svg')) {
+    return {
+      error: `${where}: refusing to download ${entry.imageUrl} as an SVG. Save the file into assets/ yourself and pass it as local_image.`,
+    };
   }
 
   const target = join(root, local);
@@ -92,7 +121,7 @@ async function resolveImage(entry, { root, download, fetchImpl, created }) {
 
   let response;
   try {
-    response = await fetchImpl(entry.imageUrl);
+    response = await fetchImpl(remote);
   } catch (error) {
     return { error: `${where}: downloading ${entry.imageUrl} failed: ${error.message}` };
   }
@@ -106,9 +135,12 @@ async function resolveImage(entry, { root, download, fetchImpl, created }) {
   }
 
   await mkdir(dirname(target), { recursive: true });
-  await writeFile(target, bytes);
-  // Only a file this run created may be cleaned up if the import is refused.
+  // Recorded before the write, not after: a write that fails part-way still
+  // leaves a truncated file, and only a recorded path is cleaned up. Recording
+  // it after would strand those bytes — and the "already in the working tree"
+  // check above would then accept the truncated file on every later run.
   created.push(target);
+  await writeFile(target, bytes);
   return { src: local };
 }
 
@@ -122,7 +154,8 @@ async function resolveImage(entry, { root, download, fetchImpl, created }) {
  * @param {string} options.input proposal file: one object, an array, or {records: []}
  * @param {boolean} [options.download] allow fetching an explicitly supplied image_url
  * @param {Function} [options.fetchImpl] injected fetch, so tests stay offline
- * @returns {Promise<{ok: boolean, errors: string[], imported: object[], skipped: object[], assets: string[]}>}
+ * @returns {Promise<{ok: boolean, errors: string[], warnings: string[], imported: object[],
+ *                    skipped: object[], assets: string[]}>}
  */
 export async function runImport({
   root = DEFAULT_ROOT,
@@ -131,7 +164,7 @@ export async function runImport({
   download = false,
   fetchImpl = globalThis.fetch,
 } = {}) {
-  const result = { ok: false, errors: [], imported: [], skipped: [], assets: [] };
+  const result = { ok: false, errors: [], warnings: [], imported: [], skipped: [], assets: [] };
   const contentPath = content === null ? join(root, ...CANONICAL.split('/')) : content;
 
   if (typeof input !== 'string' || input === '') {
@@ -194,6 +227,7 @@ export async function runImport({
         result.errors.push(image.error);
         break;
       }
+      if (image.warning !== undefined) result.warnings.push(image.warning);
       resolved.push({ proposal: proposals[index], imageSrc: image.src });
     }
     if (result.errors.length > 0) throw new Error('refused');
@@ -267,6 +301,8 @@ async function main() {
   }
 
   const result = await runImport(options);
+
+  for (const warning of result.warnings) process.stderr.write(`Warning: ${warning}\n`);
 
   if (!result.ok) {
     process.stderr.write('Nothing was imported. The canonical document is unchanged.\n\n');

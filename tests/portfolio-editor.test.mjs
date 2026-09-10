@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { validatePortfolio, moveCurated, createEmptyPortfolio } from '../lib/portfolio-content.mjs';
+import { validatePortfolio, moveCurated, createEmptyPortfolio, MAX_SLUG_LENGTH } from '../lib/portfolio-content.mjs';
 import { buildSite } from '../scripts/build-portfolio.mjs';
 import {
   RECORD_KINDS,
@@ -114,6 +114,16 @@ describe('slugify', () => {
     assert.equal(slugify(''), '');
     assert.equal(slugify(null), '');
   });
+
+  it('caps a long title at the length the canonical rules accept', () => {
+    // A long title otherwise slugifies to something that looks entirely valid
+    // and is refused on length alone, with a message describing its shape.
+    const slug = slugify('Fixture Title '.repeat(40));
+    assert.ok(slug.length <= MAX_SLUG_LENGTH, `${slug.length} characters`);
+    assert.equal(slug.endsWith('-'), false, 'a cut never leaves a trailing hyphen');
+    const document = { ...createEmptyPortfolio(), artPieces: [fixturePiece({ slug })] };
+    assert.deepEqual(validatePortfolio(document), []);
+  });
 });
 
 describe('inboxAssetPath', () => {
@@ -149,6 +159,15 @@ describe('uniqueSlug and nextRecordId', () => {
   it('lets a record keep its own slug while editing it', () => {
     const document = fixtureDocument();
     assert.equal(uniqueSlug(document, 'piece', 'fixture-doorway', 'piece-fixture-1'), 'fixture-doorway');
+  });
+
+  it('keeps a de-duplicated slug inside the length limit too', () => {
+    const long = slugify('Fixture Title '.repeat(40));
+    const document = { ...createEmptyPortfolio(), artPieces: [fixturePiece({ slug: long })] };
+    const next = uniqueSlug(document, 'piece', long);
+    assert.notEqual(next, long, 'the taken slug is not handed out twice');
+    assert.ok(next.length <= MAX_SLUG_LENGTH, `${next.length} characters`);
+    assert.deepEqual(validatePortfolio({ ...document, artPieces: [fixturePiece({ id: 'piece-fixture-9', slug: next })] }), []);
   });
 
   it('mints ids that collide with no record of any type', () => {
@@ -291,8 +310,15 @@ describe('curatedView', () => {
       ['art-project-fixture-1', 'piece-fixture-1'],
     );
 
-    // The raw stored position would have addressed the wrong row.
-    assert.equal(document.artFavorites.indexOf(document.artFavorites[0]), 0);
+    // The two positions really do disagree: this row is stored first but shown
+    // second, so passing its stored position would have addressed the other row
+    // — and, being position 0, could not have moved at all.
+    assert.equal(
+      document.artFavorites.findIndex((entry) => entry.id === 'art-project-fixture-1'),
+      0,
+      'the project is the first entry in the stored array',
+    );
+    assert.equal(project.index, 1, 'but the second row of the list');
     assert.throws(() => moveCurated(document, 'artFavorites', 0, 'up'), /Cannot move the first/);
   });
 

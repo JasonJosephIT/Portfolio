@@ -9,7 +9,7 @@
 // curated lists the way moveCurated does, and turning an explicitly supplied
 // submission proposal into a canonical draft.
 
-import { createEmptyPortfolio, validatePortfolio, safeUrl } from '../lib/portfolio-content.mjs';
+import { createEmptyPortfolio, validatePortfolio, safeUrl, MAX_SLUG_LENGTH } from '../lib/portfolio-content.mjs';
 
 /* ------------------------------------------------------------------ *
  * Record kinds
@@ -82,15 +82,21 @@ const allRecords = (document) =>
  * Compatibility decomposition turns "Café" into "Cafe" and "№" into "No"; every
  * character the canonical local-path and slug rules reject is then collapsed to
  * a separator. An input with nothing left returns "", never an invented value.
+ *
+ * The result is capped at the canonical slug limit. A long title otherwise
+ * produces something that looks like a perfectly good slug and is refused by
+ * the validator on length alone, which reads as the validator objecting to a
+ * value that is plainly in the right shape.
  */
-export function slugify(value) {
+export function slugify(value, { max = MAX_SLUG_LENGTH } = {}) {
   if (typeof value !== 'string') return '';
-  return value
+  const folded = value
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+  return folded.length <= max ? folded : folded.slice(0, max).replace(/-+$/, '');
 }
 
 /** Extensions the inbox may hand us. Anything else is refused, never guessed. */
@@ -133,7 +139,9 @@ export function uniqueSlug(document, type, desired, exceptId = null) {
   const base = slugify(desired) || 'untitled';
   if (!taken.has(base)) return base;
   for (let suffix = 2; suffix < 1000; suffix += 1) {
-    const candidate = `${base}-${suffix}`;
+    // The suffix has to fit inside the same limit, so the stem gives way to it.
+    const tail = `-${suffix}`;
+    const candidate = `${slugify(base, { max: MAX_SLUG_LENGTH - tail.length })}${tail}`;
     if (!taken.has(candidate)) return candidate;
   }
   throw new Error(`Could not find a free slug for ${JSON.stringify(desired)}.`);

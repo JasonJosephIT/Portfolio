@@ -237,20 +237,29 @@ clone that every transform and the published projection perform.
 Validation is not an HTML escaper. The rule for the renderer is structural,
 not a list of field names: **every string field in `publishedPortfolio`'s
 output must be treated as arbitrary, unescaped text and HTML-escaped before
-it is rendered, except `id`, `slug`, `src` (on an image and on each entry of
-`sources`), `liveUrl` and `repositoryUrl`** — those are already constrained
-by the id/slug patterns or by `safeUrl`, so they are safe to place in `href`,
-`src` or route-building code as-is. Numeric fields (`width`, `height`,
+it is rendered. There are no exemptions.** Numeric fields (`width`, `height`,
 `order`, `focalPoint.x`, `focalPoint.y`) are constrained to numbers and never
-need escaping. Do not special-case this list by field name in the renderer;
-treat it as "escape every string except the six named above," because it is
-easy for a new free-text field to be added later and be missed by an
-enumeration. That currently includes, but is not limited to: `title`,
+need escaping; everything else is escaped, including `id`, `slug`, `src`,
+`liveUrl` and `repositoryUrl`. Do not special-case any field by name in the
+renderer: it is easy for a new free-text field to be added later and be
+missed by an enumeration, and an exemption list is one more thing to
+remember correctly under pressure.
+
+The URL fields used to be exempt, on the grounds that `safeUrl` and the
+slug pattern already constrain them. That was true of *injection* and beside
+the point: `https://example.com/x?a=1&copy;b=2` is a perfectly safe URL whose
+`&copy;` an HTML parser reads as `©`, so an unescaped `href` sends the visitor
+to a **different address** than the one stored. Escaping is also a no-op on a
+value that has nothing to escape, so the constrained fields lose nothing by
+being escaped with the rest.
+
+The fields this covers currently include, but are not limited to: `title`,
 `caption`, `summary`, `about`, `sections[].title`, `sections[].body`,
-`technologies[]`, `contacts[].label`, `styles[].name`,
-`styles[].description`, `medium`, `dimensions`, `year`, `role`, and
-`image.alt` (on a piece's `image`, a project's `cover`, and each of a tech
-project's `screenshots`).
+`technologies[]`, `contacts[].label`, `contacts[].url`, `styles[].name`,
+`styles[].description`, `medium`, `dimensions`, `year`, `role`, `liveUrl`,
+`repositoryUrl`, `src` (on an image and on each entry of `sources`, in both
+`src` and the `srcset` built from them), and `image.alt` (on a piece's
+`image`, a project's `cover`, and each of a tech project's `screenshots`).
 
 `alt` needs particular care: unlike every other free-text field, which
 typically lands inside an HTML element's text content, `alt` is rendered
@@ -356,6 +365,39 @@ from `content/generated-pages.json`.
 `DIR` must also sit outside the repository. `--out .` from the root would copy
 every file over its own source, and a nested output directory would be swept
 into the next build's copy step; the build refuses both with an error.
+
+`DIR` is what you deploy — not the repository folder. `docs/launch-checklist.md`
+walks that through for GitHub Pages: build to a sibling directory, publish that
+directory to a `gh-pages` branch, and point Pages at it. Serving the repository
+root instead would publish `content/portfolio.json`, and with it every draft.
+
+### `--site-base` and the not-found page
+
+`node scripts/build-portfolio.mjs --site-base /Portfolio/` sets the absolute
+root every link on `404.html` is written against. It affects that page and no
+other, and defaults to `/`.
+
+The reason it exists: a static host serves `404.html`'s bytes **at the address
+that was requested**, so unlike every other page it has no fixed depth of its
+own. This site's deep addresses are the detail routes,
+`art/pieces/{slug}/index.html` — exactly what a renamed slug or an unpublished
+record leaves behind. A relative `styles.css` on that page would resolve to
+`art/pieces/{slug}/styles.css`, so the visitor would get an unstyled page whose
+every link 404s in turn. Absolute URLs are the only ones correct at every depth.
+
+Set it to `/` for a user site or an apex domain, and to the project path for a
+GitHub project site (`/Portfolio/` for
+`jasonjosephit.github.io/Portfolio/`). Every other page stays relative on
+purpose, so the site keeps working from any subdirectory.
+
+### Missing image files
+
+The build warns — on stderr, without failing — for any published image whose
+`src` is a local path with no file behind it, naming the record and the path.
+No other stage can: `validatePortfolio` is pure by design and never touches the
+filesystem, and the importer only ever sees the one image it was handed. The
+page still renders, with its quiet "Image unavailable" frame; the warning is so
+that Jason hears about it before a visitor does.
 
 ### Hosting requirements
 
@@ -493,6 +535,20 @@ Fix every error the build reports, then look at the result in a browser.
 Deployment is its own decision and its own step. Nothing in this workflow
 performs it, and nothing in this workflow should be read as having performed it.
 
+What you deploy is a `--out DIR` build, never the repository folder — see
+"The canonical file never ships" below, and `docs/launch-checklist.md` for the
+GitHub Pages steps.
+
+### 8. Mark what is now live as placed
+
+`node scripts/mark-placed.mjs <id>` sets a submission to `status: 'placed'`.
+Nothing else in this workflow does — not the editor, not the importer — because
+only you know when the work is actually on the live site.
+
+This is a real step, not an optional tidy. Until a submission is marked placed
+it stays in the inbox count, and **Export proposal file** re-exports it on every
+run alongside the ones you have not yet imported.
+
 ### The canonical file never ships
 
 `content/portfolio.json` holds your drafts. `node scripts/build-portfolio.mjs
@@ -530,8 +586,12 @@ them:
   structured workflow marks a submission placed — not the editor, not the
   importer — because only you know when the work is actually live. Run it
   yourself, after deploying, if you want the inbox to reflect that.
-- **The `/place-image` command** belongs to the retired pipeline. It edits pages
-  directly, which the structured system does not do.
+- **The `/place-image` command** belonged to the retired pipeline: it edited the
+  gallery pages directly, which the structured system does not do, and its
+  layout keys are the ones `isLegacyLayout` now refuses. Its body has been
+  replaced with a deprecation notice — running the old steps would edit
+  generated files, and the next build would overwrite them. The file itself is
+  kept because deleting the owner's tooling is his call.
 
 ## Fixture examples
 

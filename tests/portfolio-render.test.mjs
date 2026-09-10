@@ -251,8 +251,10 @@ describe('renderPortfolio — the empty canonical document', () => {
     for (const [path, html] of pages) {
       assert.match(html, /class="skip-link" href="#main"/, path);
       assert.match(html, /<main id="main"/, path);
-      assert.match(html, /href="styles\.css"/, path);
-      assert.match(html, /href="gallery\.css"/, path);
+      // The not-found page links the same two stylesheets from the site root;
+      // every other page links them relative to its own depth.
+      assert.match(html, /href="\/?styles\.css"/, path);
+      assert.match(html, /href="\/?gallery\.css"/, path);
     }
   });
 
@@ -271,9 +273,38 @@ describe('renderPortfolio — the empty canonical document', () => {
 
   it('offers a useful not-found page with Art and Tech return links', () => {
     const notFound = pages.get('404.html');
-    assert.match(notFound, /href="art\.html"/);
-    assert.match(notFound, /href="tech\.html"/);
-    assert.match(notFound, /href="index\.html"/);
+    assert.match(notFound, /href="\/art\.html"/);
+    assert.match(notFound, /href="\/tech\.html"/);
+    assert.match(notFound, /href="\/index\.html"/);
+  });
+
+  it('addresses every not-found reference absolutely, so it works at any depth', () => {
+    const notFound = pages.get('404.html');
+    // A static host serves these bytes at the address that was requested, and
+    // the deep addresses this site has are the detail routes. Resolving each
+    // reference against one of them is the test that matters: a relative URL
+    // would land inside art/pieces/gone/ and 404 in turn.
+    const served = 'https://example.invalid/art/pieces/gone/';
+    for (const reference of [...notFound.matchAll(/(?:href|src)="([^"#]+)"/g)].map((match) => match[1])) {
+      assert.equal(
+        new URL(reference, served).href.startsWith('https://example.invalid/art/'),
+        false,
+        `${reference} resolves under the missing route`,
+      );
+    }
+    assert.equal(new URL('/styles.css', served).href, 'https://example.invalid/styles.css');
+    assert.match(notFound, /src="\/gallery\.js"/);
+    assert.match(notFound, /src="\/assets\/bard\.svg"/);
+  });
+
+  it('writes the not-found page against a project-site base when one is given', () => {
+    const projectSite = renderPortfolio(emptyDocument(), { siteBase: 'Portfolio' }).get('404.html');
+    assert.match(projectSite, /href="\/Portfolio\/styles\.css"/);
+    assert.match(projectSite, /href="\/Portfolio\/art\.html"/);
+    assert.match(projectSite, /src="\/Portfolio\/gallery\.js"/);
+    // Only the not-found page moves; the gallery pages stay relative so the
+    // site keeps working from any subdirectory.
+    assert.match(renderPortfolio(emptyDocument(), { siteBase: 'Portfolio' }).get('art.html'), /href="styles\.css"/);
   });
 
   it('ends every page with exactly one trailing newline', () => {
@@ -596,6 +627,57 @@ describe('renderPortfolio — hostile content is escaped', () => {
     assert.match(art, /Fixture &quot;label&quot; &amp; &lt;em&gt;/);
     assert.match(art, /Fixture &lt;img src=x onerror=alert\(1\)&gt;/);
   });
+
+  it('escapes every remaining url, so no destination is silently rewritten', () => {
+    // `safeUrl` percent-encodes the characters that would break out of an
+    // attribute, so none of these is an injection. `&copy;` is the whole point:
+    // left raw in an href it parses as © and the visitor lands somewhere else.
+    const detail = renderPortfolio(
+      documentWith({
+        techProjects: [
+          fixtureTechProject({
+            liveUrl: 'https://example.com/live?a=1&copy;b=2',
+            repositoryUrl: 'https://example.com/repo?a=1&copy;b=2',
+            cover: fixtureImage({
+              src: 'https://example.com/cover.jpg?a=1&copy;b=2',
+              alt: 'Fixture: a cover served with a query string',
+              sources: [{ src: 'https://example.com/cover-800.jpg?a=1&copy;b=2', width: 800 }],
+            }),
+          }),
+        ],
+      }),
+    ).get('tech/projects/fixture-tool/index.html');
+
+    assert.match(detail, /href="https:\/\/example\.com\/live\?a=1&amp;copy;b=2"/);
+    assert.match(detail, /href="https:\/\/example\.com\/repo\?a=1&amp;copy;b=2"/);
+    assert.match(detail, /src="https:\/\/example\.com\/cover\.jpg\?a=1&amp;copy;b=2"/);
+    assert.match(detail, /srcset="[^"]*cover-800\.jpg\?a=1&amp;copy;b=2 800w/);
+    assert.equal(detail.includes('&copy;b=2'), false, 'no raw entity survives into any attribute');
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * The stylesheet the generated pages depend on
+ * ------------------------------------------------------------------ */
+
+describe('gallery.css — the no-JavaScript contract', () => {
+  it('keeps the [hidden] override that hides the progressive-enhancement controls', () => {
+    // Every control the renderer ships hidden — the colour toggle, Show all and
+    // the filter bar — is revealed by gallery.js. `.control` and `.filters`
+    // carry an author-origin `display`, which beats the UA stylesheet's
+    // `[hidden] { display: none }` at any specificity, so this one rule is the
+    // whole of the degradation story: without it a visitor with JavaScript off
+    // sees inert buttons. It is easy to delete and nothing else would notice.
+    const stylesheet = readFileSync(join(repoRoot, 'gallery.css'), 'utf8');
+    assert.match(stylesheet, /\.gallery-page\s*\[hidden\]\s*\{[^}]*display:\s*none\s*!important/);
+  });
+
+  it('ships every control the renderer hides in that state', () => {
+    const art = renderPortfolio(populatedArt()).get('art.html');
+    for (const pattern of [/<button[^>]*data-color-toggle[^>]*>/, /<div[^>]*class="filters"[^>]*>/]) {
+      assert.ok(hasHiddenAttribute(openingTag(art, pattern)), `${pattern} must ship hidden`);
+    }
+  });
 });
 
 /* ------------------------------------------------------------------ *
@@ -781,7 +863,13 @@ describe('buildSite — writing the checked-in pages', () => {
       const result = await buildSite({ root });
       assert.equal(result.ok, true, result.errors.join('\n'));
       assert.equal(result.removed.includes(traversal), false);
-      assert.equal(await readFile(victim, 'utf8').then(() => true), true, 'the outside file survives');
+      // Read the bytes back and compare them: the file is still there, still
+      // whole, and was not truncated or rewritten on its way past the guard.
+      assert.equal(
+        await readFile(victim, 'utf8'),
+        `<!doctype html>\n${GENERATED_MARKER}\nFIXTURE outside the root`,
+        'the outside file survives untouched',
+      );
     } finally {
       await cleanup(root);
       await cleanup(escapee);
@@ -938,6 +1026,78 @@ describe('buildSite — the public --out directory', () => {
       assert.equal(files.includes('.env.example'), false);
     } finally {
       await cleanup(out);
+    }
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Build-time warnings and the site base
+ * ------------------------------------------------------------------ */
+
+describe('buildSite — warnings that no other stage can raise', () => {
+  it('names a published image whose file is not in the working tree', async () => {
+    const root = await makeRoot(populatedArt());
+    try {
+      // `validatePortfolio` is pure and cannot look at the filesystem, and the
+      // importer only ever sees the one image it is handed. This is the only
+      // stage that knows both the published set and the working tree.
+      const result = await buildSite({ root });
+      assert.equal(result.ok, true, result.errors.join('\n'));
+      assert.ok(
+        result.warnings.some((warning) => warning.includes('assets/fixture-doorway.jpg')),
+        result.warnings.join('\n'),
+      );
+      assert.equal(
+        result.warnings.some((warning) => warning.includes('fixture-draft.jpg')),
+        false,
+        'a draft is not published and is not warned about',
+      );
+    } finally {
+      await cleanup(root);
+    }
+  });
+
+  it('says nothing once the file is there, and never blocks the build', async () => {
+    const root = await makeRoot(documentWith({ artPieces: [fixturePiece()] }));
+    try {
+      await writeFile(join(root, 'assets', 'fixture-doorway.jpg'), 'FIXTURE bytes');
+      const result = await buildSite({ root });
+      assert.equal(result.ok, true, result.errors.join('\n'));
+      assert.deepEqual(result.warnings, []);
+    } finally {
+      await cleanup(root);
+    }
+  });
+});
+
+describe('buildSite — the not-found page and the site base', () => {
+  it('writes an absolute-rooted 404 by default, resolvable from a deep route', async () => {
+    const root = await makeRoot(populatedArt());
+    try {
+      await buildSite({ root });
+      const notFound = await readFile(join(root, '404.html'), 'utf8');
+      // The address a stale detail link leaves the visitor at.
+      const served = 'https://example.invalid/art/pieces/gone/';
+      for (const reference of [...notFound.matchAll(/(?:href|src)="([^"#]+)"/g)].map((match) => match[1])) {
+        assert.equal(new URL(reference, served).href, `https://example.invalid${reference}`, reference);
+      }
+    } finally {
+      await cleanup(root);
+    }
+  });
+
+  it('carries --site-base through to that page and to no other', async () => {
+    const root = await makeRoot(populatedArt());
+    try {
+      await buildSite({ root, siteBase: '/Portfolio/' });
+      assert.match(await readFile(join(root, '404.html'), 'utf8'), /href="\/Portfolio\/styles\.css"/);
+      assert.match(await readFile(join(root, 'art.html'), 'utf8'), /href="styles\.css"/);
+      assert.match(
+        await readFile(join(root, 'art', 'pieces', 'fixture-doorway', 'index.html'), 'utf8'),
+        /href="\.\.\/\.\.\/\.\.\/styles\.css"/,
+      );
+    } finally {
+      await cleanup(root);
     }
   });
 });
