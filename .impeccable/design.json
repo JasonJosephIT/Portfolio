@@ -1,0 +1,463 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-05T00:00:00Z",
+  "title": "Design System: JASON",
+  "extensions": {
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "Backing Board",
+        "canonical": "#08090b",
+        "tonalRamp": [
+          "oklch(13% 0.005 260)",
+          "oklch(24% 0.005 260)",
+          "oklch(35% 0.005 260)",
+          "oklch(46% 0.005 260)",
+          "oklch(57% 0.005 260)",
+          "oklch(70% 0.005 260)",
+          "oklch(84% 0.005 260)",
+          "oklch(95% 0.005 260)"
+        ]
+      },
+      "board": {
+        "role": "neutral",
+        "displayName": "Mat Face",
+        "canonical": "#101115",
+        "tonalRamp": [
+          "oklch(17% 0.008 270)",
+          "oklch(26% 0.008 270)",
+          "oklch(36% 0.008 270)",
+          "oklch(47% 0.008 270)",
+          "oklch(58% 0.008 270)",
+          "oklch(70% 0.008 270)",
+          "oklch(84% 0.008 270)",
+          "oklch(95% 0.008 270)"
+        ]
+      },
+      "board-edge": {
+        "role": "neutral",
+        "displayName": "Cut Edge",
+        "canonical": "#030304",
+        "tonalRamp": [
+          "oklch(8% 0.004 270)",
+          "oklch(20% 0.004 270)",
+          "oklch(32% 0.004 270)",
+          "oklch(44% 0.004 270)",
+          "oklch(56% 0.004 270)",
+          "oklch(70% 0.004 270)",
+          "oklch(84% 0.004 270)",
+          "oklch(95% 0.004 270)"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "#ece8de",
+        "tonalRamp": [
+          "oklch(15% 0.012 90)",
+          "oklch(27% 0.012 90)",
+          "oklch(39% 0.012 90)",
+          "oklch(51% 0.012 90)",
+          "oklch(63% 0.012 90)",
+          "oklch(75% 0.012 90)",
+          "oklch(87% 0.012 90)",
+          "oklch(94% 0.012 90)"
+        ]
+      },
+      "ink-display": {
+        "role": "neutral",
+        "displayName": "Pale Ink",
+        "canonical": "#d9d4c8",
+        "tonalRamp": [
+          "oklch(15% 0.014 90)",
+          "oklch(27% 0.014 90)",
+          "oklch(39% 0.014 90)",
+          "oklch(51% 0.014 90)",
+          "oklch(63% 0.014 90)",
+          "oklch(75% 0.014 90)",
+          "oklch(87% 0.014 90)",
+          "oklch(95% 0.014 90)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "#a5a197",
+        "tonalRamp": [
+          "oklch(15% 0.012 95)",
+          "oklch(26% 0.012 95)",
+          "oklch(37% 0.012 95)",
+          "oklch(48% 0.012 95)",
+          "oklch(59% 0.012 95)",
+          "oklch(70% 0.012 95)",
+          "oklch(83% 0.012 95)",
+          "oklch(95% 0.012 95)"
+        ]
+      },
+      "pencil": {
+        "role": "neutral",
+        "displayName": "Soft Pencil",
+        "canonical": "#8a8479",
+        "tonalRamp": [
+          "oklch(15% 0.015 90)",
+          "oklch(26% 0.015 90)",
+          "oklch(37% 0.015 90)",
+          "oklch(48% 0.015 90)",
+          "oklch(60% 0.015 90)",
+          "oklch(72% 0.015 90)",
+          "oklch(84% 0.015 90)",
+          "oklch(95% 0.015 90)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "rgba(236, 232, 222, 0.07)",
+        "tonalRamp": [
+          "oklch(15% 0.012 90 / 0.07)",
+          "oklch(27% 0.012 90 / 0.07)",
+          "oklch(39% 0.012 90 / 0.07)",
+          "oklch(51% 0.012 90 / 0.07)",
+          "oklch(63% 0.012 90 / 0.07)",
+          "oklch(75% 0.012 90 / 0.07)",
+          "oklch(87% 0.012 90 / 0.07)",
+          "oklch(94% 0.012 90 / 0.07)"
+        ]
+      },
+      "accent-art": {
+        "role": "primary",
+        "displayName": "Amber Core",
+        "canonical": "#e98a3e",
+        "tonalRamp": [
+          "oklch(15% 0.05 55)",
+          "oklch(27% 0.08 55)",
+          "oklch(39% 0.11 55)",
+          "oklch(51% 0.14 55)",
+          "oklch(62% 0.16 55)",
+          "oklch(70% 0.16 55)",
+          "oklch(84% 0.10 55)",
+          "oklch(95% 0.04 55)"
+        ]
+      },
+      "accent-tech": {
+        "role": "primary",
+        "displayName": "Ice-Cyan Core",
+        "canonical": "#48c4dc",
+        "tonalRamp": [
+          "oklch(15% 0.04 210)",
+          "oklch(27% 0.06 210)",
+          "oklch(39% 0.08 210)",
+          "oklch(51% 0.10 210)",
+          "oklch(63% 0.11 210)",
+          "oklch(76% 0.11 210)",
+          "oklch(87% 0.07 210)",
+          "oklch(95% 0.03 210)"
+        ]
+      },
+      "accent-home": {
+        "role": "primary",
+        "displayName": "Bone",
+        "canonical": "#c9c4b8",
+        "tonalRamp": [
+          "oklch(15% 0.015 90)",
+          "oklch(27% 0.015 90)",
+          "oklch(39% 0.015 90)",
+          "oklch(51% 0.015 90)",
+          "oklch(63% 0.015 90)",
+          "oklch(75% 0.015 90)",
+          "oklch(82% 0.015 90)",
+          "oklch(95% 0.015 90)"
+        ]
+      },
+      "bevel": {
+        "role": "primary",
+        "displayName": "Bevel",
+        "canonical": "color-mix(in srgb, var(--accent) 58%, var(--board))",
+        "tonalRamp": [
+          "oklch(15% 0.03 55)",
+          "oklch(25% 0.05 55)",
+          "oklch(35% 0.07 55)",
+          "oklch(45% 0.09 55)",
+          "oklch(55% 0.10 55)",
+          "oklch(65% 0.10 55)",
+          "oklch(80% 0.07 55)",
+          "oklch(95% 0.03 55)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page titles on Art and Tech; the wall name on the home page uses the same register at --name-h."
+      },
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "JASON in the nav and on the back of the frame."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "The wall-label h2."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Project titles and the diptych panel labels."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "Page-title subline and wall-label paragraph."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Project descriptions and unstyled prose."
+      },
+      "label": {
+        "displayName": "Pencil Caption",
+        "purpose": "Every label on a mat: nav, plate numbers, tags, skills, text links, footer."
+      },
+      "label-section": {
+        "displayName": "Section Label",
+        "purpose": "Projects and Skills headings with a hairline rule."
+      },
+      "note": {
+        "displayName": "Note",
+        "purpose": "Placeholders and pending facts; sentence case separates it from a label."
+      }
+    },
+    "shadows": [
+      {
+        "name": "mat-rest",
+        "value": "inset 0 1px 0 rgba(255,255,255,0.035), 0 1px 0 var(--board-edge)",
+        "purpose": "Gallery prints and project cards at rest."
+      },
+      {
+        "name": "mat-lifted",
+        "value": "inset 0 1px 0 rgba(255,255,255,0.035), 0 1px 0 var(--board-edge), 0 26px 34px -22px rgba(0,0,0,0.95)",
+        "purpose": "Prints and cards on hover or focus, with translateY(-4px)."
+      },
+      {
+        "name": "panel",
+        "value": "inset 0 1px 0 rgba(255,255,255,0.035), 0 1px 0 var(--board-edge), 0 40px 60px -40px rgba(0,0,0,0.9)",
+        "purpose": "The two diptych panels at rest."
+      },
+      {
+        "name": "bevel-ring",
+        "value": "0 0 0 1px var(--bevel)",
+        "purpose": "Every window and print at rest; becomes 0 0 0 1px var(--accent) on hover."
+      },
+      {
+        "name": "window-shade",
+        "value": "inset 0 10px 18px -12px rgba(0,0,0,0.95), inset 0 0 0 1px rgba(0,0,0,0.55)",
+        "purpose": "Overlay on diptych windows and project-title plates."
+      },
+      {
+        "name": "ink-cast",
+        "value": "0 4px 14px rgba(0,0,0,0.6)",
+        "purpose": "text-shadow on display type only."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Every transform, box-shadow, and arrow transition."
+      },
+      {
+        "name": "duration-panel",
+        "value": "0.9s",
+        "purpose": "Diptych panel swing and window bevel."
+      },
+      {
+        "name": "duration-mat",
+        "value": "0.7s",
+        "purpose": "Mat lift, bevel change, arrow nudge on prints and cards."
+      },
+      {
+        "name": "duration-link",
+        "value": "0.25s",
+        "purpose": "Nav and footer link color and underline."
+      },
+      {
+        "name": "hinge-swing",
+        "value": "rotateY(-7deg) translateZ(6px) [Art] / rotateY(7deg) translateZ(6px) [Tech], perspective 1800px, transform-origin on the hinge edge",
+        "purpose": "Panel hover and focus."
+      },
+      {
+        "name": "lift",
+        "value": "translateY(-4px)",
+        "purpose": "Print and card hover."
+      },
+      {
+        "name": "develop",
+        "value": "@keyframes develop { from { opacity: 0.25; filter: grayscale(1) contrast(0.6) brightness(0.5) } to { opacity: 1; filter: none } } animation-timeline: view(); animation-range: entry 0% entry 55%",
+        "purpose": "Gallery prints, behind @supports (animation-timeline: view()) and prefers-reduced-motion: no-preference."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "transition-duration: 0.01ms; animation: none; hover transforms removed",
+        "purpose": "prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "700px"
+      },
+      {
+        "name": "projects-3col",
+        "value": "960px"
+      },
+      {
+        "name": "gallery-3col",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Top-bar link in the pencil register; current page gets an accent underline.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-wordmark\" href=\"#\">JASON</a><ul class=\"ds-nav-links\"><li><a class=\"ds-nav-link ds-current\" href=\"#\">Home</a></li><li><a class=\"ds-nav-link\" href=\"#\">Art</a></li><li><a class=\"ds-nav-link\" href=\"#\">Tech</a></li></ul></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; justify-content: space-between; height: var(--nav-height, 72px); padding: 0 24px; background: var(--bg, #08090b); border-bottom: 1px solid var(--hairline, rgba(236,232,222,0.07)); font-family: var(--font, Archivo, sans-serif); } .ds-nav-wordmark { font-size: 0.9rem; font-weight: 800; font-stretch: 125%; letter-spacing: 0.24em; color: #d9d4c8; text-decoration: none; } .ds-nav-links { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; } .ds-nav-link { color: var(--muted, #a5a197); text-decoration: none; padding: 8px 0 6px; border-bottom: 1px solid transparent; font-size: 0.72rem; font-weight: 500; font-stretch: 108%; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.4; transition: color 0.25s ease, border-color 0.25s ease; } .ds-nav-link:hover { color: var(--text, #ece8de); } .ds-nav-link.ds-current { color: var(--text, #ece8de); border-bottom-color: var(--accent, #c9c4b8); } .ds-nav-link:focus-visible { outline: 2px solid var(--accent, #c9c4b8); outline-offset: 4px; border-radius: 1px; }"
+    },
+    {
+      "name": "Diptych Panel",
+      "kind": "custom",
+      "refersTo": "diptych-panel",
+      "description": "One mat of the home-page diptych: window with bevel ring, caption, plate; swings on its hinge edge on hover.",
+      "html": "<div class=\"ds-diptych\"><a class=\"ds-panel ds-panel-art\" href=\"#\"><span class=\"ds-window\"></span><span class=\"ds-caption\"><span class=\"ds-label\"><svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" aria-hidden=\"true\"><path d=\"M20 12H5M11 6l-6 6 6 6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Art</span><span class=\"ds-sub\">Self-portraits in available light</span><span class=\"ds-plate\">Panel I</span></span></a><span class=\"ds-hinge\"></span><a class=\"ds-panel ds-panel-tech\" href=\"#\"><span class=\"ds-window\"></span><span class=\"ds-caption\"><span class=\"ds-label\">Tech<svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" aria-hidden=\"true\"><path d=\"M4 12h15M13 6l6 6-6 6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></span><span class=\"ds-sub\">Software, small tools to full products</span><span class=\"ds-plate\">Panel II</span></span></a></div>",
+      "css": ".ds-diptych { display: flex; justify-content: center; align-items: stretch; perspective: 1800px; background: var(--bg, #08090b); padding: 24px; font-family: var(--font, Archivo, sans-serif); } .ds-panel { --accent: var(--accent-art, #e98a3e); --bevel: color-mix(in srgb, var(--accent) 58%, var(--board, #101115)); display: flex; flex-direction: column; padding: 20px; background: var(--board, #101115); color: var(--text, #ece8de); text-decoration: none; box-shadow: inset 0 1px 0 rgba(255,255,255,0.035), 0 1px 0 #030304, 0 40px 60px -40px rgba(0,0,0,0.9); transform-origin: 100% 50%; transition: transform 0.9s cubic-bezier(0.16,1,0.3,1); } .ds-panel-tech { --accent: var(--accent-tech, #48c4dc); transform-origin: 0% 50%; } .ds-panel-tech .ds-caption { align-items: flex-end; text-align: right; } .ds-window { position: relative; width: 140px; aspect-ratio: 7 / 10; background: linear-gradient(160deg, #3a2a1c, #000 70%); box-shadow: 0 0 0 1px var(--bevel); transition: box-shadow 0.9s cubic-bezier(0.16,1,0.3,1); } .ds-panel-tech .ds-window { background: linear-gradient(200deg, #1a2e33, #000 70%); } .ds-window::after { content: \"\"; position: absolute; inset: 0; box-shadow: inset 0 10px 18px -12px rgba(0,0,0,0.95), inset 0 0 0 1px rgba(0,0,0,0.55); } .ds-caption { display: flex; flex-direction: column; gap: 4px; margin-top: 16px; } .ds-label { display: inline-flex; align-items: center; gap: 10px; font-size: 1.35rem; font-weight: 700; font-stretch: 118%; letter-spacing: 0.02em; line-height: 1.1; transition: color 0.5s ease; } .ds-label svg { color: var(--accent); transition: transform 0.7s cubic-bezier(0.16,1,0.3,1); } .ds-sub { color: var(--muted, #a5a197); font-size: 0.9rem; } .ds-plate { margin-top: 6px; color: var(--pencil, #8a8479); font-size: 0.72rem; font-weight: 500; font-stretch: 108%; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.4; } .ds-hinge { position: relative; flex: 0 0 22px; background: linear-gradient(#8b8270, #8b8270) 50% 14% / 7px 36% no-repeat, linear-gradient(#8b8270, #8b8270) 50% 86% / 7px 36% no-repeat, var(--bg, #08090b); opacity: 0.9; } .ds-hinge::before { content: \"\"; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0,0,0,0.15) 2px 3px) 50% 0 / 7px 100% no-repeat; } .ds-panel:hover, .ds-panel:focus-visible { transform: rotateY(-7deg) translateZ(6px); } .ds-panel-tech:hover, .ds-panel-tech:focus-visible { transform: rotateY(7deg) translateZ(6px); } .ds-panel:hover .ds-window, .ds-panel:focus-visible .ds-window { box-shadow: 0 0 0 1px var(--accent); } .ds-panel:hover .ds-label, .ds-panel:focus-visible .ds-label { color: var(--accent); } .ds-panel-art:hover .ds-label svg { transform: translateX(-5px); } .ds-panel-tech:hover .ds-label svg { transform: translateX(5px); } .ds-panel:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }"
+    },
+    {
+      "name": "Mat Print",
+      "kind": "card",
+      "refersTo": "mat-print",
+      "description": "A gallery work: print on a small mat with a bevel ring and a counter-generated plate number.",
+      "html": "<div class=\"ds-gallery\"><a class=\"ds-print\" href=\"#\" data-title=\"Warm study\"><span class=\"ds-print-img\"></span></a><a class=\"ds-print\" href=\"#\"><span class=\"ds-print-img ds-cool\"></span></a></div>",
+      "css": ".ds-gallery { --accent: var(--accent-art, #e98a3e); --bevel: color-mix(in srgb, var(--accent) 58%, var(--board, #101115)); display: flex; gap: 20px; padding: 24px; background: var(--bg, #08090b); counter-reset: plate; font-family: var(--font, Archivo, sans-serif); } .ds-print { display: block; width: 180px; padding: 12px 12px 14px; background: var(--board, #101115); color: var(--pencil, #8a8479); text-decoration: none; counter-increment: plate; box-shadow: inset 0 1px 0 rgba(255,255,255,0.035), 0 1px 0 #030304; transition: transform 0.7s cubic-bezier(0.16,1,0.3,1), box-shadow 0.7s cubic-bezier(0.16,1,0.3,1), color 0.4s ease; } .ds-print-img { display: block; width: 100%; aspect-ratio: 4 / 5; background: linear-gradient(160deg, #4a3320, #000 75%); box-shadow: 0 0 0 1px var(--bevel); transition: box-shadow 0.7s cubic-bezier(0.16,1,0.3,1); } .ds-print-img.ds-cool { background: linear-gradient(200deg, #1f3a40, #000 75%); } .ds-print::after { content: \"Plate \" counter(plate, decimal-leading-zero); display: block; margin-top: 10px; font-size: 0.72rem; font-weight: 500; font-stretch: 108%; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.4; } .ds-print[data-title]::after { content: \"Plate \" counter(plate, decimal-leading-zero) \" · \" attr(data-title); } .ds-print:hover, .ds-print:focus-visible { color: var(--muted, #a5a197); transform: translateY(-4px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.035), 0 1px 0 #030304, 0 26px 34px -22px rgba(0,0,0,0.95); } .ds-print:hover .ds-print-img, .ds-print:focus-visible .ds-print-img { box-shadow: 0 0 0 1px var(--accent); } .ds-print:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }"
+    },
+    {
+      "name": "Project Card",
+      "kind": "card",
+      "refersTo": "project-card",
+      "description": "A Tech work: title and description printed on a backing-board window inside a small mat, with tags and a link.",
+      "html": "<div class=\"ds-projects\"><article class=\"ds-card\"><h3 class=\"ds-card-title\" data-note=\"Placeholder\">Ledgerline</h3><p class=\"ds-card-body\">A browser-only ledger that reconciles bank exports against invoices, with no account to create.</p><div class=\"ds-tags\"><span>TypeScript</span><span>IndexedDB</span><span>Web Workers</span></div><a class=\"ds-card-link\" href=\"#\">View project</a></article></div>",
+      "css": ".ds-projects { padding: 24px; background: var(--bg, #08090b); counter-reset: project; font-family: var(--font, Archivo, sans-serif); } .ds-card { --accent: var(--accent-tech, #48c4dc); --bevel: color-mix(in srgb, var(--accent) 58%, var(--board, #101115)); --plate-pad: 22px; position: relative; display: grid; grid-template-columns: 100%; grid-template-rows: auto 1fr auto auto; max-width: 360px; padding: 12px; background: var(--board, #101115); color: var(--text, #ece8de); counter-increment: project; box-shadow: inset 0 1px 0 rgba(255,255,255,0.035), 0 1px 0 #030304; transition: transform 0.7s cubic-bezier(0.16,1,0.3,1), box-shadow 0.7s cubic-bezier(0.16,1,0.3,1); } .ds-card::before { content: \"\"; grid-row: 1 / 3; grid-column: 1; background: var(--bg, #08090b); box-shadow: 0 0 0 1px var(--bevel), inset 0 10px 18px -12px rgba(0,0,0,0.95); transition: box-shadow 0.7s cubic-bezier(0.16,1,0.3,1); } .ds-card-title { grid-row: 1; grid-column: 1; z-index: 1; margin: 0; padding: var(--plate-pad) var(--plate-pad) 8px; font-size: 1.5rem; font-weight: 700; font-stretch: 118%; letter-spacing: 0.01em; line-height: 1.1; text-wrap: balance; } .ds-card-title::after { content: \"Plate \" counter(project, decimal-leading-zero); display: block; margin-top: 12px; color: var(--pencil, #8a8479); font-size: 0.72rem; font-weight: 500; font-stretch: 108%; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.4; } .ds-card-title[data-note]::after { content: \"Plate \" counter(project, decimal-leading-zero) \" · \" attr(data-note); } .ds-card-body { grid-row: 2; grid-column: 1; z-index: 1; margin: 0; padding: 0 var(--plate-pad) var(--plate-pad); color: var(--muted, #a5a197); font-size: 1rem; line-height: 1.55; max-width: 52ch; } .ds-tags { grid-row: 3; display: flex; flex-wrap: wrap; gap: 4px 0; margin: 12px 0 0; } .ds-tags > span { color: var(--pencil, #8a8479); font-size: 0.72rem; font-weight: 500; font-stretch: 108%; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.4; padding: 3px 10px 3px 0; } .ds-tags > span + span::before { content: \"\"; display: inline-block; width: 1px; height: 0.8em; margin-right: 10px; background: var(--hairline, rgba(236,232,222,0.07)); vertical-align: -1px; } .ds-card-link { grid-row: 4; justify-self: start; display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; color: var(--text, #ece8de); text-decoration: none; font-size: 0.72rem; font-weight: 500; font-stretch: 108%; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.4; } .ds-card-link::after { content: \"\"; width: 16px; height: 16px; background: currentColor; -webkit-mask: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E\") center / contain no-repeat; mask: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E\") center / contain no-repeat; transition: transform 0.6s cubic-bezier(0.16,1,0.3,1); } .ds-card:hover, .ds-card:focus-within { transform: translateY(-4px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.035), 0 1px 0 #030304, 0 26px 34px -22px rgba(0,0,0,0.95); } .ds-card:hover::before, .ds-card:focus-within::before { box-shadow: 0 0 0 1px var(--accent), inset 0 10px 18px -12px rgba(0,0,0,0.95); } .ds-card:hover .ds-card-link::after, .ds-card:focus-within .ds-card-link::after { transform: translateX(4px); } .ds-card-link:hover { text-decoration: underline; } .ds-card-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }"
+    },
+    {
+      "name": "Wall Label",
+      "kind": "card",
+      "refersTo": "wall-label-card",
+      "description": "The about card on the home page: headline, lede, hairline-topped contact line with a note.",
+      "html": "<div class=\"ds-wall\"><div class=\"ds-wall-label\"><h2 class=\"ds-wall-h2\">One person, two practices.</h2><p class=\"ds-wall-p\">Self-portraits shot in available light. Software built for clarity. Both halves share one eye.</p><p class=\"ds-contact-line\"><a class=\"ds-contact\" href=\"#\">Get in touch<svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M4 12h15M13 6l6 6-6 6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></a><span class=\"ds-note\">address pending</span></p></div></div>",
+      "css": ".ds-wall { --accent: #c9c4b8; --bevel: color-mix(in srgb, var(--accent) 58%, var(--board, #101115)); padding: 32px 24px; background: var(--bg, #08090b); font-family: var(--font, Archivo, sans-serif); color: var(--text, #ece8de); } .ds-wall-label { max-width: 62ch; margin: 0 auto; padding: 28px 32px 26px; background: var(--board, #101115); box-shadow: 0 0 0 1px var(--bevel), inset 0 1px 0 rgba(255,255,255,0.035), 0 26px 34px -24px rgba(0,0,0,0.95); } .ds-wall-h2 { margin: 0 0 16px; font-size: 1.85rem; font-weight: 700; font-stretch: 115%; letter-spacing: 0.01em; line-height: 1.15; text-wrap: balance; } .ds-wall-p { margin: 0 0 24px; color: var(--muted, #a5a197); font-size: 1.05rem; line-height: 1.55; } .ds-contact-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin: 0; padding-top: 16px; border-top: 1px solid var(--hairline, rgba(236,232,222,0.07)); } .ds-contact { display: inline-flex; align-items: center; gap: 10px; color: var(--text, #ece8de); text-decoration: none; padding: 4px 0; border-bottom: 1px solid transparent; font-size: 0.72rem; font-weight: 500; font-stretch: 108%; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.4; transition: border-color 0.3s ease; } .ds-contact svg { color: var(--muted, #a5a197); transition: transform 0.6s cubic-bezier(0.16,1,0.3,1); } .ds-contact:hover { border-bottom-color: var(--text, #ece8de); } .ds-contact:hover svg { transform: translateX(3px); } .ds-contact:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; } .ds-note { font-size: 0.72rem; font-weight: 500; font-stretch: 100%; letter-spacing: 0.04em; color: var(--pencil, #8a8479); }"
+    },
+    {
+      "name": "Section Heading",
+      "kind": "custom",
+      "refersTo": "section-heading",
+      "description": "Projects / Skills heading in tracked caps with a hairline rule filling the row.",
+      "html": "<div class=\"ds-section\"><h2 class=\"ds-section-h2\">Projects</h2></div>",
+      "css": ".ds-section { padding: 24px; background: var(--bg, #08090b); font-family: var(--font, Archivo, sans-serif); } .ds-section-h2 { display: flex; align-items: center; gap: 16px; margin: 0; color: var(--muted, #a5a197); font-size: 0.8rem; font-weight: 600; font-stretch: 108%; letter-spacing: 0.2em; text-transform: uppercase; line-height: 1.4; } .ds-section-h2::after { content: \"\"; flex: 1; height: 1px; background: var(--hairline, rgba(236,232,222,0.07)); }"
+    },
+    {
+      "name": "Skill Pill",
+      "kind": "chip",
+      "refersTo": "skill-pill",
+      "description": "Skills as a hairline-separated run of pencil labels; no fill, no radius.",
+      "html": "<div class=\"ds-pills\"><span class=\"ds-pill\">JavaScript</span><span class=\"ds-pill\">TypeScript</span><span class=\"ds-pill\">Python</span><span class=\"ds-pill\">SQL</span></div>",
+      "css": ".ds-pills { display: flex; flex-wrap: wrap; gap: 8px 0; padding: 24px; background: var(--bg, #08090b); font-family: var(--font, Archivo, sans-serif); } .ds-pill { color: var(--muted, #a5a197); padding: 6px 16px; border-left: 1px solid var(--hairline, rgba(236,232,222,0.07)); font-size: 0.72rem; font-weight: 500; font-stretch: 108%; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.4; } .ds-pill:first-child { padding-left: 0; border-left: 0; }"
+    },
+    {
+      "name": "Page Title",
+      "kind": "custom",
+      "refersTo": "display",
+      "description": "Inner-page header: pale-ink display title with one soft cast, lede beside it, bevel rule beneath.",
+      "html": "<header class=\"ds-page-title\"><h1 class=\"ds-page-h1\">Art</h1><p class=\"ds-page-p\">Self-portraits shot in available light, chasing the line between figure and shadow.</p></header>",
+      "css": ".ds-page-title { --accent: var(--accent-art, #e98a3e); --bevel: color-mix(in srgb, var(--accent) 58%, var(--board, #101115)); display: grid; grid-template-columns: auto 1fr; align-items: end; gap: 12px 40px; padding: 48px 24px 24px; background: var(--bg, #08090b); border-bottom: 1px solid var(--bevel); font-family: var(--font, Archivo, sans-serif); } .ds-page-h1 { margin: 0; font-size: clamp(3rem, 8vw, 6rem); font-weight: 800; font-stretch: 125%; letter-spacing: 0.05em; line-height: 0.9; color: #d9d4c8; text-shadow: 0 4px 14px rgba(0,0,0,0.6); } .ds-page-p { margin: 0 0 0.4em; color: var(--muted, #a5a197); max-width: 44ch; font-size: 1.05rem; line-height: 1.55; text-wrap: pretty; }"
+    },
+    {
+      "name": "Frame Back",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "The footer: wordmark and medium left, pencil-register links right, copyright below.",
+      "html": "<footer class=\"ds-frame\"><div><p class=\"ds-frame-name\">JASON</p><p class=\"ds-frame-medium\">Photography · Software</p></div><nav class=\"ds-frame-links\"><a href=\"#\">Home</a><a href=\"#\">Art</a><a href=\"#\">Tech</a><a href=\"#\">Get in touch <span class=\"ds-note\">address pending</span></a></nav><p class=\"ds-frame-copy\">© 2026 Jason. Man is not truly one, but truly two.</p></footer>",
+      "css": ".ds-frame { --accent: #c9c4b8; display: grid; grid-template-columns: 1fr auto; gap: 16px 32px; align-items: start; padding: 32px 24px 24px; background: var(--bg, #08090b); border-top: 1px solid var(--hairline, rgba(236,232,222,0.07)); color: var(--muted, #a5a197); font-family: var(--font, Archivo, sans-serif); } .ds-frame-name { margin: 0; font-size: 0.9rem; font-weight: 800; font-stretch: 125%; letter-spacing: 0.24em; color: #d9d4c8; } .ds-frame-medium { margin: 8px 0 0; color: var(--pencil, #8a8479); font-size: 0.72rem; font-weight: 500; font-stretch: 108%; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.4; } .ds-frame-links { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: flex-end; } .ds-frame-links a { color: var(--muted, #a5a197); text-decoration: none; padding: 4px 0; border-bottom: 1px solid transparent; font-size: 0.72rem; font-weight: 500; font-stretch: 108%; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.4; transition: color 0.25s ease, border-color 0.25s ease; } .ds-frame-links a:hover { color: var(--text, #ece8de); border-bottom-color: var(--accent); } .ds-frame-links a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; } .ds-frame-copy { grid-column: 1 / -1; margin: 16px 0 0; color: var(--pencil, #8a8479); letter-spacing: 0.02em; font-size: 0.78rem; } .ds-note { font-size: 0.72rem; font-weight: 500; font-stretch: 100%; letter-spacing: 0.04em; text-transform: none; color: var(--pencil, #8a8479); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Hinged Diptych",
+    "overview": "The whole site is one matted object. A near-black museum board is the ground; charcoal mat faces sit on it, each cut with a one-pixel bevel that takes its color from the half of the work it frames, amber for Art and ice-cyan for Tech. Titles are a wide grotesque set as pale ink directly on the board with a single soft cast shadow. Everything else that is written on a mat is written in pencil: small, tracked, uppercase captions in graphite. Color never fills a surface; it lives on the bevels and in the light inside the prints.\n\nThe home page is the hinge between the two disciplines: a split-lit portrait cut into two panels that meet edge to edge down the center of the face, with no line between them, the name riding across both mats above it. Art and Tech pages are the same board with their works matted and plate-numbered in a run. Density is museum-quiet: one column of prose at 44-62ch, generous mats, hairline dividers, and no chrome beyond the nav and the back of the frame.\n\nConfirmed rejections: no name-over-hero-plus-grids arrangement; no accent fills, glows, or colored shadows; no second typeface; no rounded corners on the public surfaces; no embossed or engraved type.",
+    "keyCharacteristics": [
+      "One near-black board, charcoal mats, one-pixel colored bevels",
+      "One variable family (Archivo) doing all hierarchy through width and weight",
+      "Pencil caption register for every label on a mat",
+      "Every work carries a counter-generated plate number",
+      "Physical depth: an inset highlight line, a cut edge, and a long soft cast",
+      "Motion is the object moving: panels swing on their hinge, mats lift, prints develop into view"
+    ],
+    "rules": [
+      {
+        "name": "The Bevel Rule",
+        "body": "Color lives only on bevels and in the light on the prints. An accent may draw a 1px line, tint a glyph, or color a hovered label; it never fills a surface, a button, or a block of text.",
+        "section": "colors"
+      },
+      {
+        "name": "The Accent Scope Rule",
+        "body": "`--accent` is set once per scope (`body.home` bone, `body.tech` cyan, `.panel-art` / `.panel-tech` / `.project-card` per half) and `--bevel` is recomputed inside that scope. New surfaces inherit their hue by declaring which half they belong to, never by hard-coding a hex.",
+        "section": "colors"
+      },
+      {
+        "name": "The Home Is Bone Rule",
+        "body": "On index.html the two hues appear only inside the two panels. Everything outside the diptych (nav, focus, selection, wall label, footer) uses the neutral bone accent.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Family Rule",
+        "body": "Archivo is the only face. Hierarchy comes from the width axis (100 / 108 / 115 / 118 / 125) and weight (400 / 500 / 600 / 700 / 800), never from a second family.",
+        "section": "typography"
+      },
+      {
+        "name": "The Pencil Register Rule",
+        "body": "Anything written on a mat that is not a title or prose is set in the label register: 0.72rem, 500, width 108%, tracking 0.16em, uppercase, in graphite or soft pencil. Plate numbers are always soft pencil.",
+        "section": "typography"
+      },
+      {
+        "name": "The Plate Number Rule",
+        "body": "Every work carries a plate number generated by a CSS counter (`Plate 01`), with an optional title or note after a spaced middle dot (`data-title` on prints, `data-note` on project h3). Numbers are never typed into the markup.",
+        "section": "typography"
+      },
+      {
+        "name": "The Cut Mat Rule",
+        "body": "Every mat carries the inset highlight and the cut edge. No surface floats on a generic drop shadow; if it needs more depth it gets the long soft cast, never a hard offset.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Lift Rule",
+        "body": "Hover on a matted work is a 4px rise plus the cast shadow plus the bevel turning to full accent, all on the 0.7s ease-out. The diptych panels swing instead of rising.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do declare which half a new surface belongs to by scoping `--accent` (`body.tech`, `.panel-tech`, `.project-card`) and let `--bevel` recompute; never hard-code an accent hex on a surface.",
+      "Do mat every work: mat face, `mat-sm` padding, inset highlight and cut edge, and a bevel ring on the print or window.",
+      "Do give every work a counter-generated plate number in soft pencil, with an optional title after a spaced middle dot.",
+      "Do set every label on a mat in the pencil register (0.72rem, 500, width 108%, tracking 0.16em, uppercase).",
+      "Do use the 0.7s / 0.9s `cubic-bezier(0.16, 1, 0.3, 1)` ease-out for lifts, swings, and arrow nudges, and remove transforms entirely under `prefers-reduced-motion: reduce`.",
+      "Do keep the pipeline contracts intact: `.gallery > a > img`, `.projects .project-grid > .project-card` with `h3`, `p`, `.tech-tags`, `.project-link`, `.skills .skill-pills > .skill-pill`, and a `.page-title` on inner pages.",
+      "Do keep the token names `--bg --text --muted --accent-art --accent-tech --space --radius --nav-height`; the admin stylesheet reads them.",
+      "Do draw arrows as inline 24-unit stroke SVG (1.5 stroke, round caps) or a `currentColor` mask, sized 16-22px."
+    ],
+    "donts": [
+      "Don't fill any surface, button, or text block with an accent; accents are 1px rings, glyph tints, and hover label color only.",
+      "Don't put amber or cyan outside the two panels on the home page; the home surface's accent is bone.",
+      "Don't introduce a second typeface or a system display face; use Archivo's width and weight axes.",
+      "Don't round corners on public surfaces; mats, windows, and cards are square-cut.",
+      "Don't use hard-offset, colored, or glowing shadows; depth is the inset highlight, the cut edge, and the long soft cast.",
+      "Don't emboss, engrave, or outline display type; it is pale ink with one soft cast shadow.",
+      "Don't type plate numbers into markup or add label rows above titles; the counter and the `data-title` / `data-note` attributes are the only caption mechanism.",
+      "Don't add runtime JavaScript, icon fonts, or glyph characters to the public pages."
+    ]
+  }
+}
