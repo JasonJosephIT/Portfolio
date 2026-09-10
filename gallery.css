@@ -80,6 +80,38 @@
   }
 }
 
+/* --------------------------------------------------------------------------
+   The wave: the Art background Jason selected (docs/portfolio-design-brief.md,
+   "Selected brand assets"; treatment locked in .tastemaker/style-lock.md).
+
+   `patterned` is the marker the generator stamps on Art pages and nowhere
+   else, so pairing it with `.gallery-page` keeps the wave off Tech, off the
+   not-found page and off Home while staying inside this file's scope rule.
+
+   styles.css has already spent `body::before` on the board's rag texture, so
+   the wave takes `::after`. Both are z-index -1 inside the stacking context
+   `body { isolation: isolate }` opens: the wave lies over the rag, and both
+   lie under every mat, plate and label. The near-black canvas stays beneath
+   them, the layer takes no pointer events, and no text ever inherits its
+   opacity — the 4% is spent on the artwork alone, never on a photograph.
+   -------------------------------------------------------------------------- */
+.gallery-page.patterned::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("assets/wave-pattern.svg");
+  background-repeat: repeat;
+  /* The locked tile: the 1104x608 source hung at half scale. */
+  background-size: 552px 304px;
+  /* The supplied strokes are dark on transparent. brightness(0) then invert(1)
+     drives every stroke to pure white without touching alpha, so 4% reads as
+     silver drawn on the board rather than as a grey wash laid over it. */
+  filter: grayscale(1) brightness(0) invert(1);
+  opacity: 0.04;
+}
+
 /* ==========================================================================
    The type registers, shared by every component below
 
@@ -222,7 +254,8 @@
    offset 4px onto the backing board (amber 7.75:1, ice-cyan 9.68:1, bone
    11.45:1). It is deliberately not overridden here: one indicator sitewide. */
 
-/* The generated nav ships a 40px brand file where Home ships a 36px mark. */
+/* The generated nav carries the same bone mark Home does, under its own class
+   name. No colour filter: the file is already paper white on the board. */
 .gallery-page .brand-logo {
   width: 36px;
   height: 36px;
