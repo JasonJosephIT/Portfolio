@@ -81,6 +81,15 @@ async function resolveImage(entry, { root, download, fetchImpl, created }) {
     return { error: `${where}: cannot derive a safe asset filename from ${JSON.stringify(entry.imagePath ?? entry.imageUrl)}.` };
   }
 
+  const target = join(root, local);
+  // A file already in the working tree is not this run's to write, and above all
+  // not this run's to delete. An export re-lists every submission that was
+  // already imported, so without this the rollback of one bad new proposal would
+  // erase the assets of every record imported before it — leaving the canonical
+  // document pointing at files that are gone. It also saves the pointless
+  // re-download of an asset that is already exactly where it belongs.
+  if (await exists(target)) return { src: local };
+
   let response;
   try {
     response = await fetchImpl(entry.imageUrl);
@@ -96,7 +105,6 @@ async function resolveImage(entry, { root, download, fetchImpl, created }) {
     return { error: `${where}: downloading ${entry.imageUrl} returned an empty file.` };
   }
 
-  const target = join(root, local);
   await mkdir(dirname(target), { recursive: true });
   await writeFile(target, bytes);
   // Only a file this run created may be cleaned up if the import is refused.

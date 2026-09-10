@@ -324,6 +324,25 @@ describe('structuredLayout', () => {
     assert.deepEqual(layout.replaces, legacy);
     assert.equal(layout.mode, 'structured');
   });
+
+  it('carries the preserved layout through a second save instead of losing it', () => {
+    const legacy = { page: 'art.html', x_pct: 12.5, y_px: 40, width_pct: 40 };
+    const first = structuredLayout({ type: 'piece', title: 'Fixture Harbour' }, legacy);
+    const second = structuredLayout({ type: 'piece', title: 'Fixture Harbour, again' }, first);
+    assert.deepEqual(second.replaces, legacy, 're-saving must not throw the original spec away');
+    // Still no nesting: what is kept is the legacy spec, not the envelope.
+    assert.equal(second.replaces.mode, undefined);
+    assert.equal(second.record.title, 'Fixture Harbour, again');
+
+    const third = structuredLayout({ type: 'piece', title: 'Third' }, second);
+    assert.deepEqual(third.replaces, legacy);
+  });
+
+  it('keeps replaces null when there was never a layout to preserve', () => {
+    const first = structuredLayout({ type: 'piece', title: 'Fixture Harbour' });
+    assert.equal(first.replaces, null);
+    assert.equal(structuredLayout({ type: 'piece', title: 'Again' }, first).replaces, null);
+  });
 });
 
 describe('isLegacyLayout', () => {
@@ -492,10 +511,45 @@ describe('recordErrors and fieldOfError', () => {
     assert.deepEqual(recordErrors(fixtureDocument(), 'piece', 'piece-absent'), []);
   });
 
-  it('names the form field a message is about', () => {
-    assert.equal(fieldOfError('artPieces[0]: title is required before this art piece can be published.'), 'title');
-    assert.equal(fieldOfError('artPieces[0].image.alt must be meaningful, non-blank text.'), 'image.alt');
-    assert.equal(fieldOfError('artFavorites[0] references a missing record.'), null);
+  // Every input here comes out of validatePortfolio itself. Hand-written message
+  // strings would only restate the regex: they cannot notice the day the library
+  // changes the shape of a message, which is exactly how this stopped working —
+  // real messages name the record's id, and the pattern did not allow for it.
+  it('names the form field a real validation message is about', () => {
+    const document = {
+      ...createEmptyPortfolio(),
+      artPieces: [
+        fixturePiece({ title: '   ', image: fixtureImage({ alt: 'image' }) }),
+        fixturePiece({
+          id: 'piece-fixture-2',
+          slug: 'fixture-two',
+          image: fixtureImage({ src: 'assets/b b.jpg' }),
+        }),
+      ],
+      artFavorites: [{ type: 'piece', id: 'piece-absent', order: 0 }],
+    };
+    const messages = validatePortfolio(document);
+
+    const about = (needle) => {
+      const message = messages.find((candidate) => candidate.includes(needle));
+      assert.ok(message !== undefined, `no message about ${needle} in:\n${messages.join('\n')}`);
+      return fieldOfError(message);
+    };
+
+    assert.equal(about('title is required'), 'title');
+    assert.equal(about('.alt must be meaningful'), 'image.alt');
+    assert.equal(about('is not a safe local asset path'), 'image.src');
+
+    // Every message naming a record has to reach a field, or the editor drops
+    // the lot into its generic box and focuses nothing.
+    const record = messages.filter((message) => message.startsWith('artPieces['));
+    assert.ok(record.length >= 3, messages.join('\n'));
+    for (const message of record) {
+      assert.notEqual(fieldOfError(message), null, `no field attributed to: ${message}`);
+    }
+
+    // A message about a curated entry names no editable field, and says so.
+    assert.equal(about('artFavorites[0]'), null);
     assert.equal(fieldOfError(null), null);
   });
 });

@@ -368,6 +368,50 @@ describe('runImport — image handling', () => {
     }
   });
 
+  it('leaves an earlier import’s asset alone when a later run is refused', async () => {
+    const root = await makeRoot();
+    try {
+      // The editor exports every ready_to_place row every time, so a second
+      // import re-lists the submission the first one already placed. That asset
+      // belongs to the earlier import and is still referenced by the canonical
+      // document: refusing this run must neither re-download it nor delete it.
+      const placed = fixtureProposal({ image_url: 'https://example.invalid/fixture.jpg' });
+      const asset = join(root, 'assets', 'cafe-bar-fixture-submission-1.jpg');
+      const downloaded = [];
+      const fetchImpl = async (url) => {
+        downloaded.push(url);
+        return new Response(FIXTURE_BYTES, { status: 200 });
+      };
+
+      const first = await runImport({ root, input: await writeInput(root, placed), download: true, fetchImpl });
+      assert.equal(first.ok, true, first.errors.join('\n'));
+      assert.equal(await exists(asset), true, 'the first import saved its asset');
+
+      const broken = fixtureProposal({ id: 'fixture-submission-2', image_url: 'https://example.invalid/second.jpg' });
+      broken.layout.record.projectId = 'art-project-fixture-1';
+      downloaded.length = 0;
+      const second = await runImport({
+        root,
+        input: await writeInput(root, [placed, broken]),
+        download: true,
+        fetchImpl,
+      });
+
+      assert.equal(second.ok, false);
+      assert.ok(second.errors.some((error) => error.includes('projectId')), second.errors.join('\n'));
+      assert.equal(await exists(asset), true, 'the rollback deleted an asset this run did not create');
+      assert.deepEqual(await readFile(asset), FIXTURE_BYTES, 'the earlier bytes are untouched');
+      assert.deepEqual(downloaded, ['https://example.invalid/second.jpg'], 'an asset already on disk is not fetched again');
+      assert.equal(await exists(join(root, 'assets', 'cafe-bar-fixture-submission-2.jpg')), false);
+
+      const canonical = await readCanonical(root);
+      assert.equal(canonical.artPieces.length, 1, 'the refused proposal added nothing');
+      assert.equal(canonical.artPieces[0].image.src, 'assets/cafe-bar-fixture-submission-1.jpg');
+    } finally {
+      await cleanup(root);
+    }
+  });
+
   it('never downloads without the explicit flag, even when a url is supplied', async () => {
     const root = await makeRoot();
     try {

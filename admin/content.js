@@ -41,7 +41,18 @@ import {
 
 const main = document.getElementById("main");
 main.hidden = true;
-await requireAuth("../login/");
+try {
+  await requireAuth("../login/");
+} catch (error) {
+  // requireAuth redirects when there is no session, so reaching here means it
+  // could not tell either way — Supabase unreachable, say. Dying quietly behind
+  // a hidden #main would leave the owner staring at an empty page, so show the
+  // page far enough to carry the reason, then stop before any client call.
+  main.hidden = false;
+  document.getElementById("file-status").textContent =
+    `The editor could not start: your sign-in could not be checked (${error.message}). Reload the page, or sign in again from the login page. Nothing has been loaded and nothing has changed.`;
+  throw error;
+}
 main.hidden = false;
 document.getElementById("signout").addEventListener("click", () => signOut("../login/"));
 
@@ -506,15 +517,23 @@ function saveRecord(type, id, body, { form, errorBox }) {
     showFormErrors(form, errorBox, problems);
     return;
   }
-  const whole = validatePortfolio(next);
-  if (whole.length > 0) {
-    showFormErrors(form, errorBox, whole);
-    return;
-  }
+  // Only this record's own problems may block its own save. A document is loaded
+  // even when it does not validate, precisely so the owner can repair it here —
+  // and refusing every save while any other record is broken makes that repair
+  // impossible: with two broken records, neither can ever be fixed first. What
+  // is left is real, so the status line says so and the Checks panel names it.
+  const elsewhere = validatePortfolio(next).length;
 
   state.editing = { type, id: record.id };
   state.focus = "record-submit";
-  commit(next, `Saved ${kind.label.toLowerCase()} “${record.title ?? record.slug}”. Export the file to keep the change.`);
+  commit(
+    next,
+    `Saved ${kind.label.toLowerCase()} “${record.title ?? record.slug}”. Export the file to keep the change.${
+      elsewhere === 0
+        ? ""
+        : ` ${elsewhere} problem${elsewhere === 1 ? " remains" : "s remain"} elsewhere in this document; see Checks.`
+    }`,
+  );
 }
 
 /** Apply a canonical transform, surfacing its refusal instead of swallowing it. */
@@ -672,7 +691,7 @@ function membershipPanel(project) {
   const members = project.pieceIds ?? [];
   const pieces = state.doc.artPieces ?? [];
   const available = pieces.filter((piece) => !members.includes(piece.id));
-  const apply = (ids, message, focus) =>
+  const applyMembership = (ids, message, focus) =>
     attempt(() => setMembership(state.doc, project.id, ids), message, focus);
   const pieceName = (id) => pieces.find((candidate) => candidate.id === id)?.title || id;
 
@@ -690,7 +709,7 @@ function membershipPanel(project) {
             click: () => {
               const next = members.slice();
               [next[index - 1], next[index]] = [next[index], next[index - 1]];
-              apply(next, `Moved “${pieceName(id)}” up, to position ${index} of ${members.length}.`, `member-up:${id}`);
+              applyMembership(next, `Moved “${pieceName(id)}” up, to position ${index} of ${members.length}.`, `member-up:${id}`);
             },
           },
         }),
@@ -703,7 +722,7 @@ function membershipPanel(project) {
             click: () => {
               const next = members.slice();
               [next[index + 1], next[index]] = [next[index], next[index + 1]];
-              apply(next, `Moved “${pieceName(id)}” down, to position ${index + 2} of ${members.length}.`, `member-down:${id}`);
+              applyMembership(next, `Moved “${pieceName(id)}” down, to position ${index + 2} of ${members.length}.`, `member-down:${id}`);
             },
           },
         }),
@@ -712,7 +731,7 @@ function membershipPanel(project) {
           text: "Remove from project",
           on: {
             click: () =>
-              apply(
+              applyMembership(
                 members.filter((member) => member !== id),
                 `Removed “${pieceName(id)}” from this project. The piece itself is untouched.`,
                 "add-member",
@@ -745,7 +764,7 @@ function membershipPanel(project) {
         on: {
           click: () => {
             if (select.value === "") return;
-            apply([...members, select.value], `Added “${pieceName(select.value)}” to this project.`, "add-member");
+            applyMembership([...members, select.value], `Added “${pieceName(select.value)}” to this project.`, "add-member");
           },
         },
       }),
@@ -982,7 +1001,17 @@ function render() {
 $("open-file").addEventListener("change", async (event) => {
   const file = event.target.files[0];
   if (!file) return;
-  const result = parseCanonical(await file.text());
+  let text;
+  try {
+    text = await file.text();
+  } catch (error) {
+    // A file that cannot be read at all — moved, or permission withdrawn since
+    // the picker closed — must say so rather than leave the editor looking idle.
+    fileStatus(`Could not read ${file.name}: ${error.message}. Nothing was opened.`);
+    event.target.value = "";
+    return;
+  }
+  const result = parseCanonical(text);
   if (result.document === null) {
     fileStatus(result.errors.join(" "));
     return;
@@ -1008,9 +1037,13 @@ $("start-empty").addEventListener("click", () => {
   fileStatus("Started an empty content file. Nothing is saved until you export it.");
 });
 
+/** Export under the name the owner opened, so the file they save back matches. */
+const exportName = () =>
+  typeof state.origin === "string" && state.origin.toLowerCase().endsWith(".json") ? state.origin : "portfolio.json";
+
 $("export-file").addEventListener("click", () => {
   if (state.doc === null) return;
-  download("portfolio.json", serializeCanonical(state.doc));
+  download(exportName(), serializeCanonical(state.doc));
   fileStatus(
     "Exported to your downloads. Save it over content/portfolio.json in the repository, then run node scripts/build-portfolio.mjs. Exporting is not deploying.",
   );
@@ -1171,6 +1204,10 @@ async function saveProposal(row, type, body, { form, errorBox }) {
     say("inbox-status", `Unable to save the proposal: ${error.message}`);
     return;
   }
+  // Close the draft. This form closed over the row as it stood before the save,
+  // so a second save from it would compute `replaces` from a stale snapshot of
+  // `layout`. Re-opening it from the reloaded inbox gives the row as it now is.
+  clear($("proposal-host"));
   say(
     "inbox-status",
     `Saved the draft for “${row.title}” on its submission. The uploaded file is untouched, and nothing is public. Export the proposal file, then run the import script in the repository.`,

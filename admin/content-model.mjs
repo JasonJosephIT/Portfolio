@@ -309,13 +309,22 @@ export function isLegacyLayout(layout) {
 export function structuredLayout(record, previousLayout = null) {
   const value = clone(isPlainObject(record) ? record : {});
   value.state = 'draft';
+  const previous = isPlainObject(previousLayout) ? previousLayout : null;
+  // Only a layout this envelope did not itself write is worth keeping, so
+  // re-saving a proposal never nests one structured layout inside the next. What
+  // the first save preserved is carried forward all the same: dropping it on the
+  // second save would destroy the only remaining copy of the original spec.
+  const kept =
+    previous === null
+      ? null
+      : previous.mode === 'structured'
+        ? previous.replaces
+        : previous;
   return {
     schemaVersion: 1,
     mode: 'structured',
     record: value,
-    // Only a layout this envelope did not itself write is worth keeping, so
-    // re-saving a proposal never nests one structured layout inside the next.
-    replaces: isPlainObject(previousLayout) && previousLayout.mode !== 'structured' ? clone(previousLayout) : null,
+    replaces: isPlainObject(kept) ? clone(kept) : null,
   };
 }
 
@@ -488,10 +497,13 @@ export function importProposals(document, entries) {
  *
  * `validatePortfolio` messages start with the record's position, either
  * `artPieces[0]: title is required…` or `artPieces[0].image.alt must be…`.
+ * A record that has an id carries it in between — `artPieces[0] (id "piece-1")` —
+ * so that segment is optional here; without it every real message, which always
+ * names an id, would be attributed to no field at all.
  */
 export function fieldOfError(message) {
   if (typeof message !== 'string') return null;
-  const match = /^[A-Za-z]+\[\d+\](?:\.([A-Za-z0-9_.]+)|:\s+([A-Za-z0-9_]+))/.exec(message);
+  const match = /^[A-Za-z]+\[\d+\](?: \(id [^)]*\))?(?:\.([A-Za-z0-9_.]+)|:\s+([A-Za-z0-9_]+))/.exec(message);
   if (match === null) return null;
   return match[1] ?? match[2] ?? null;
 }
