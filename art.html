@@ -27,14 +27,15 @@
   </header>
 
   <!--
-    Gallery contract (admin/edit.js and /place-image depend on it):
+    Gallery contract (hand-edited; keep this shape so styles.css keeps working):
     <section class="gallery"> holds <a href="assets/photo-NN.jpg"><img src="assets/photo-NN.jpg" alt="..." loading="lazy"></a>
     as direct children. Optional data-title on the <a> prints after the plate number.
     Masonry via CSS columns: 3 cols >=1024px, 2 cols >=700px, 1 below. Full spec: docs/prd.md "Art".
 
     PLACEHOLDERS: photo-01..09 are synthetic studies (crops of the two hero portraits and
-    generated light studies). Replace each file and its alt/data-title with real work,
-    or submit real photos through /admin/ and run /place-image.
+    generated light studies). Replace each file and its alt/data-title with real work.
+    To add a plate: drop the file in assets/ and add an <a> below by hand. Photos
+    uploaded through /admin/ sit in an inbox — nothing places them on the page for you.
   -->
   <section class="gallery wrap" aria-label="Plates">
     <a href="assets/photo-01.jpg" data-title="Placeholder, warm study"><img src="assets/photo-01.jpg" alt="Placeholder plate 01: warm-toned crop of the eyes from the split-lit portrait. Replace with your photograph." width="1400" height="883" loading="lazy"></a>
@@ -64,9 +65,5 @@
       <p class="frame-copy">&copy; 2026 Jason. Man is not truly one, but truly two.</p>
     </div>
   </footer>
-
-  <script type="module">
-    if (new URLSearchParams(location.search).has("edit")) import("./admin/edit.js");
-  </script>
 </body>
 </html>

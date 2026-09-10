@@ -56,7 +56,7 @@
       const photos = rows.filter((r) => r.kind === "photo").length;
       const projects = rows.filter((r) => r.kind === "project").length;
       const pending = rows.filter((r) => r.status !== "placed").length;
-      el.textContent = `${photos} photo${photos === 1 ? "" : "s"} · ${projects} project${projects === 1 ? "" : "s"} · ${pending} awaiting placement`;
+      el.textContent = `${photos} photo${photos === 1 ? "" : "s"} · ${projects} project${projects === 1 ? "" : "s"} · ${pending} not yet on the site`;
     }
   </script>
 </body>

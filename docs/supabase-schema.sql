@@ -9,14 +9,14 @@ create table if not exists public.submissions (
   link_url text,            -- projects only
   status text not null default 'submitted'
     check (status in ('submitted','ready_to_place','placed')),
-  layout jsonb,             -- change spec written by edit mode (Task 4)
+  layout jsonb,             -- legacy: drag-editor layout specs (editor removed 2026-09-10)
   created_at timestamptz not null default now()
 );
 
 alter table public.submissions enable row level security;
 
 -- Reads require sign-in (tightened 2026-07-20, migration submissions_read_authenticated;
--- originally "public read"). The service-role key used by scripts/ bypasses RLS.
+-- originally "public read"). Nothing in this repo uses a service-role key any more.
 create policy "authenticated read" on public.submissions
   for select to authenticated using (true);
 create policy "authenticated insert" on public.submissions

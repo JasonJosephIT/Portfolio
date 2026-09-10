@@ -1,6 +1,6 @@
 # Launch Checklist — Jason's Portfolio
 
-**What you're launching:** a 3-page portfolio site (Home / Art / Tech) built as plain HTML and CSS — no build step, no frameworks — plus a private admin pipeline (Supabase + the `/place-image` command) that only you use to add photos and projects.
+**What you're launching:** a 3-page portfolio site (Home / Art / Tech) built as plain HTML and CSS — no build step, no frameworks — plus a private admin inbox (Supabase) where you can stash photos and project notes from your phone.
 
 **Recommended path:** GitHub Pages (free static hosting built into GitHub, where your code already lives), with an optional custom domain later.
 
@@ -23,9 +23,7 @@ Your site's plumbing is done, but the shelves are nearly empty: the Art gallery 
   > If you want it removed, tell your agent: *"Revert commit db1a467 (the Soul Study I test placement) and delete assets/photo-01.jpg."*
   **You'll know it worked when...** art.html shows the gallery you intend, with no accidental duplicates of the hero image.
 
-- [ ] 🤝 **Add your real photos** (30–60 min, fun part). Two ways — pick either:
-  - *The pipeline you built:* serve the site locally, sign in at `/admin/` with a magic link (a sign-in email with a one-time link — no password), submit each photo, then open `art.html?edit=1`, drag it where you want, save, and tell your agent: *"Run /place-image"*. This also doubles as your pipeline's first real test (Phase 4).
-  - *The direct way:* put photos in `assets/` as `photo-02.jpg`, `photo-03.jpg`, … and tell your agent: *"Add these photos to the art.html gallery per the layout notes in the HTML comment."*
+- [ ] 🤝 **Add your real photos** (30–60 min, fun part). Put your photos in `assets/` as `photo-01.jpg`, `photo-02.jpg`, … and tell your agent: *"Add these photos to the art.html gallery per the layout notes in the HTML comment."* If you shot them on your phone, you can stash them in the `/admin/` inbox first so they don't get lost — they still reach the page through this step.
   **You'll know it worked when...** the gallery reflows nicely at desktop, tablet, and phone widths with your actual work.
 
 - [ ] 🤝 **Fill in the Tech page** (20–40 min). The page has a hidden note describing exactly how projects and skills should look, but no content. Gather: project names, one-sentence descriptions, tags, and links.
@@ -36,16 +34,7 @@ Your site's plumbing is done, but the shelves are nearly empty: the Art gallery 
 
 ## Phase 2 — Supabase production settings
 
-Supabase is the service that receives your photo submissions. It's already built and tested; three settings make it launch-ready. All of these live at **supabase.com/dashboard → project `jason-portfolio`**.
-
-- [ ] 🧑 **Put your service-role key in `.env`** (5 min). The service-role key is the master key your local scripts use to mark submissions as placed. Agents can't fetch it for you, and it must never be committed or pasted into chat.
-  Go to **Project Settings → API keys**, copy the `service_role` key, then edit the file `.env` in your project folder (copy `.env.example` if it doesn't exist) so it reads:
-  ```
-  SUPABASE_URL=https://nflhxvypzahwbpxjogbt.supabase.co
-  SUPABASE_SERVICE_KEY=<paste the service_role key here>
-  ```
-  `.env` is git-ignored (listed in a file that tells git what never to upload), so this stays on your machine only.
-  **You'll know it worked when...** after placing a test submission, `node scripts/mark-placed.mjs <id>` prints `placed: <id>` instead of a "no row updated" error.
+Supabase is the service that receives your photo submissions. It's already built and tested; two settings make it launch-ready. You do **not** need a service-role key — nothing in this repo uses one. All of these live at **supabase.com/dashboard → project `jason-portfolio`**.
 
 - [ ] 🧑 **Disable public sign-ups** (2 min). Right now anyone who found your site's code could create an account and drop junk into your submission inbox. Go to **Authentication → Sign In / Up** and turn **off** "Allow new users to sign up" *after* you've signed in at `/admin/` at least once (your account must exist first).
   **You'll know it worked when...** the setting shows disabled, and your own magic-link sign-in still works.
@@ -84,9 +73,9 @@ Skip this entirely if `jasonjosephit.github.io/Portfolio` is fine for now — yo
 
 The site isn't launched until this passes on the **live** URL, not localhost.
 
-- [ ] 🧑 **As a visitor** (10 min): on your phone and a desktop browser, open the live Home, Art, and Tech pages. Check: no horizontal scrolling at any size, every photo loads, hover-lift works on desktop, nav highlights the current page, and **no admin controls are visible anywhere** (the edit overlay must only ever appear when you add `?edit=1` yourself).
-- [ ] 🧑 **As the admin — one full loop on the live site** (15 min): request a magic link at `/admin/`, sign in, submit a test photo → open `art.html?edit=1`, drag and save → tell your agent *"Run /place-image"* → agent commits and pushes → confirm the photo appears on the live page for a normal visitor. This is the one flow that has never been human-tested end to end (everything downstream of it has been verified by agents).
-  **You'll know it worked when...** the loop completes without touching the Supabase dashboard, and running `/place-image` again reports "nothing to place".
+- [ ] 🧑 **As a visitor** (10 min): on your phone and a desktop browser, open the live Home, Art, and Tech pages. Check: no horizontal scrolling at any size, every photo loads, hover-lift works on desktop, nav highlights the current page, and **no admin controls are visible anywhere** (the public pages ship zero JavaScript, so there is nothing that can appear).
+- [ ] 🧑 **As the admin — sign in on the live site** (5 min): request a magic link at `/admin/`, sign in, submit a test photo, and confirm it appears in the Submissions list. That is the whole admin loop now: the inbox stores your upload, and putting it on a public page is an ordinary edit to `art.html`.
+  **You'll know it worked when...** the submission appears in the list without you touching the Supabase dashboard.
 
 ---
 

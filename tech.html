@@ -27,14 +27,15 @@
   </header>
 
   <!--
-    Projects contract (admin/edit.js and /place-image depend on it):
+    Projects contract (hand-edited; keep this shape so styles.css keeps working):
     <section class="projects"> > <div class="project-grid"> > <article class="project-card">
       h3 (title; optional data-note prints after the plate number), p (one sentence),
       .tech-tags (spans), .project-link (href). Grid: auto-fit, min 300px; first card spans
       the row on wide screens. Full spec: docs/prd.md "Tech".
 
     PLACEHOLDERS: the three projects below are fictional and labeled. Replace each with a
-    real project, or submit through /admin/ and run /place-image.
+    real project by editing the markup below. Projects submitted through /admin/ sit in
+    an inbox — nothing places them on the page for you.
   -->
   <section class="projects wrap">
     <h2>Projects</h2>
@@ -94,9 +95,5 @@
       <p class="frame-copy">&copy; 2026 Jason. Man is not truly one, but truly two.</p>
     </div>
   </footer>
-
-  <script type="module">
-    if (new URLSearchParams(location.search).has("edit")) import("./admin/edit.js");
-  </script>
 </body>
 </html>

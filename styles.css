@@ -496,7 +496,7 @@ body.home { position: relative; }
 
 /* ==========================================================================
    Gallery (art.html): matted prints in a masonry run
-   Contract: .gallery > a > img (admin/edit.js and /place-image rely on it)
+   Contract: .gallery > a > img (art.html is hand-edited; keep this shape)
    ========================================================================== */
 .gallery {
   columns: 1;

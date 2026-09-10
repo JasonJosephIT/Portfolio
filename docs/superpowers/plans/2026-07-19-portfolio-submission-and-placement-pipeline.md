@@ -1,3 +1,8 @@
+> **SUPERSEDED 2026-09-10 — do not execute.** Tasks 4-6 (the `?edit=1` drag-to-place
+> overlay, `/place-image`, and `scripts/fetch-pending.mjs` / `mark-placed.mjs`) were
+> removed. `art.html` and `tech.html` are hand-edited; `/admin/` is an upload inbox
+> only. Kept as a record of what was built and why. See PRODUCT.md for current shape.
+
 # Portfolio Submission & Agent Placement Pipeline — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
