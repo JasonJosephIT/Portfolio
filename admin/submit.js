@@ -30,7 +30,7 @@ $("submit-form").addEventListener("submit", async (e) => {
     image_path,
     link_url: $("link_url").value || null,
   });
-  status(error ? `Insert failed: ${error.message}` : "Submitted ✓ — open the page with ?edit=1 to place it.");
+  status(error ? `Insert failed: ${error.message}` : "Submitted ✓ — write its draft record under Content.");
   if (!error) {
     e.target.reset();
     document.dispatchEvent(new CustomEvent("submission:created"));
