@@ -129,7 +129,6 @@ svg { display: inline-block; vertical-align: middle; }
 .wall-title,
 .plate,
 .contact,
-.frame-medium,
 .frame-links a,
 .frame-copy {
   font-size: 0.72rem;
@@ -508,8 +507,6 @@ body.home { position: relative; }
   font-size: 0.9rem;
   letter-spacing: 0.24em;
 }
-
-.frame-medium { margin: 8px 0 0; color: var(--pencil); }
 
 .frame-links {
   display: flex;
