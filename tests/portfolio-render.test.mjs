@@ -307,6 +307,18 @@ describe('renderPortfolio — the empty canonical document', () => {
     assert.match(renderPortfolio(emptyDocument(), { siteBase: 'Portfolio' }).get('art.html'), /href="styles\.css"/);
   });
 
+  it('rejects a protocol-relative site base instead of linking the 404 page off-site', () => {
+    // A leading `//` is parsed by browsers as "same scheme, different host" —
+    // `href="//evil.com/styles.css"` would send every visitor who lands on the
+    // not-found page at another origin. --site-base is owner-supplied, but a
+    // typo like `--site-base //Portfolio/` should fail the build loudly rather
+    // than ship a page that quietly links off-site.
+    assert.throws(
+      () => renderPortfolio(emptyDocument(), { siteBase: '//evil.com/' }),
+      /single-slash-rooted|protocol-relative/i,
+    );
+  });
+
   it('ends every page with exactly one trailing newline', () => {
     for (const [path, html] of pages) {
       assert.match(html, /<\/html>\n$/, path);

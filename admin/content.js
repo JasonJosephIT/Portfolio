@@ -553,14 +553,23 @@ function saveRecord(type, id, body, { form, errorBox }) {
   // `uniqueSlug` tidies and de-duplicates, so the stored slug is not always the
   // one that was typed — and the slug is the public detail address. Saying so
   // is the difference between a link the owner chose and one they discover.
-  const slugChanged = record.slug !== submittedSlug;
+  //
+  // Compare against the *normalized* form of what the owner actually typed
+  // into the Slug field, not the raw text: folding "Soul Study I" down to
+  // "soul-study-i" is expected and silent. What deserves a notice is what
+  // tidying could not preserve — a collision that forced a different slug, or
+  // nothing URL-safe left at all. When the field was left blank, the slug was
+  // derived from the title rather than typed, so there is nothing to compare
+  // and the notice stays silent — that is the normal case for a new record.
+  const typedSlug = body.slug;
+  const slugChanged = typedSlug !== undefined && record.slug !== slugify(typedSlug);
 
   state.editing = { type, id: record.id };
   state.focus = "record-submit";
   commit(
     next,
     `Saved ${kind.label.toLowerCase()} “${record.title ?? record.slug}”. Export the file to keep the change.${
-      slugChanged ? ` Its address is “${record.slug}”, not “${submittedSlug}” — that slug was taken or not URL-safe.` : ""
+      slugChanged ? ` Its address is “${record.slug}”, not “${typedSlug}” — that slug was taken or not URL-safe.` : ""
     }${
       elsewhere === 0
         ? ""

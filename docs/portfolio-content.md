@@ -401,16 +401,15 @@ that Jason hears about it before a visitor does.
 
 ### Hosting requirements
 
-`404.html` is written for the site root and every reference in it — the
-stylesheets, the navigation, the Art and Tech links — is relative. This keeps it
-consistent with every other generated page, which is what lets the same markup
-serve from any depth. The consequence is that the host must **serve `404.html`
-from the site root**: a host that serves the file's own body for a deep path such
-as `/art/pieces/missing/` resolves those relative references against that
-directory instead, and the page loads without styling and with broken links.
-
-Configure the not-found handler as a root-relative rewrite to `/404.html` (the
-default on Netlify, Cloudflare Pages, GitHub Pages and S3 static hosting).
+Because `404.html`'s references are absolute (see above), the page itself no
+longer cares what depth it is served from — that is what `--site-base` buys.
+What the host still has to do is serve that file's bytes for a request that
+does not otherwise resolve, since nothing does this on its own for a static
+site. Configure the not-found handler as a root-relative rewrite to
+`/404.html` (the default on Netlify, Cloudflare Pages, GitHub Pages and S3
+static hosting): with that in place, a request for `/art/pieces/missing/`
+still gets `404.html`'s bytes, and because every reference inside it is
+absolute, the page renders styled with working links at that depth too.
 
 ## The owner workflow
 

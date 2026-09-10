@@ -74,8 +74,8 @@ Your repo `JasonJosephIT/Portfolio` already exists on GitHub; local `main` is 11
   Note: your `main` branch is public-web-readable as source code — that's fine by design (the Supabase "anon" key in `admin/config.js` is meant to be public; write access is protected by sign-in, which Phase 2 locked down). What Pages *serves* is only the built `gh-pages` branch.
   **You'll know it worked when...** `https://jasonjosephit.github.io/Portfolio/` loads your homepage with a padlock (HTTPS) in the address bar, and `https://jasonjosephit.github.io/Portfolio/content/portfolio.json` gives you a "page not found".
 
-- [ ] 🤝 **Whenever you add work, redeploy the same way** (2 min each time). Publishing is always: publish over `content/portfolio.json`, `node scripts/build-portfolio.mjs`, commit and push `main`, then rebuild `../portfolio-public` and push `gh-pages`.
-  > Tell your agent: *"Rebuild and redeploy the site."*
+- [ ] 🤝 **Whenever you add work, redeploy the same way** (2 min each time). Publishing is always: publish over `content/portfolio.json`, `node scripts/build-portfolio.mjs`, commit and push `main`, then `node scripts/build-portfolio.mjs --out ../portfolio-public --site-base /Portfolio/` (the same `--out` and `--site-base` as the Phase 3 command above — drop to `--site-base /` once you've done Phase 4) and push `gh-pages`.
+  > Tell your agent: *"Rebuild and redeploy the site with `node scripts/build-portfolio.mjs --out ../portfolio-public --site-base /Portfolio/`, same as Phase 3."*
   **You'll know it worked when...** the new piece appears on the live URL, not just locally.
 
 ---
