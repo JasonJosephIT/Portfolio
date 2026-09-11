@@ -237,7 +237,7 @@ describe('renderPortfolio — the empty canonical document', () => {
     // With no work only Home, About Me and Contact survive, but their relative
     // order must still follow the requested rail sequence.
     const art = pages.get('art.html');
-    const rail = art.slice(art.indexOf('art-rail__nav'), art.indexOf('</nav>', art.indexOf('art-rail__nav')));
+    const rail = art.slice(art.indexOf('rail__nav'), art.indexOf('</nav>', art.indexOf('rail__nav')));
     assert.ok(rail.indexOf('Home') < rail.indexOf('About Me'));
     assert.ok(rail.indexOf('About Me') < rail.indexOf('Contact'));
   });
@@ -694,6 +694,101 @@ describe('gallery.css — the no-JavaScript contract', () => {
     for (const pattern of [/<button[^>]*data-color-toggle[^>]*>/, /<div[^>]*class="filters"[^>]*>/]) {
       assert.ok(hasHiddenAttribute(openingTag(art, pattern)), `${pattern} must ship hidden`);
     }
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * The identity rail
+ * ------------------------------------------------------------------ */
+
+describe('renderPortfolio — the shared identity rail', () => {
+  // Jason moved the rail onto Tech and the not-found page and narrowed it to
+  // 100px on 2026-09-10, overriding the brief's "Art rail" and 200px column.
+  const pages = renderPortfolio(emptyDocument());
+  const railPages = ['art.html', 'tech.html', '404.html'];
+
+  it('hangs Art, Tech and the not-found page from one rail rather than the top nav', () => {
+    for (const path of railPages) {
+      const html = pages.get(path);
+      assert.match(html, /<div class="rail-shell">/, path);
+      assert.match(html, /<header class="rail" id="top">/, path);
+      assert.match(html, /<div class="rail-content">/, path);
+      // The sticky bar is the detail views' chrome now; a page cannot carry
+      // both without navigating itself twice.
+      assert.equal(html.includes('class="site-nav"'), false, path);
+    }
+  });
+
+  it('keeps one brand lockup on every rail: home, named, with a decorative mark', () => {
+    for (const path of railPages) {
+      const brand = openingTag(pages.get(path), /<a[^>]*class="wordmark rail__brand"[^>]*>/);
+      assert.match(brand, /aria-label="Jason — portfolio home"/, path);
+      assert.match(brand, /href="\/?index\.html"/, path);
+      // The name comes from the label and the adjacent wordmark, so the mark
+      // must stay out of the accessible name.
+      assert.match(pages.get(path), /<img class="brand-logo" src="[^"]*bard-mark\.png" alt="" width="36" height="36">/, path);
+    }
+  });
+
+  it('gives Tech the Art rail semantics: its own sections, its own top, the other portfolio', () => {
+    const tech = pages.get('tech.html');
+    assert.match(tech, /<nav class="rail__nav" aria-label="Tech sections">/);
+    // The rail's Home is the top of Tech, not the site landing page the brand
+    // above already goes to.
+    assert.match(tech, /<a href="#overview" aria-label="Home — Tech overview">Home<\/a>/);
+    assert.match(tech, /<header class="page-head" id="overview">/);
+    assert.match(tech, /<nav class="rail__switch" aria-label="Other portfolios">/);
+    assert.match(tech, /<li><a href="art\.html">Art<\/a><\/li>/);
+    // With no published work the rail is honestly the brand, Home and Art.
+    assert.equal(tech.includes('href="#starred"'), false);
+    assert.equal(tech.includes('href="#projects"'), false);
+  });
+
+  it('names Tech rail links after the headings they point at once there is work', () => {
+    const populated = renderPortfolio(
+      documentWith({
+        techProjects: [fixtureTechProject()],
+        techStarred: [{ id: 'tech-project-fixture-1', order: 0 }],
+      }),
+    ).get('tech.html');
+    const rail = populated.slice(populated.indexOf('rail__nav'), populated.indexOf('</nav>', populated.indexOf('rail__nav')));
+    // Verbatim headings, in document order, with Home last as on Art. A label
+    // wider than the column wraps; it is never shortened into a name the
+    // section heading does not use.
+    assert.match(rail, /<a href="#starred">Starred Projects<\/a>/);
+    assert.match(rail, /<a href="#projects">Projects<\/a>/);
+    assert.ok(rail.indexOf('#starred') < rail.indexOf('#projects'));
+    assert.ok(rail.indexOf('#projects') < rail.indexOf('#overview'));
+    assert.match(populated, /<h2 class="section__title" id="starred-title">Starred Projects<\/h2>/);
+  });
+
+  it('keeps the not-found rail to the brand and the two portfolios', () => {
+    const notFound = pages.get('404.html');
+    assert.match(notFound, /<nav class="rail__nav" aria-label="Portfolios">/);
+    assert.match(notFound, /<li><a href="\/art\.html">Art<\/a><\/li>/);
+    assert.match(notFound, /<li><a href="\/tech\.html">Tech<\/a><\/li>/);
+    // A dead end has no sections of its own, so its rail grows no in-page
+    // anchors and no cross-discipline switch beside a nav that is the switch.
+    assert.equal(notFound.includes('rail__switch'), false);
+    const rail = notFound.slice(notFound.indexOf('<header class="rail"'), notFound.indexOf('</header>'));
+    assert.equal(/href="#/.test(rail), false);
+  });
+
+  it('leaves the detail views on the shared sticky top navigation', () => {
+    const detail = renderPortfolio(populatedArt()).get('art/pieces/fixture-doorway/index.html');
+    assert.match(detail, /<nav class="site-nav" id="top" aria-label="Site">/);
+    assert.equal(detail.includes('class="rail-shell"'), false);
+  });
+
+  it('pins the 100px column and the wrapping top bar it collapses into', () => {
+    const stylesheet = readFileSync(join(repoRoot, 'gallery.css'), 'utf8');
+    // 100px is Jason's override of the brief's 200px rail (2026-09-10).
+    assert.match(stylesheet, /grid-template-columns:\s*100px minmax\(0, 1fr\)/);
+    assert.equal(/grid-template-columns:\s*200px/.test(stylesheet), false);
+    // Below the breakpoint the rail is the visible wrapping top bar the design
+    // brief requires — never a drawer, an offscreen sidebar or a scroller.
+    const base = stylesheet.slice(stylesheet.indexOf('.gallery-page .rail {'));
+    assert.match(base.slice(0, base.indexOf('}')), /flex-wrap:\s*wrap/);
   });
 });
 
