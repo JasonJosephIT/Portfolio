@@ -81,7 +81,7 @@ Chatbot (separate Worker with its own routes, secrets, Vectorize binding and spe
 - Guardrails: chats in D1 only, AI Gateway logging off for chat traffic, no message bodies in Workers Logs; 90-day deletion by a scheduled Worker; read only by Jason behind Cloudflare Access. Visible notice before the first message (also covers EU AI Act disclosure). Turnstile on the first message, verified server-side. 10 messages/min/session, 500-char cap, AI Gateway daily spend limit, kill switch. Retrieved text delimited as untrusted; system prompt never revealed; emails and phones scrubbed from stored and shown text; non-streaming so AI Gateway Guardrails can check responses.
 
 Migration phases, each its own PR
-- A dropped (Jason, 2026-10-16): the staged changes would remove the side rail and skip link and restore the retired `?edit=1` overlay, so they are not landed. The port starts from `main`; C and D remove the generated-gallery system and admin/. B Astro skeleton with existing pages ported, preview deploy. C wire the bundle and replace the Tech cards from it. D retire admin/, Supabase pipeline, Instatic and place-image. E docs. F chatbot.
+- A dropped (Jason, 2026-10-16): the staged changes would remove the side rail and skip link and restore the retired `?edit=1` overlay, so they are not landed. The port starts from `main`; B removes the generated-gallery system and D removes admin/. B Astro skeleton with existing pages ported, preview deploy. C wire the bundle and replace the Tech cards from it. D retire admin/, Supabase pipeline, Instatic and place-image. E docs. F chatbot.
 - Tag the last static commit `static-final`. Cut over when the workers.dev preview passes a side-by-side check.
 
 ## Testing Decisions
