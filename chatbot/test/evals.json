@@ -832,5 +832,146 @@
 				]
 			}
 		}
+	},
+	{
+		"name": "first message without a Turnstile token is 403",
+		"session": "none",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 403,
+			"json": {
+				"error": "verify"
+			}
+		}
+	},
+	{
+		"name": "a session with a tampered signature is 403",
+		"session": "forged",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 403,
+			"json": {
+				"error": "verify"
+			}
+		}
+	},
+	{
+		"name": "an expired session is 403",
+		"session": "expired",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 403,
+			"json": {
+				"error": "verify"
+			}
+		}
+	},
+	{
+		"name": "a session with an extra segment is 403",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": [],
+				"session": "SESSION.x"
+			}
+		},
+		"expect": {
+			"status": 403,
+			"json": {
+				"error": "verify"
+			}
+		}
+	},
+	{
+		"name": "a token Turnstile rejects is 403",
+		"session": "none",
+		"env": {
+			"TURNSTILE_SECRET": "2x0000000000000000000000000000000AA"
+		},
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": [],
+				"turnstileToken": "XXXX.DUMMY.TOKEN.XXXX"
+			}
+		},
+		"expect": {
+			"status": 403,
+			"json": {
+				"error": "verify"
+			}
+		}
+	},
+	{
+		"name": "a valid test token answers 200 with a session",
+		"session": "none",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": [],
+				"turnstileToken": "XXXX.DUMMY.TOKEN.XXXX"
+			}
+		},
+		"expect": {
+			"status": 200,
+			"bodyIncludes": "\"session\":\""
+		}
+	},
+	{
+		"name": "a failing D1 still returns the answer",
+		"fail": "d1",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 200,
+			"bodyIncludes": "I don't know. See the contact page."
+		}
 	}
 ]
