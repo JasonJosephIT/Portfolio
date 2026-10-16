@@ -10,7 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "node --test tests/site.test.mjs",
+    "test": "node --test --test-concurrency=1 \"tests/site*.test.mjs\"",
     "pull": "node scripts/pull-bundle.mjs",
     "pull:preview": "node scripts/pull-bundle.mjs --preview",
     "deploy": "astro build && wrangler deploy"
