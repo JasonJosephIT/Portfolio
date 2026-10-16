@@ -1,0 +1,13 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "jason-portfolio",
+	"compatibility_date": "2026-10-13",
+	// Fully prerendered: static assets only, no Worker script, no adapter.
+	"assets": {
+		"directory": "./dist",
+		"not_found_handling": "404-page"
+	}
+	// Workers Builds: production (main) build command `pnpm build`, deploy `pnpm wrangler deploy`.
+	// Non-production (PR preview) build command `BUNDLE_DIR=tests/fixtures/bundle pnpm build`,
+	// deploy `pnpm wrangler versions upload`, until an approved bundle is committed (P11).
+}
