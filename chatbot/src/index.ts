@@ -19,7 +19,11 @@ async function chat(request: Request, env: Env): Promise<Reply> {
 	if (typeof message !== "string" || !Array.isArray(history)) return [{ error: "bad request" }, 400];
 	if (message.length > CAP) return [{ error: "message too long" }, 413];
 	if (history.length > MAX_TURNS || !history.every(turnOk)) return [{ error: "bad history" }, 400];
-	return [await answer(message, history as Turn[], env), 200];
+	try {
+		return [await answer(message, history as Turn[], env), 200];
+	} catch {
+		return [{ error: "unavailable" }, 502]; // no error text: it could carry model or index internals
+	}
 }
 
 const SYSTEM = `You answer visitors' questions about Jason's published work on his portfolio site.
@@ -38,6 +42,10 @@ const scrub = (s: string) =>
 	s
 		.replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, "[email removed]")
 		.replace(/\+?\d[\d\s().-]{6,}\d/g, (m) => (m.replace(/\D/g, "").length >= 9 ? "[phone removed]" : m));
+
+// Markdown links and images pointing off-site (anything but a /path; //host is off-site) keep only their text,
+// so the widget never renders a link or loads an image the model was talked into (OWASP LLM05).
+const unlink = (s: string) => s.replace(/!?\[([^\]]*)\]\((?!\/(?!\/))[^)]*\)/g, "$1");
 
 const REFUSAL = { answer: "I can only answer questions about Jason's published work.", citations: [] };
 // ponytail: tiny on purpose (each pattern has an eval); the system prompt and the output checks below do the rest.
@@ -63,10 +71,14 @@ async function answer(message: string, history: Turn[], env: Env) {
 		data: number[][];
 	};
 	const { matches } = await env.VECTORIZE.query(embedded.data[0], { topK: 5, namespace, returnMetadata: "all" });
-	const chunks = matches.filter((m) => m.score >= Number(env.MIN_SCORE)).map((m) => m.metadata as unknown as Chunk);
+	// A blank or non-numeric MIN_SCORE must not become 0 (Number("") is 0): treat retrieval as weak instead.
+	const min = env.MIN_SCORE?.trim() ? Number(env.MIN_SCORE) : NaN;
+	if (!Number.isFinite(min)) return DONT_KNOW;
+	const chunks = matches.filter((m) => m.score >= min).map((m) => m.metadata as unknown as Chunk);
 	if (!chunks.length) return DONT_KNOW; // matches come sorted by score: none over the bar means the best is weak
 	// Retrieved text is untrusted (OWASP LLM01): fenced in excerpt tags it cannot close itself.
-	const fence = (c: Chunk) => `<excerpt url="${c.url}" untrusted>\n${c.text.replace(/<(\/?excerpt)/gi, "&lt;$1")}\n</excerpt>`;
+	const attr = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+	const fence = (c: Chunk) => `<excerpt url="${attr(c.url)}" untrusted>\n${c.text.replace(/<(\/?excerpt)/gi, "&lt;$1")}\n</excerpt>`;
 	const excerpts = chunks.map(fence).join("\n");
 	const messages = [
 		{ role: "system", content: SYSTEM },
@@ -75,11 +87,17 @@ async function answer(message: string, history: Turn[], env: Env) {
 	];
 	// Non-streaming, so the whole answer is checked and scrubbed before anyone sees it.
 	const model = env.CHAT_MODEL as "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
-	const reply = (await env.AI.run(model, { messages, max_tokens: 400 }, gateway)) as { response?: string };
+	const reply = (await env.AI.run(model, { messages, max_tokens: 400 }, gateway)) as {
+		response?: string;
+		choices?: { message?: { content?: string } }[];
+		content?: { text?: string }[];
+	};
 	const citations = [...new Map(chunks.map((c) => [c.url, { title: c.section || c.slug, url: c.url }])).values()];
-	const text = reply.response?.trim() ?? "";
+	// Workers AI, OpenAI-compatible and Anthropic shapes, so moving CHAT_MODEL to Claude is config only.
+	const raw = reply.response ?? reply.choices?.[0]?.message?.content ?? reply.content?.[0]?.text;
+	const text = typeof raw === "string" ? raw.trim() : "";
 	if (!text || leaks(text)) return REFUSAL;
-	return { answer: scrub(text), citations };
+	return { answer: unlink(scrub(text)), citations };
 }
 
 export default {

@@ -10,6 +10,10 @@ type Case = {
 	env?: Record<string, string>;
 	// What the stubbed chat model returns; by default it echoes the non-system messages it was sent.
 	modelReply?: string;
+	// Reply shape the fake chat model uses: Workers AI (default), OpenAI-compatible or Anthropic.
+	modelShape?: "openai" | "anthropic";
+	// Which fake binding throws.
+	fail?: "ai" | "vectorize";
 	// "none": no ACTIVE_NS in KV. Otherwise the fixture index is active.
 	index?: "none";
 	expect: {
@@ -47,7 +51,9 @@ function toRequest(c: Case) {
 
 // Fake AI, Vectorize and KV: no real calls. The embed counts fixture vocab words in the text.
 type Msg = { role: string; content: string };
-function fakes(modelReply?: string, activeNs: string | null = index.namespace) {
+const BOOM = "boom: internal detail 9c1e";
+function fakes(c: Partial<Case> = {}, activeNs: string | null = index.namespace) {
+	const { modelReply, modelShape, fail } = c;
 	const chats: Msg[][] = [];
 	const embed = (t: string) => index.vocab.map((w) => t.toLowerCase().split(w).length - 1);
 	const cos = (a: number[], b: number[]) => {
@@ -57,14 +63,19 @@ function fakes(modelReply?: string, activeNs: string | null = index.namespace) {
 	const AI = {
 		async run(model: string, input: { text?: string[]; messages?: Msg[] }, opts?: { gateway?: { id: string } }) {
 			expect(opts?.gateway?.id).toBe(env.AI_GATEWAY_ID);
+			if (fail === "ai") throw new Error(BOOM);
 			if (model === env.EMBED_MODEL) return { shape: [1, index.vocab.length], data: input.text!.map(embed) };
 			expect(model).toBe(env.CHAT_MODEL);
 			chats.push(input.messages!);
-			return { response: modelReply ?? input.messages!.filter((m) => m.role !== "system").map((m) => m.content).join("\n") };
+			const text = modelReply ?? input.messages!.filter((m) => m.role !== "system").map((m) => m.content).join("\n");
+			if (modelShape === "openai") return { choices: [{ message: { role: "assistant", content: text } }] };
+			if (modelShape === "anthropic") return { content: [{ type: "text", text }] };
+			return { response: text };
 		},
 	};
 	const VECTORIZE = {
 		async query(vector: number[], opts: { topK: number; namespace: string }) {
+			if (fail === "vectorize") throw new Error(BOOM);
 			const matches = index.chunks
 				.filter((c) => c.id.startsWith(`${opts.namespace}:`))
 				.map((c) => ({ id: c.id, score: cos(vector, c.values), metadata: c.metadata }))
@@ -80,13 +91,14 @@ function fakes(modelReply?: string, activeNs: string | null = index.namespace) {
 // Every case goes through the Worker's fetch with fakes wired in: the real AI binding is remote and costs money.
 for (const c of cases as Case[]) {
 	it(c.name, async () => {
-		const { bindings, chats } = fakes(c.modelReply, c.index === "none" ? null : undefined);
+		const { bindings, chats } = fakes(c, c.index === "none" ? null : undefined);
 		const res = await worker.fetch(toRequest(c), { ...env, ...bindings, ...c.env } as Env);
 		const text = await res.text();
 		expect(res.status).toBe(c.expect.status);
 		for (const [k, v] of Object.entries(c.expect.headers ?? {})) expect(res.headers.get(k)).toBe(v);
 		if (c.expect.bodyIncludes) expect(text).toContain(c.expect.bodyIncludes);
 		for (const s of c.expect.bodyExcludes ?? []) expect(text).not.toContain(s);
+		if (c.fail) expect(text).not.toContain("boom");
 		if (c.expect.json) expect(JSON.parse(text)).toEqual(c.expect.json);
 		if (c.expect.modelCalled !== undefined) expect(chats.length > 0).toBe(c.expect.modelCalled);
 		if (c.expect.untrusted) {

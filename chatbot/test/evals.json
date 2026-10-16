@@ -666,5 +666,171 @@
 				"citations": []
 			}
 		}
+	},
+	{
+		"name": "an OpenAI-compatible model reply is read",
+		"modelShape": "openai",
+		"modelReply": "Alpha Tool sorts files.",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "Tell me about Alpha Tool and its sorting",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 200,
+			"json": {
+				"answer": "Alpha Tool sorts files.",
+				"citations": [
+					{
+						"title": "Overview",
+						"url": "/tech/alpha-tool"
+					}
+				]
+			}
+		}
+	},
+	{
+		"name": "an Anthropic model reply is read",
+		"modelShape": "anthropic",
+		"modelReply": "Alpha Tool sorts files.",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "Tell me about Alpha Tool and its sorting",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 200,
+			"json": {
+				"answer": "Alpha Tool sorts files.",
+				"citations": [
+					{
+						"title": "Overview",
+						"url": "/tech/alpha-tool"
+					}
+				]
+			}
+		}
+	},
+	{
+		"name": "a failing model answers 502 unavailable with CORS and no error text",
+		"fail": "ai",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json",
+				"origin": "http://localhost:4321"
+			},
+			"body": {
+				"message": "Tell me about Alpha Tool and its sorting",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 502,
+			"json": {
+				"error": "unavailable"
+			},
+			"headers": {
+				"access-control-allow-origin": "http://localhost:4321"
+			}
+		}
+	},
+	{
+		"name": "a failing index answers 502 unavailable with no error text",
+		"fail": "vectorize",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "Tell me about Alpha Tool and its sorting",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 502,
+			"json": {
+				"error": "unavailable"
+			}
+		}
+	},
+	{
+		"name": "a blank MIN_SCORE treats retrieval as weak",
+		"env": {
+			"MIN_SCORE": ""
+		},
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "Tell me about Alpha Tool and its sorting",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 200,
+			"modelCalled": false,
+			"bodyIncludes": "I don't know. See the contact page."
+		}
+	},
+	{
+		"name": "a non-numeric MIN_SCORE treats retrieval as weak",
+		"env": {
+			"MIN_SCORE": "high"
+		},
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "Tell me about Alpha Tool and its sorting",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 200,
+			"modelCalled": false,
+			"bodyIncludes": "I don't know. See the contact page."
+		}
+	},
+	{
+		"name": "off-site markdown links and images keep only their text",
+		"modelReply": "See [the repo](https://evil.example/x), ![logo](//evil.example/p.png) and [Alpha Tool](/tech/alpha-tool).",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "Tell me about Alpha Tool and its sorting",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 200,
+			"json": {
+				"answer": "See the repo, logo and [Alpha Tool](/tech/alpha-tool).",
+				"citations": [
+					{
+						"title": "Overview",
+						"url": "/tech/alpha-tool"
+					}
+				]
+			}
+		}
 	}
 ]
