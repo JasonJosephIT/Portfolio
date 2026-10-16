@@ -1,8 +1,4 @@
 import { useMemo, useState } from "react";
-import { ArrowUpRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 
 export interface IndexProject {
   slug: string;
@@ -11,60 +7,73 @@ export interface IndexProject {
   tags: string[];
 }
 
-/** The project index: a text tag filter on the left (MOUTHWASH-style), numbered rows on the right. */
+/** Filter key: "web-design" and "web design" are the same tag. Display keeps the bundle's own spelling. */
+export const tagKey = (t: string) => t.toLowerCase().replace(/-/g, " ");
+
+/**
+ * The project index: a text filter (MOUTHWASH-style) beside numbered matted plates.
+ * Every plate is server-rendered; filtering only toggles `hidden`, so the list reads in full without JS.
+ * Only tags shared by two or more projects become filters; the rest stay on the plates.
+ */
 export default function ProjectIndex({ projects }: { projects: IndexProject[] }) {
   const [tag, setTag] = useState<string | null>(null);
-  const tags = useMemo(() => {
+  const filters = useMemo(() => {
     const count = new Map<string, number>();
-    projects.forEach((p) => p.tags.forEach((t) => count.set(t, (count.get(t) ?? 0) + 1)));
-    return [...count].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    projects.forEach((p) => new Set(p.tags.map(tagKey)).forEach((t) => count.set(t, (count.get(t) ?? 0) + 1)));
+    return [...count].filter(([, n]) => n > 1).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
   }, [projects]);
-  const shown = tag ? projects.filter((p) => p.tags.includes(tag)) : projects;
+  const matches = (p: IndexProject) => !tag || p.tags.some((t) => tagKey(t) === tag);
+  const shown = projects.filter(matches).length;
 
   return (
-    <div className="grid gap-8 md:grid-cols-[11rem_1fr]">
-      <nav aria-label="Filter by tag" className="md:sticky md:top-20 md:self-start">
-        <p className="label mb-3">Tags</p>
-        <ul className="flex flex-wrap gap-x-3 gap-y-1 text-sm md:flex-col md:gap-1">
+    <div className="grid gap-x-12 gap-y-8 md:grid-cols-[10rem_1fr]">
+      <div className="md:sticky md:top-[104px] md:self-start">
+        <h3 id="filter-label" className="label mb-3">Filter</h3>
+        <ul aria-labelledby="filter-label" className="flex flex-wrap gap-x-5 md:flex-col">
           <li>
-            <TagButton active={tag === null} onClick={() => setTag(null)}>
-              All <span className="text-pencil">{projects.length}</span>
-            </TagButton>
+            <FilterButton active={tag === null} count={projects.length} onClick={() => setTag(null)}>
+              All
+            </FilterButton>
           </li>
-          {tags.map(([t, n]) => (
+          {filters.map(([t, n]) => (
             <li key={t}>
-              <TagButton active={tag === t} onClick={() => setTag(tag === t ? null : t)}>
-                {t} <span className="text-pencil">{n}</span>
-              </TagButton>
+              <FilterButton active={tag === t} count={n} onClick={() => setTag(tag === t ? null : t)}>
+                {t}
+              </FilterButton>
             </li>
           ))}
         </ul>
-      </nav>
+        <p className="sr-only" aria-live="polite">
+          {tag ? `Showing ${shown} of ${projects.length} projects tagged ${tag}` : ""}
+        </p>
+      </div>
 
-      <ol className="grid gap-3" aria-live="polite">
-        {shown.map((p) => (
-          <li key={p.slug}>
-            <a href={`/tech/${p.slug}`} className="group block focus-visible:outline-none">
-              <Card className="relative overflow-hidden px-5 py-5 transition-colors group-hover:border-tech/40 group-focus-visible:border-tech sm:px-6">
-                <span aria-hidden className="absolute inset-y-0 left-0 w-0.5 bg-tech/0 transition-colors group-hover:bg-tech" />
-                <div className="flex items-start gap-5">
-                  <span className="title hidden w-10 shrink-0 text-2xl text-pencil tabular-nums sm:block">
-                    {String(projects.indexOf(p) + 1).padStart(2, "0")}
-                  </span>
-                  <div className="grid min-w-0 flex-1 gap-2">
-                    <h3 className="title text-xl text-foreground sm:text-2xl">{p.name}</h3>
-                    <p className="max-w-prose text-muted-foreground">{p.summary}</p>
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {p.tags.map((t) => (
-                        <Badge key={t} variant="outline" className={cn("rounded-sm font-normal", t === tag && "border-tech/60 text-tech")}>
-                          {t}
-                        </Badge>
-                      ))}
-                    </div>
+      <ol className="grid gap-[clamp(12px,1.4vw,16px)]">
+        {projects.map((p, i) => (
+          <li key={p.slug} hidden={!matches(p)} className="plate-item">
+            <a href={`/tech/${p.slug}`} className="mat lift develop group grid gap-x-[var(--mat-sm)] p-[var(--mat-sm)] sm:grid-cols-[3.25rem_1fr]">
+              <span aria-hidden="true" className="hidden pt-[clamp(18px,2.4vw,26px)] text-right sm:block">
+                <span className="title block text-[1.75rem] leading-none text-pencil tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+              </span>
+              <div className="window grid gap-2.5 px-[clamp(18px,2.4vw,28px)] py-[clamp(16px,2vw,24px)]">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="grid gap-1.5">
+                    <span className="label sm:hidden">Plate {String(i + 1).padStart(2, "0")}</span>
+                    <h3 className="title text-[clamp(1.25rem,2.2vw,1.6rem)] text-foreground">{p.name}</h3>
                   </div>
-                  <ArrowUpRight className="mt-1 size-5 shrink-0 text-pencil transition-colors group-hover:text-tech" />
+                  <svg aria-hidden="true" viewBox="0 0 24 24" className="arrow mt-0.5 size-5 shrink-0 text-pencil" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M7 17L17 7M9 7h8v8" />
+                  </svg>
                 </div>
-              </Card>
+                <p className="max-w-[60ch] text-pretty text-muted-text">{p.summary}</p>
+                <ul className="tags label pt-1" aria-label="Tags">
+                  {p.tags.map((t) => (
+                    <li key={t} className={tagKey(t) === tag ? "!text-tech" : undefined}>
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </a>
           </li>
         ))}
@@ -73,19 +82,19 @@ export default function ProjectIndex({ projects }: { projects: IndexProject[] })
   );
 }
 
-function TagButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function FilterButton({ active, count, onClick, children }: { active: boolean; count: number; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={cn(
-        "rounded-sm py-0.5 text-left lowercase transition-colors hover:text-foreground focus-visible:text-tech focus-visible:outline-none",
-        active ? "text-tech" : "text-muted-foreground",
-      )}
+      className={`group flex min-h-10 items-center gap-2 text-left text-[0.95rem] transition-colors duration-200 hover:text-foreground ${
+        active ? "text-foreground" : "text-muted-text"
+      }`}
     >
-      {active && <span aria-hidden className="mr-1">▪</span>}
-      {children}
+      <span aria-hidden="true" className={`h-px transition-[width,background-color] duration-200 ease-out ${active ? "w-4 bg-tech" : "w-2 bg-pencil/40"}`} />
+      <span>{children}</span>
+      <sup className="text-[0.65rem] text-pencil tabular-nums">{count}</sup>
     </button>
   );
 }
