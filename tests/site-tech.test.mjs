@@ -31,7 +31,7 @@ test("each card holds name, summary and tags, and nothing else", () => {
 
 // The slugs linked inside the "Related projects" section.
 const related = (html) => {
-  const at = html.indexOf('id="connected"');
+  const at = html.indexOf('id="related"');
   if (at < 0) return null;
   return [...html.slice(at, html.indexOf("</section>", at)).matchAll(/href="\/tech\/([a-z-]+)"/g)].map((m) => m[1]);
 };
@@ -40,7 +40,11 @@ test("project page uses visitor labels and one plain Related projects list", () 
   const alpha = page(out, "tech/alpha-tool/index.html");
   assert.match(alpha, /Alpha Tool sorts files into folders by type\./);
   for (const l of ["What it is", "Made with", "Related projects", "See it working"]) assert.ok(alpha.includes(`>${l}<`), l);
-  for (const old of ["Overview", "Tags", "Connected work", "Prototype video", "Used by", "Uses", "Built with", "Used to build", "Part of", "Includes"]) assert.ok(!text(alpha).includes(` ${old} `), old);
+  const headings = [...alpha.matchAll(/<h[23][^>]*>([^<]*)</g)].map((m) => m[1].trim());
+  for (const old of ["Overview", "Tags", "Docs", "Connected work", "Prototype video", "Used by", "Uses", "Built with", "Used to build", "Part of", "Includes"]) assert.ok(!headings.includes(old), old);
+  assert.ok(text(alpha).includes("Plate 01 · See it working") || /Plate \d\d · See it working/.test(text(alpha)));
+  assert.doesNotMatch(text(alpha), /prototype/i);
+  assert.match(alpha, /aria-label="Placeholder for a video of it working/);
   assert.doesNotMatch(alpha, /<h3/);
   assert.deepEqual(related(alpha).sort(), ["beta-site", "gamma-lib"]);
   assert.deepEqual(related(page(out, "tech/beta-site/index.html")), ["alpha-tool"]);

@@ -36,7 +36,7 @@ const next = all[(index + 1) % all.length];
   <div class="grid gap-x-[clamp(32px,5vw,72px)] gap-y-12 pt-[clamp(32px,6vh,64px)] lg:grid-cols-[minmax(0,1fr)_20rem]">
     <div class="grid min-w-0 content-start gap-[clamp(40px,7vh,72px)]">
       <figure class="mat grid gap-3 p-[var(--mat-sm)]">
-        <div class="window grid aspect-video place-items-center overflow-hidden" role="img" aria-label="Placeholder for a prototype video, not recorded yet">
+        <div class="window grid aspect-video place-items-center overflow-hidden" role="img" aria-label="Placeholder for a video of it working, not recorded yet">
           <!-- Placeholder only: no prototype is built or hosted yet (prototype-hosting ticket, deferred). -->
           <div class="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(135deg,transparent_0_14px,rgba(236,232,222,0.025)_14px_15px)]" aria-hidden="true"></div>
           <div class="relative grid justify-items-center gap-4 px-6 text-center">
@@ -48,7 +48,7 @@ const next = all[(index + 1) % all.length];
           </div>
         </div>
         <figcaption class="label flex justify-between gap-4 px-1">
-          <span>Plate {plate(index)} · Prototype</span>
+          <span>Plate {plate(index)} · See it working</span>
           <span class="note normal-case tracking-[0.04em]">Coming later</span>
         </figcaption>
       </figure>
@@ -62,16 +62,16 @@ const next = all[(index + 1) % all.length];
 
     <aside aria-label="Project details" class="lg:sticky lg:top-[104px] lg:self-start">
       <div class="mat-cast grid gap-8 p-[clamp(20px,2.4vw,28px)]">
-        <section aria-labelledby="tags" class="grid gap-3">
-          <h2 id="tags" class="label">Made with</h2>
+        <section aria-labelledby="made-with" class="grid gap-3">
+          <h2 id="made-with" class="label">Made with</h2>
           <ul class="grid border-t border-hairline">
             {p.tags.map((t) => <li class="border-b border-hairline py-2 text-[0.95rem] text-foreground/90 first-letter:uppercase">{t}</li>)}
           </ul>
         </section>
         {
           docs.length > 0 && (
-            <section aria-labelledby="docs" class="grid gap-3">
-              <h2 id="docs" class="label">Docs</h2>
+            <section aria-labelledby="read-more" class="grid gap-3">
+              <h2 id="read-more" class="label">Read more</h2>
               <ul class="grid gap-2">
                 {docs.map((d) => (
                   <li>
@@ -98,8 +98,8 @@ const next = all[(index + 1) % all.length];
         }
         {
           related.length > 0 && (
-            <section aria-labelledby="connected" class="grid gap-3">
-              <h2 id="connected" class="label">Related projects</h2>
+            <section aria-labelledby="related" class="grid gap-3">
+              <h2 id="related" class="label">Related projects</h2>
               <ul class="grid gap-2">
                 {related.map((slug) => (
                   <li>
