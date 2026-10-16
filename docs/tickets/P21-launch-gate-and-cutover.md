@@ -17,4 +17,5 @@ claimed-by:
 - [ ] Verify: Turnstile free-tier pricing, EU AI Act Article 50 text on eur-lex (and the notice wording against it), AI Gateway log retention, whether Llama Guard powers AI Gateway Guardrails. Update the notice if any differ.
 - [ ] Side-by-side check of the workers.dev site against the current GitHub Pages site.
 - [ ] Move the domain's nameservers to Cloudflare, attach the custom domain to both Workers, retire GitHub Pages.
+- [ ] Tag the last static `main` commit `static-final` before merging phase B.
 - [ ] Confirm rollback: `static-final` redeploys, and `rollback-index` switches the chat namespace.

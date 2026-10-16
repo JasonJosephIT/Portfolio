@@ -40,7 +40,7 @@ Rebuild the site in Astro on Cloudflare. It pulls an approved bundle that Open T
 19. As Jason, I want a preview URL for every PR, including the pull PR, so that I can check before merging.
 20. As Jason, I want the build to fail on an invalid or too-new bundle, so that a bad export never goes live.
 21. As Jason, I want an item retagged away from `public` to vanish from the next bundle, so that withdrawing something works.
-22. As Jason, I want the 46 staged changes landed first on their own branch and PR, so that the cleanup is reviewed before the rebuild.
+22. ~~As Jason, I want the 46 staged changes landed first~~ (dropped 2026-10-16; the port starts from `main`).
 23. As Jason, I want a `static-final` tag on the last static commit, so that rollback is redeploying it.
 24. As Jason, I want admin/, the Supabase pipeline, Instatic and the place-image command retired without deleting the Supabase project, so that I delete that myself later.
 25. As Jason, I want the site on workers.dev first and the custom domain at launch, so that I can check everything before the switch.
@@ -81,7 +81,7 @@ Chatbot (separate Worker with its own routes, secrets, Vectorize binding and spe
 - Guardrails: chats in D1 only, AI Gateway logging off for chat traffic, no message bodies in Workers Logs; 90-day deletion by a scheduled Worker; read only by Jason behind Cloudflare Access. Visible notice before the first message (also covers EU AI Act disclosure). Turnstile on the first message, verified server-side. 10 messages/min/session, 500-char cap, AI Gateway daily spend limit, kill switch. Retrieved text delimited as untrusted; system prompt never revealed; emails and phones scrubbed from stored and shown text; non-streaming so AI Gateway Guardrails can check responses.
 
 Migration phases, each its own PR
-- A land the 46 staged changes as they are (`chore: retire the generated-gallery system`). B Astro skeleton with existing pages ported, preview deploy. C wire the bundle and replace the Tech cards from it. D retire admin/, Supabase pipeline, Instatic and place-image. E docs. F chatbot.
+- A dropped (Jason, 2026-10-16): the staged changes would remove the side rail and skip link and restore the retired `?edit=1` overlay, so they are not landed. The port starts from `main`; C and D remove the generated-gallery system and admin/. B Astro skeleton with existing pages ported, preview deploy. C wire the bundle and replace the Tech cards from it. D retire admin/, Supabase pipeline, Instatic and place-image. E docs. F chatbot.
 - Tag the last static commit `static-final`. Cut over when the workers.dev preview passes a side-by-side check.
 
 ## Testing Decisions
@@ -113,5 +113,5 @@ Prior art: none in the repo for these. The old `tests/*.mjs` (node test runner) 
 - The spike (`spike/open-thoughts-feed`) proves only card-fill from a feed; it is superseded by phase C.
 - **Existing work to start from (do not rebuild):** branch `redesign/astro-tech`, worktree `~/Projects/Portfolio-astro` (last commit dcf3f2c). It already has Astro 7, React, Tailwind v4 and shadcn/ui; content collections reading `content/bundle/` (gitignored while drafts are pending); `scripts/pull-bundle.mjs` (refuses a newer schema, and refuses an unapproved bundle unless `--preview`); `/tech` and `/tech/[slug]` in the matted-plate design; and placeholders for prototype video and the chatbot. Tickets for phases B and C start from this branch. Remaining gaps: the home and art ports, the Cloudflare Worker deploy, the review-desk approval, and the 46 staged changes (phase A).
 - The bundle for that preview comes from Open Thoughts branch `build/enrichment` (`scripts/enrich.py`: Opus 5.5 drafts, Jev checks every claim, Haiku 5.5 fixes flags), writing `~/Projects/Open Thoughts/exports/bundle` with approval still pending. Reported by the Wiki process session; the branch exists but `enrich.py` was not inspected here.
-- Phase A depends on the 46 staged changes in the working tree; keep them intact until that PR.
+- The staged changes in the main checkout are left untouched; they are not part of this build.
 - Research notes: `research-cloudflare-facts.md` and `research-chatbot-safety.md` in the shared notes folder.

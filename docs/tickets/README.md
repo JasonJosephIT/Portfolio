@@ -12,12 +12,12 @@ HITL = needs Jason (a click, a dashboard, a judgment). AFK = an agent can do it 
 
 | ID | Title | Phase | Type | Blocked by |
 |---|---|---|---|---|
-| [P01](P01-land-phase-a.md) | Land the staged cleanup as its own PR, tag `static-final` | A | HITL | — |
-| [P02](P02-astro-on-phase-a-and-build-seam.md) | Rebase the Astro branch onto phase A; fixture bundle and build-seam tests | B | AFK | P01 |
+| [P01](P01-land-phase-a.md) | ~~Land the staged cleanup~~ dropped: port from `main` | A | closed | — |
+| [P02](P02-astro-on-phase-a-and-build-seam.md) | Fixture bundle and build-seam tests | B | AFK | — |
 | [P03](P03-cloudflare-worker-deploy.md) | Deploy as a Cloudflare Worker with static assets; preview per PR | B | HITL | P02 |
 | [P04](P04-diptych-layout-and-home.md) | Diptych base layout and the Home page in Astro | B | AFK | P02 |
-| [P05](P05-art-page.md) | Art page in Astro | B | AFK | P04 |
-| [P06](P06-not-found-redirects-remove-static.md) | Not-found page, `.html` 301s, remove the static pages | B | AFK | P04, P05 |
+| [P05](P05-art-page.md) | Art page and piece pages in Astro | B | AFK | P04 |
+| [P06](P06-not-found-redirects-remove-static.md) | Not-found page, `.html` 301s, remove the static and generated pages | B | AFK | P04, P05 |
 | [OT01](OT01-bundle-json-schema.md) | Bundle JSON Schema and a fixture bundle (Open Thoughts) | C | AFK | — |
 | [P07](P07-vendor-schema-validate-build.md) | Vendor the schema; the build fails on an invalid, too-new or pending bundle | C | AFK | P02, OT01 |
 | [P08](P08-tech-from-bundle.md) | Tech cards, project pages, related projects and profile from the bundle | C | AFK | P06, P07 |
@@ -40,7 +40,7 @@ HITL = needs Jason (a click, a dashboard, a judgment). AFK = an agent can do it 
 | [P21](P21-launch-gate-and-cutover.md) | Launch gate: red-team pass, unverified facts, custom domain cutover | F | HITL | P18, P20, P11 |
 
 ```
-P01 ── P02 ──┬── P03 ───────────────────────────── P14 ── P15 ── P16 ── P17 ──┬── P18 ──┐
+       P02 ──┬── P03 ───────────────────────────── P14 ── P15 ── P16 ── P17 ──┬── P18 ──┐
              ├── P04 ── P05 ── P06 ──┬── P08 ──┬── P13 ──────┘                 └── P19 ── P20 ── P21
              │                       └── P12   │                                          (P21 also needs P11)
              └───────── P07 ──┬────────────────┘
@@ -50,20 +50,19 @@ OT01 ──┘                  └── OT05
 ```
 
 ## Waves (what can run in parallel)
-1. **P01** (Jason), **OT01**, **OT02**
-2. **P02**, **OT03**
-3. **P03**, **P04**, **P07**, **OT04**
-4. **P05**, **P09**, **OT05**
-5. **P06**, **P10**
-6. **P08**, **P12**
-7. **P11**, **P13**
-8. **P14** (may start in wave 4 after P03), then **P15 → P16 → P17**
-9. **P18**, **P19**, then **P20**, then **P21**
+1. **P02** (P01 dropped: the port starts from `main`)
+2. **P03**, **P04**, **P07**
+3. **P05**, **P09**
+4. **P06**, **P10**
+5. **P08**, **P12**
+6. **P11**, **P13**
+7. **P14** (may start in wave 3 after P03), then **P15 → P16 → P17**
+8. **P18**, **P19**, then **P20**, then **P21**
 
-Critical path: P01 → P02 → P04 → P05 → P06 → P08 → P13 → P15 → P16 → P17 → P19 → P20 → P21.
+Critical path: P02 → P04 → P05 → P06 → P08 → P13 → P15 → P16 → P17 → P19 → P20 → P21.
 
 ## Integration branches and phase PRs
-- Phase A: Jason's branch from the staged changes (P01).
+- Phase A: dropped (P01). The staged changes in the main checkout stay untouched.
 - Phase B: `redesign/astro-tech`. Open the B PR after P06.
 - Phase C: `redesign/astro-bundle`, cut from B's tip. P07 may start on it before P06 merges; rebase once B is in. Open the C PR after P08–P10.
 - Phase D: `redesign/retire-admin`, cut from C's tip (or B's if C is still open).
@@ -78,3 +77,6 @@ Critical path: P01 → P02 → P04 → P05 → P06 → P08 → P13 → P15 → P
 
 ## Not ticketed (belongs to the Open Thoughts spec)
 The `revise` proposal kind with diff, staleness marking, enrichment relations and tag vocabulary beyond what `enrich.py` already writes, Keychain keys and the monthly spend cap. The approval-flow and enrichment tickets in the map settle them.
+
+## Status (2026-10-16)
+- OT01 is merged on Open Thoughts `build/enrichment`. OT02 and OT03 are merged there too, but Jason moved the enrichment build to the T30–T39 tickets (`build/enrichment-app`): OT04 and OT05 are not built here, and P11/P13 will point at that work instead.
