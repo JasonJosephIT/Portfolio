@@ -154,7 +154,7 @@ body { font-variant-numeric: tabular-nums; }
 .lift { position: relative; isolation: isolate; transition: transform 0.7s var(--ease-out); }
 /* The cast lives on a pseudo-element so hover only fades opacity instead of repainting a shadow. */
 .lift::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; box-shadow: 0 26px 34px -22px rgba(0, 0, 0, 0.95); transition: opacity 0.7s var(--ease-out); }
-.lift .window { transition: box-shadow 0.25s ease; }
+.lift .window { box-shadow: 0 0 0 1px rgba(236, 232, 222, 0.12); transition: box-shadow 0.25s ease; } /* grey at rest, cyan on hover/focus */
 .lift .arrow { transition: transform 0.7s var(--ease-out), color 0.25s ease; }
 .lift:focus-visible::before { opacity: 1; }
 .lift:focus-visible .window { box-shadow: 0 0 0 1px var(--accent-tech); }
