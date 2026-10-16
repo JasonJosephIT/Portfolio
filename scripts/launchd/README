@@ -1,0 +1,8 @@
+Daily `pnpm pull` (09:00) in a dedicated clone, not your working checkouts.
+1. Clone: mkdir -p ~/Library/"Application Support"/portfolio-pull && git clone <portfolio-remote-url> ~/Library/"Application Support"/portfolio-pull/Portfolio
+2. Check `gh auth status` works from a plain shell (no prompts).
+3. Install: sed "s#__HOME__#$HOME#g" scripts/launchd/com.jason.portfolio-pull.plist > ~/Library/LaunchAgents/com.jason.portfolio-pull.plist
+4. Load: launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.jason.portfolio-pull.plist
+5. Run once now: launchctl kickstart gui/$(id -u)/com.jason.portfolio-pull
+6. Unload: launchctl bootout gui/$(id -u)/com.jason.portfolio-pull
+Log: ~/Library/Logs/portfolio-pull.log
