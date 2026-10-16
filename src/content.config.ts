@@ -1,19 +1,32 @@
 import { defineCollection, z } from "astro:content";
 import { file, glob } from "astro/loaders";
 import { BUNDLE_DIR } from "./lib/bundle-dir";
+import { validateBundle } from "../scripts/lib/validate-bundle.mjs";
+
+// One check for the whole bundle (vendored schema + cross-file rules); a pending bundle only builds with PREVIEW=1.
+validateBundle(BUNDLE_DIR, { allowPending: process.env.PREVIEW === "1" });
 
 // content/bundle/ is the Open Thoughts public bundle (bundle-format ticket), pulled by scripts/pull-bundle.mjs.
 const projects = defineCollection({
   loader: glob({ pattern: "*.json", base: `${BUNDLE_DIR}/projects` }),
-  schema: z.object({
+  schema: z.strictObject({
     slug: z.string(),
     name: z.string(),
     summary: z.string(),
     tags: z.array(z.string()),
     description: z.string(),
-    media: z.array(z.object({ key: z.string(), kind: z.string(), caption: z.string().optional() })).default([]),
-    part_of: z.string().nullable().optional(),
+    media: z.array(
+      z.strictObject({
+        key: z.string(),
+        kind: z.enum(["image", "video"]),
+        checksum: z.string(),
+        poster_key: z.string().nullable().optional(),
+        caption: z.string().optional(),
+      }),
+    ),
+    part_of: z.string().nullable(),
     approved_at: z.string().nullable(),
+    source_hash: z.string(),
   }),
 });
 
@@ -21,6 +34,7 @@ const relations = defineCollection({
   loader: file(`${BUNDLE_DIR}/relations.json`, {
     parser: (text) => JSON.parse(text).map((e: { from: string; to: string }, i: number) => ({ id: `${e.from}-${e.to}-${i}`, ...e })),
   }),
+  // ponytail: not strict, the parser above adds `id` to each edge; validateBundle already refuses extra fields
   schema: z.object({
     from: z.string(),
     to: z.string(),
