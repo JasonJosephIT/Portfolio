@@ -15,7 +15,7 @@ claimed-by:
 **Spec:** approval-flow ticket (unit, export gate); public-face ticket.
 
 ## What to build
-`enrich.py` writes each draft as a `publish` proposal into the existing proposal store instead of straight into `exports/bundle/`. The review desk shows one card per record (project or profile): proposed tag, the full public record, relations, and the Jev review beside the internal note. One Approve sets the note's `visibility: public`, stamps `approved_at`, and stores the approved record in a public section (`public/<slug>.json`, `public/profile.json`, `public/relations.json`). Reject leaves everything private. Agents never approve (existing invariant).
+`enrich.py` writes each draft as a `publish` proposal into the existing proposal store instead of straight into `exports/bundle/`. The review desk shows one card per record (project or profile): proposed tag, the full public record, relations, and the Jev review beside the internal note. One Approve sets the project's tag to `public` in `public/visibility.json`, stamps `approved_at`, and stores the approved record in a public section (`public/<slug>.json`, `public/profile.json`, `public/relations.json`). Reject leaves everything private. Agents never approve (existing invariant).
 
 ## Acceptance criteria
 - [ ] Rust test: approving a publish proposal writes `public/<slug>.json` that validates against `schemas/bundle.schema.json` and sets the note's tag to `public`.

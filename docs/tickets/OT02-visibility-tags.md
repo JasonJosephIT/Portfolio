@@ -15,11 +15,11 @@ claimed-by:
 **Spec:** story 15, 21; public-face and approval-flow tickets; CONTEXT.md → visibility tag.
 
 ## What to build
-Each `notes/output/<slug>.md` carries `visibility:` in its frontmatter; a missing value means `private`. The Output view shows the tag on each project. Jason can **lower** a tag (to `context-only` or `private`) directly from the view; it takes effect at the next export. Raising to `public` is not possible here: it only happens by approving a publish card (OT03). Agents never write the field.
+Tags live in `public/visibility.json` (`{"<slug>": "public" | "context-only" | "private"}`); a missing file or slug means `private`. (Decided at build time, 2026-10-16: notes have no frontmatter and `build.py` renders them as is, and proposals can only target `notes/*.md`, so a sidecar keeps agents out structurally.) The Output view shows the tag on each project. Jason can **lower** a tag (to `context-only` or `private`) directly from the view; it takes effect at the next export. Raising to `public` is not possible here: it only happens by approving a publish card (OT03). Agents never write the field.
 
 ## Acceptance criteria
 - [ ] Rust test: a note with no `visibility` reads as `private`; an unknown value reads as `private` and is reported.
-- [ ] Rust test: the lower command rewrites only the frontmatter line (base-checked atomic save, same as the note editor) and refuses `public`.
+- [ ] Rust test: the lower command changes only that slug's entry in `public/visibility.json` (base-checked atomic save, same as the note editor) and refuses `public`.
 - [ ] TS test: the Output view shows the tag and offers lower actions only below the current tag.
 - [ ] The librarian and any proposal apply path cannot change `visibility` (test: applying a proposal that edits the field is refused).
 
