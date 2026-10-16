@@ -60,12 +60,13 @@ export function validateBundle(dir, { allowPending = false } = {}) {
     for (const end of [e.from, e.to])
       if (!listed.has(end)) problems.push(`relations.json: edge end ${JSON.stringify(end)} is not a listed project`);
 
-
   for (const p of all.filter((p) => /^docs\/[^/]+\.md$/.test(p))) {
     const fm = frontmatter(readFileSync(join(dir, p), "utf8"));
     if (!fm) { problems.push(`${p}: no frontmatter`); continue; }
     problems.push(...shape("doc", fm, p));
     if (fm.slug !== basename(p, ".md")) problems.push(`${p}: slug ${JSON.stringify(fm.slug)} != filename stem`);
+    const want = `${fm.parent}-${fm.kind}`; // also rules out two docs for one (parent, kind) page
+    if (fm.slug !== want) problems.push(`${p}: slug ${JSON.stringify(fm.slug)} != ${JSON.stringify(want)} (<parent>-<kind>)`);
     if (!listed.has(fm.parent)) problems.push(`${p}: parent ${JSON.stringify(fm.parent)} is not a listed project`);
   }
 

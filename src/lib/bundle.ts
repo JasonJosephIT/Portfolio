@@ -42,7 +42,8 @@ export const RELATION_LABEL: Record<string, [string, string]> = {
 /** A project's docs (features first), empty when the bundle ships none. */
 export async function docsFor(slug: string) {
   const all = await getCollection("docs");
-  return all.filter((d) => d.data.parent === slug).sort((a, b) => b.data.kind.localeCompare(a.data.kind));
+  return all.filter((d) => d.data.parent === slug).sort((a, b) => DOC_KINDS.indexOf(a.data.kind) - DOC_KINDS.indexOf(b.data.kind));
 }
 
+const DOC_KINDS = ["features", "decisions"];
 export const DOC_TITLE = { features: "Features", decisions: "Decisions" } as const;

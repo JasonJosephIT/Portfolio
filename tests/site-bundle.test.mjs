@@ -110,3 +110,11 @@ test("a doc without frontmatter is refused", () => {
   const dir = mutated((d) => editDoc(d, (s) => s.replace(/^---[\s\S]*?---\n/, "")));
   assert.throws(() => validateBundle(dir), /docs\/alpha-tool-features\.md: no frontmatter/);
 });
+
+test("a doc whose slug is not <parent>-<kind> is refused (no two docs claim one page)", () => {
+  const dir = mutated((d) => {
+    const f = join(d, "docs/alpha-tool-decisions.md");
+    writeFileSync(f, readFileSync(f, "utf8").replace("kind: decisions", "kind: features"));
+  });
+  assert.throws(() => validateBundle(dir), /docs\/alpha-tool-decisions\.md: slug "alpha-tool-decisions" != "alpha-tool-features" \(<parent>-<kind>\)/);
+});
