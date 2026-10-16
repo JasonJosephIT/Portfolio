@@ -1,5 +1,6 @@
 ---
 import "@/styles/global.css";
+import Head from "@/layouts/Head.astro";
 import { Image } from "astro:assets";
 import { isDraft, manifest } from "@/lib/bundle";
 import ChatPlaceholder from "@/components/ChatPlaceholder.astro";
@@ -13,15 +14,7 @@ const { title, description = "Software by Jason." } = Astro.props;
 ---
 
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <meta name="theme-color" content="#08090b" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="preload" href="/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin />
-  </head>
+  <Head title={title} description={description} />
   <body class="min-h-dvh">
     <a href="#main" class="label sr-only z-50 bg-board px-4 py-3 !text-foreground focus:not-sr-only focus:fixed focus:top-2 focus:left-2">Skip to content</a>
     {

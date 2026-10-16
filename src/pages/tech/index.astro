@@ -56,6 +56,7 @@ const bio = await marked.parse(profile.bio);
       <h2 id="about-title" class="label-section">About</h2>
     </div>
     <div class="mat-cast grid gap-x-[clamp(24px,5vw,72px)] gap-y-10 p-[clamp(24px,3.4vw,44px)] lg:grid-cols-[1fr_20rem]">
+      {/* Unsanitised markdown: safe only because the bundle is reviewed and merged by PR. */}
       <div class="prose-board max-w-[62ch]" set:html={bio} />
       <div class="grid content-start gap-8">
         <div class="grid gap-3">

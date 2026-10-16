@@ -1,7 +1,8 @@
 ---
-// Art pages: Diptych's head, plus gallery.css, gallery.js and the body data Art needs.
+// Art and 404 pages: the shared Head, gallery.css, gallery.js and the body data Art needs.
 import "@/styles/diptych.css";
 import "@/styles/gallery.css";
+import Head from "@/layouts/Head.astro";
 
 interface Props {
   title: string;
@@ -13,14 +14,7 @@ const { title, description, returnPage } = Astro.props;
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{title}</title>
-  <meta name="description" content={description}>
-  <meta name="theme-color" content="#08090b">
-  <link rel="preload" href="/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
-</head>
+<Head title={title} description={description} />
 <body class="gallery-page gallery-page--art art patterned" data-return-page={returnPage}>
   <a class="skip-link" href="#main">Skip to content</a>
   <slot />
