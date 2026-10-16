@@ -4,8 +4,12 @@ import worker from "../src/index";
 import cases from "./evals.json";
 import index from "./fake-index.json";
 
+const CATEGORIES = ["injection", "off-topic", "private-data", "unknown-facts", "abuse", "rate-limit", "char-cap", "kill-switch"];
+
 type Case = {
 	name: string;
+	// One of CATEGORIES (the spec's eval list, each needing 5+ cases) or "plumbing".
+	category: string;
 	request: { method: string; path?: string; headers?: Record<string, string>; body?: unknown };
 	env?: Record<string, string>;
 	// What the stubbed chat model returns; by default it echoes the non-system messages it was sent.
@@ -18,6 +22,8 @@ type Case = {
 	index?: "none";
 	// A JSON object body gets a valid session unless it carries its own, a turnstileToken, or this says otherwise.
 	session?: "none" | "forged" | "expired";
+	// Send the request this many times on one session (the real local rate limit); expect checks the last.
+	repeat?: number;
 	expect: {
 		status: number;
 		bodyIncludes?: string;
@@ -64,14 +70,14 @@ const siteverify = vi.fn(async (url: RequestInfo | URL, init?: RequestInit) => {
 vi.stubGlobal("fetch", siteverify);
 const TOKEN = "XXXX.DUMMY.TOKEN.XXXX";
 
-async function toRequest(c: Case) {
+async function toRequest(c: Case, session: string) {
 	const { method, path = "/chat", headers } = c.request;
 	let body = c.request.body;
 	if (body && typeof body === "object" && !Array.isArray(body)) {
 		const obj = body as Record<string, unknown>;
 		// "SESSION" inside a body's own session string stands for a freshly minted valid one.
 		if (typeof obj.session === "string") body = { ...obj, session: obj.session.replace("SESSION", await mint()) };
-		else if (!("turnstileToken" in obj) && c.session !== "none") body = { ...obj, session: await sessionFor(c) };
+		else if (!("turnstileToken" in obj) && c.session !== "none") body = { ...obj, session };
 	}
 	const raw = body === undefined ? undefined : typeof body === "string" ? body : JSON.stringify(expand(body));
 	// Set content-length as an HTTP client would; a Request built in-process has none.
@@ -123,11 +129,25 @@ function fakes(c: Partial<Case> = {}, activeNs: string | null = index.namespace)
 	return { bindings: { AI, VECTORIZE, INDEX_KV, CHATS } as unknown as Partial<Env>, chats };
 }
 
+it("every spec category has at least 5 cases and every case has a known category", () => {
+	const counts = Object.fromEntries(CATEGORIES.map((k) => [k, 0]));
+	for (const c of cases as Case[]) {
+		expect([...CATEGORIES, "plumbing"], c.name).toContain(c.category);
+		counts[c.category]++;
+	}
+	for (const k of CATEGORIES) expect(counts[k], k).toBeGreaterThanOrEqual(5);
+});
+
 // Every case goes through the Worker's fetch with fakes wired in: the real AI binding is remote and costs money.
 for (const c of cases as Case[]) {
 	it(c.name, async () => {
-		const { bindings, chats } = fakes(c, c.index === "none" ? null : undefined);
-		const res = await worker.fetch(await toRequest(c), { ...env, ...bindings, ...c.env } as Env);
+		const session = await sessionFor(c);
+		let res!: Response, chats!: Msg[][];
+		for (let i = 0; i < (c.repeat ?? 1); i++) {
+			const f = fakes(c, c.index === "none" ? null : undefined);
+			chats = f.chats;
+			res = await worker.fetch(await toRequest(c, session), { ...env, ...f.bindings, ...c.env } as Env);
+		}
 		const text = await res.text();
 		expect(res.status).toBe(c.expect.status);
 		for (const [k, v] of Object.entries(c.expect.headers ?? {})) expect(res.headers.get(k)).toBe(v);

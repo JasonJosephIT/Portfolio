@@ -1,0 +1,32 @@
+# Site tests (fixture bundle, Playwright browser checks) and the chatbot evals (fixture index, stubbed AI).
+# No Cloudflare credentials or other secrets: nothing here reaches Cloudflare.
+name: test
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 12
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
+        working-directory: chatbot
+      # Playwright is a dev tool for tests/site-chat.test.mjs, not a project dependency: install it outside the repo.
+      - name: Install Playwright
+        run: |
+          npm i --prefix "$RUNNER_TEMP/pw" playwright@1.62.0
+          npx --prefix "$RUNNER_TEMP/pw" playwright install --with-deps chromium
+          echo "PLAYWRIGHT_FROM=$RUNNER_TEMP/pw/package.json" >> "$GITHUB_ENV"
+      - run: pnpm test
+      - run: pnpm test
+        working-directory: chatbot
