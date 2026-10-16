@@ -1,0 +1,31 @@
+---
+import { Image } from "astro:assets";
+import Rail from "@/layouts/Rail.astro";
+import art from "@/data/art.json";
+import bard from "@/assets/bard-mark.png";
+
+export const getStaticPaths = () => art.pieces.map((piece) => ({ params: { slug: piece.slug }, props: { piece } }));
+const { piece } = Astro.props;
+const images = import.meta.glob<{ default: ImageMetadata }>("/src/assets/art/*.jpg", { eager: true });
+---
+
+<Rail title={`${piece.title} — Art — Jason`} description={piece.image.alt}>
+  <nav class="site-nav" id="top" aria-label="Site">
+    <div class="wrap">
+      <a href="/" class="wordmark" aria-label="Jason — portfolio home"><Image class="brand-logo" src={bard} alt="" width={36} height={36} />JASON</a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/art" class="current" aria-current="page">Art</a></li>
+        <li><a href="/tech">Tech</a></li>
+      </ul>
+    </div>
+  </nav>
+  <main id="main" class="detail">
+    <a class="back-link" href="/art" data-back-link>Back to Art</a>
+    <article class="detail__body detail--piece">
+      <h1 class="detail__title">{piece.title}</h1>
+      <span class="detail__frame" style={`aspect-ratio: ${piece.image.width} / ${piece.image.height}`}><Image class="detail__image" src={images[`/src/assets/art/${piece.image.src}`].default} alt={piece.image.alt} width={piece.image.width} height={piece.image.height} loading="eager" decoding="async" /><span class="image-fallback" aria-hidden="true">Image unavailable</span></span>
+    </article>
+  </main>
+  <footer class="gallery-footer"><a class="gallery-footer__top" href="#top">Back to top</a></footer>
+</Rail>
