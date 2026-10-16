@@ -29,15 +29,9 @@ export async function projects() {
 
 export async function relationsFor(slug: string) {
   const edges = (await getCollection("relations")).map((r) => r.data);
-  return edges.filter((e) => e.from === slug || e.to === slug).map((e) => ({ ...e, other: e.from === slug ? e.to : e.from, outgoing: e.from === slug }));
+  const others = edges.filter((e) => e.from === slug || e.to === slug).map((e) => (e.from === slug ? e.to : e.from));
+  return [...new Set(others)]; // slugs, one per project however many edges join them
 }
-
-export const RELATION_LABEL: Record<string, [string, string]> = {
-  "part-of": ["Part of", "Includes"],
-  "built-with": ["Built with", "Used to build"],
-  uses: ["Uses", "Used by"],
-  "related-to": ["Related", "Related"],
-};
 
 /** A project's docs (features first), empty when the bundle ships none. */
 export async function docsFor(slug: string) {
@@ -46,4 +40,7 @@ export async function docsFor(slug: string) {
 }
 
 const DOC_KINDS = ["features", "decisions"];
-export const DOC_TITLE = { features: "Features", decisions: "Decisions" } as const;
+export const DOC_TITLE = { features: "What it does", decisions: "Why it's built this way" } as const;
+
+/** Hand-written build notes, keyed by project slug (empty when the folder is missing). */
+export const builds = async () => getCollection("builds");

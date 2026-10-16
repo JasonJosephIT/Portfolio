@@ -50,4 +50,11 @@ const docs = defineCollection({
   schema: z.object({ parent: z.string(), kind: z.enum(["features", "decisions"]) }).passthrough(),
 });
 
-export const collections = { projects, relations, docs };
+// In-repo, hand-written build notes: <slug>.md. The build page refuses a slug that is not a project.
+const BUILDS_DIR = process.env.BUILDS_DIR ?? "src/content/builds";
+const builds = defineCollection({
+  loader: glob({ pattern: "*.md", base: BUILDS_DIR }),
+  schema: z.object({}).passthrough(),
+});
+
+export const collections = { projects, relations, docs, builds };
