@@ -1,7 +1,7 @@
 ---
 id: P20
 title: Full fixed eval set and site tests in CI
-status: open
+status: closed
 type: AFK
 phase: F
 repo: Portfolio, branch redesign/chatbot
