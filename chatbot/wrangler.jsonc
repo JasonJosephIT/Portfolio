@@ -11,6 +11,21 @@
 		"CHAT_ENABLED": "false",
 		// Comma-separated site origins allowed by CORS.
 		// TODO(Jason): append ",https://jason-portfolio.<account>.workers.dev" (and the custom domain).
-		"ALLOWED_ORIGINS": "http://localhost:4321"
-	}
+		"ALLOWED_ORIGINS": "http://localhost:4321",
+		// Chat model, called through AI Gateway. Moving to Claude is a change here (e.g. "anthropic/<model>").
+		"CHAT_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+		// Must match the model build-index.mjs embedded with.
+		"EMBED_MODEL": "@cf/baai/bge-base-en-v1.5",
+		// TODO(Jason): create the gateway in the dashboard (AI > AI Gateway) with this name, or change it.
+		"AI_GATEWAY_ID": "portfolio-chat",
+		// Best match below this cosine score answers "I don't know" without calling the chat model.
+		// 0.6: bge-base-en-v1.5 scores unrelated text around 0.4-0.55 and on-topic text 0.7+; the test fixture
+		// (test/fake-index.json) puts on-topic questions at 0.7-1.0 and off-topic ones at 0-0.5, either side of it.
+		// ponytail: a guess until real traffic; retune from AI Gateway logs once the index is live.
+		"MIN_SCORE": "0.6"
+	},
+	"ai": { "binding": "AI" },
+	"vectorize": [{ "binding": "VECTORIZE", "index_name": "portfolio-chat" }],
+	// TODO(Jason): the KV namespace build-index.mjs writes ACTIVE_NS to (same id as the KV_NAMESPACE_ID secret).
+	"kv_namespaces": [{ "binding": "INDEX_KV", "id": "00000000000000000000000000000000" }]
 }
