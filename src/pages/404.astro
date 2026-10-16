@@ -1,0 +1,33 @@
+---
+import { Image } from "astro:assets";
+import Rail from "@/layouts/Rail.astro";
+import bard from "@/assets/bard-mark.png";
+---
+
+<Rail title="Page not found — Jason" description="That page is not here.">
+  <div class="rail-shell">
+    <header class="rail" id="top">
+      <a href="/" class="wordmark rail__brand" aria-label="Jason — portfolio home"><Image class="brand-logo" src={bard} alt="" width={36} height={36} />JASON</a>
+      <nav class="rail__nav" aria-label="Portfolios">
+        <ul>
+          <li><a href="/art">Art</a></li>
+          <li><a href="/tech">Tech</a></li>
+        </ul>
+      </nav>
+    </header>
+    <div class="rail-content">
+      <main id="main" class="detail">
+        <article class="detail__body">
+          <h1 class="detail__title">Page not found</h1>
+          <p class="detail__summary">That page is not here. It may have been unpublished, or the address may be wrong.</p>
+          <ul class="link-list">
+            <li><a href="/">Go home</a></li>
+            <li><a href="/art">Go to Art</a></li>
+            <li><a href="/tech">Go to Tech</a></li>
+          </ul>
+        </article>
+      </main>
+      <footer class="gallery-footer"><a class="gallery-footer__top" href="#top">Back to top</a></footer>
+    </div>
+  </div>
+</Rail>

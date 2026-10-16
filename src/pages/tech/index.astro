@@ -4,7 +4,7 @@ import { Image } from "astro:assets";
 import Tech from "@/layouts/Tech.astro";
 import ProjectIndex from "@/components/ProjectIndex";
 import { profile, projects } from "@/lib/bundle";
-import hero from "../../../assets/hero.jpg";
+import hero from "@/assets/hero.jpg";
 
 const list = await projects();
 const bio = await marked.parse(profile.bio);
