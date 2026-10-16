@@ -15,7 +15,6 @@ const card = (p) => `      <article class="project-card">
         <h3>${esc(p.name)}</h3>
         <p>${esc(p.summary)}</p>
         <div class="tech-tags">${(p.tags ?? []).map((t) => `<span>${esc(t)}</span>`).join("")}</div>
-        <p class="project-meta">${esc(p.status)}</p>
       </article>`;
 
 const { projects } = JSON.parse(readFileSync(feedPath, "utf8"));

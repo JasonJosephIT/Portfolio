@@ -6,7 +6,6 @@
       "slug": "know-your-vote",
       "name": "Know Your Vote",
       "summary": "A nonpartisan Florida voter guide: enter an address and see every race on your ballot side by side, with candidate news and deadlines.",
-      "status": "live",
       "session_count": 92,
       "tags": [
         "Next.js",
@@ -18,7 +17,6 @@
       "slug": "open-thoughts",
       "name": "Open Thoughts",
       "summary": "A desktop app that reads my Claude Code work and notes, and drafts updates I approve.",
-      "status": "active",
       "session_count": 12,
       "tags": [
         "Tauri",
@@ -29,7 +27,6 @@
       "slug": "portfolio",
       "name": "This site",
       "summary": "A static two-sided portfolio, art and tech, on GitHub Pages with no framework and no build step.",
-      "status": "paused",
       "session_count": 4,
       "tags": [
         "HTML",

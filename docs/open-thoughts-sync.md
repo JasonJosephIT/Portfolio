@@ -5,5 +5,5 @@ Run: `node scripts/sync-open-thoughts.mjs [feed.json]` rewrites the cards betwee
 `open-thoughts:projects` markers in tech.html. `--check` exits 1 if tech.html is stale.
 Node only, no deps, no build step: the output is plain committed HTML.
 
-Spike caveats: summaries are unapproved Claude drafts; `.project-meta` has no CSS yet;
+Spike caveats: summaries are unapproved Claude drafts;
 tech.html baseline came from the staged (uncommitted) placeholder version on main.
