@@ -1,0 +1,530 @@
+/* ==========================================================================
+   JASON — diptych stylesheet, ported from styles.css (rules Home uses).
+   ========================================================================== */
+
+@font-face {
+  font-family: "Archivo";
+  src: url("/fonts/archivo-var.woff2") format("woff2-variations"),
+       url("/fonts/archivo-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ==========================================================================
+   Tokens
+   ========================================================================== */
+:root {
+  --bg: #08090b;            /* backing board */
+  --board: #101115;         /* mat face */
+  --board-raised: #17181d;  /* label plate */
+  --board-edge: #030304;    /* cut edge in shadow */
+  --text: #ece8de;          /* paper white */
+  --muted: #a5a197;         /* graphite */
+  --pencil: #8a8479;        /* soft pencil */
+  --hairline: rgba(236, 232, 222, 0.07);
+  --accent-art: #e98a3e;    /* amber core */
+  --accent-tech: #48c4dc;   /* ice-cyan core */
+  --accent: var(--accent-art);
+  --bevel: color-mix(in srgb, var(--accent) 58%, var(--board));
+  --name-h: clamp(2.25rem, 6vw, 5rem);
+  --font: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --space: 8px;
+  --radius: 2px;
+  --nav-height: 72px;
+  --max-width: 1240px;
+  --mat: clamp(14px, 2.4vw, 32px);
+  --mat-sm: clamp(10px, 1.4vw, 16px);
+  --gutter: clamp(16px, 2vw, 28px);
+  --pad-x: clamp(16px, 4vw, 48px);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.home { --accent: #c9c4b8; }
+
+/* The bevel takes its color from whichever accent is in force where it is cut */
+body,
+.panel { --bevel: color-mix(in srgb, var(--accent) 58%, var(--board)); }
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  background: var(--bg);
+  color-scheme: dark;
+  scrollbar-color: #2b2c32 var(--bg);
+  scrollbar-width: thin;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  isolation: isolate;
+}
+
+/* Rag texture of the board, below all content */
+body {
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 45%, #000);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 1px;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+svg { display: inline-block; vertical-align: middle; }
+
+.wrap {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--pad-x);
+}
+
+/* Pencil caption register, shared by every label on a mat */
+.site-nav .nav-links a,
+.wall-title,
+.plate,
+.contact,
+.frame-links a,
+.frame-copy {
+  font-size: 0.72rem;
+  font-weight: 500;
+  font-stretch: 108%;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+/* Display register: pale ink on the board, one soft cast shadow */
+.site-nav .wordmark,
+.wall-name,
+.frame-name {
+  font-weight: 800;
+  font-stretch: 125%;
+  color: #d9d4c8;
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+.site-nav .wordmark,
+.frame-name { text-shadow: none; }
+
+/* ==========================================================================
+   Top nav (shared markup across all pages)
+   ========================================================================== */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: var(--nav-height);
+  background: var(--bg);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.site-nav .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.site-nav .wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  letter-spacing: 0.24em;
+  text-decoration: none;
+}
+
+/* The brand mark: the painted drummer, paper white on the board */
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  flex: none;
+}
+
+.site-nav .nav-links {
+  display: flex;
+  gap: clamp(18px, 3vw, 36px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-nav .nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 8px 0 6px;
+  border-bottom: 1px solid transparent;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+.site-nav .nav-links a:hover { color: var(--text); }
+
+.site-nav .nav-links a.current {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+body.home .site-nav {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: transparent;
+  border-bottom-color: transparent;
+}
+
+/* ==========================================================================
+   Home: the wall, the name, the diptych
+   ========================================================================== */
+body.home { position: relative; }
+
+.wall {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-content: center;
+  padding: calc(var(--nav-height) + clamp(8px, 2vh, 20px)) var(--mat) clamp(20px, 3vh, 32px);
+}
+
+.wall-name {
+  position: absolute;
+  top: calc(var(--mat) + 0.1em);
+  left: 0;
+  right: 0;
+  z-index: 3;
+  margin: 0;
+  font-size: var(--name-h);
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-align: center;
+  pointer-events: none;
+}
+
+.wall-title {
+  margin: clamp(14px, 2.4vh, 24px) 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-stretch: 100%;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: none;
+}
+
+.diptych {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  align-self: center;
+  perspective: 1800px;
+}
+
+.panel {
+  --accent: var(--accent-art);
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--mat) + var(--name-h) * 1.15) 0 var(--mat);
+  background: var(--board);
+  color: var(--text);
+  text-decoration: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    0 1px 0 var(--board-edge),
+    0 40px 60px -40px rgba(0, 0, 0, 0.9);
+  transform-origin: 100% 50%;
+  transition: transform 0.9s var(--ease-out), box-shadow 0.9s var(--ease-out);
+  will-change: transform;
+}
+
+.panel-tech {
+  --accent: var(--accent-tech);
+  transform-origin: 0% 50%;
+}
+
+.window {
+  position: relative;
+  overflow: hidden;
+  width: min(calc(clamp(300px, 100svh - var(--nav-height) - var(--name-h) * 1.15 - var(--mat) * 2 - 196px, 760px) * 0.7), 46vw);
+  aspect-ratio: 7 / 10;
+  background: #000;
+}
+
+.window img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: 50% 38%;
+  filter: brightness(1) saturate(1);
+  transition: filter 0.9s var(--ease-out);
+}
+
+.panel-tech .window img { left: -100%; }
+
+/* The light on the hovered half comes up */
+.panel:hover .window img,
+.panel:focus-visible .window img { filter: brightness(1.7) saturate(1.25); }
+
+/* The mat casts a shadow onto the print along the top of the opening */
+.window::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 10px 18px -12px rgba(0, 0, 0, 0.95);
+}
+
+/* The hinge is the seam itself: the two halves meet, and the amber and cyan
+   bevel hairlines are the only line between them. */
+.hinge {
+  flex: 0 0 0;
+  align-self: stretch;
+}
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: calc(var(--space) * 2);
+  padding: 0 var(--mat);
+}
+
+.plate {
+  margin-top: 6px;
+  color: var(--pencil);
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: clamp(1.25rem, 2.6vw, 1.75rem);
+  font-weight: 700;
+  font-stretch: 118%;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  transition: color 0.5s ease;
+}
+
+.label svg {
+  width: 22px;
+  height: 22px;
+  color: var(--accent);
+  transition: transform 0.7s var(--ease-out);
+}
+
+.panel-tech .caption { align-items: flex-end; text-align: right; }
+
+.panel:hover,
+.panel:focus-visible { transform: rotateY(-7deg) translateZ(6px); }
+
+.panel-tech:hover,
+.panel-tech:focus-visible { transform: rotateY(7deg) translateZ(6px); }
+
+.panel:hover .label,
+.panel:focus-visible .label { color: var(--accent); }
+
+.panel-art:hover .label svg,
+.panel-art:focus-visible .label svg { transform: translateX(-5px); }
+
+.panel-tech:hover .label svg,
+.panel-tech:focus-visible .label svg { transform: translateX(5px); }
+
+/* Wall label beside the piece */
+.wall-label { padding: clamp(40px, 8vh, 88px) 0 clamp(16px, 3vh, 32px); }
+
+.wall-label-inner {
+  max-width: 62ch;
+  margin: 0 auto;
+  padding: clamp(24px, 3vw, 36px) clamp(24px, 3.4vw, 44px) clamp(22px, 3vw, 32px);
+  background: var(--board);
+  box-shadow:
+    0 0 0 1px var(--bevel),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    0 26px 34px -24px rgba(0, 0, 0, 0.95);
+}
+
+.wall-label h2 {
+  margin: 0 0 calc(var(--space) * 2);
+  font-size: clamp(1.5rem, 3.2vw, 2.25rem);
+  font-weight: 700;
+  font-stretch: 115%;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.wall-label p {
+  margin: 0 0 calc(var(--space) * 3);
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.wall-label .contact-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  margin: 0;
+  padding-top: calc(var(--space) * 2);
+  border-top: 1px solid var(--hairline);
+}
+
+.contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  text-decoration: none;
+  padding: 4px 0;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.contact svg {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  transition: transform 0.6s var(--ease-out);
+}
+
+.contact:hover { border-bottom-color: var(--text); }
+.contact:hover svg { transform: translateX(3px); }
+
+/* Pencil note for anything not yet real */
+.note {
+  font-size: 0.72rem;
+  font-weight: 500;
+  font-stretch: 100%;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--pencil);
+}
+
+/* ==========================================================================
+   The back of the frame (footer, shared)
+   ========================================================================== */
+.frame-back {
+  margin-top: clamp(48px, 8vh, 96px);
+  padding: clamp(32px, 5vh, 56px) 0 clamp(24px, 4vh, 40px);
+  border-top: 1px solid var(--hairline);
+  color: var(--muted);
+}
+
+.frame-back-inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px 32px;
+  align-items: start;
+}
+
+.frame-name {
+  margin: 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.24em;
+}
+
+.frame-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  justify-content: flex-end;
+}
+
+.frame-links a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 4px 0;
+  border-bottom: 1px solid transparent;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+.frame-links a:hover {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.frame-copy {
+  grid-column: 1 / -1;
+  margin: 16px 0 0;
+  color: var(--pencil);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-size: 0.78rem;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 700px) {
+  .wall { min-height: auto; padding-left: var(--mat-sm); padding-right: var(--mat-sm); padding-bottom: 0; }
+  .wall-label { padding-top: clamp(40px, 8vh, 64px); }
+  .panel { padding: calc(var(--mat-sm) + var(--name-h) * 1.15) 0 var(--mat-sm); }
+  .wall-name { top: calc(var(--mat-sm) + 0.1em); }
+  .caption { padding: 0 var(--mat-sm); }
+  .window { width: calc((100vw - var(--mat-sm) * 2) / 2); }
+  .label { font-size: 1.15rem; gap: 6px; }
+  .label svg { width: 18px; height: 18px; }
+  .frame-back-inner { grid-template-columns: 1fr; }
+  .frame-links { justify-content: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation: none !important;
+  }
+  .panel:hover,
+  .panel:focus-visible,
+  .panel-tech:hover,
+  .panel-tech:focus-visible { transform: none; }
+}

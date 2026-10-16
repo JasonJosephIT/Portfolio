@@ -1,22 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jason — Man is not truly one, but truly two.</title>
-  <meta name="description" content="Jason's portfolio home, linking to the Art and Tech sections.">
-  <meta name="theme-color" content="#08090b">
-  <link rel="preload" href="assets/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body class="home">
+---
+import { Image } from "astro:assets";
+import Diptych from "@/layouts/Diptych.astro";
+import bard from "@/assets/bard-mark.png";
+import hero from "@/assets/hero.jpg";
+---
+
+<Diptych title="Jason — Man is not truly one, but truly two." description="Jason's portfolio home, linking to the Art and Tech sections." bodyClass="home">
   <nav class="site-nav">
     <div class="wrap">
-      <a href="index.html" class="wordmark"><img class="brand-mark" src="assets/bard-mark.png" alt="" width="36" height="36">JASON</a>
+      <a href="/" class="wordmark"><Image class="brand-mark" src={bard} alt="" width={36} height={36} />JASON</a>
       <ul class="nav-links">
-        <li><a href="index.html" class="current">Home</a></li>
-        <li><a href="art.html">Art</a></li>
-        <li><a href="tech.html">Tech</a></li>
+        <li><a href="/" class="current">Home</a></li>
+        <li><a href="/art">Art</a></li>
+        <li><a href="/tech">Tech</a></li>
       </ul>
     </div>
   </nav>
@@ -24,8 +20,8 @@
   <main class="wall">
     <div class="diptych">
       <h1 class="wall-name">JASON</h1>
-      <a class="panel panel-art" href="art.html">
-        <span class="window"><img src="assets/hero.jpg" alt="" width="1194" height="1600" fetchpriority="high"></span>
+      <a class="panel panel-art" href="/art">
+        <span class="window"><Image src={hero} alt="" width={1194} height={1600} loading="eager" fetchpriority="high" /></span>
         <span class="caption">
           <span class="label">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -37,8 +33,8 @@
 
       <span class="hinge" aria-hidden="true"></span>
 
-      <a class="panel panel-tech" href="tech.html">
-        <span class="window"><img src="assets/hero.jpg" alt="" width="1194" height="1600"></span>
+      <a class="panel panel-tech" href="/tech">
+        <span class="window"><Image src={hero} alt="" width={1194} height={1600} loading="eager" /></span>
         <span class="caption">
           <span class="label">
             Tech
@@ -74,14 +70,13 @@
         <p class="frame-name">JASON</p>
       </div>
       <nav class="frame-links" aria-label="Footer">
-        <a href="index.html">Home</a>
-        <a href="art.html">Art</a>
-        <a href="tech.html">Tech</a>
+        <a href="/">Home</a>
+        <a href="/art">Art</a>
+        <a href="/tech">Tech</a>
         <!-- TODO: replace the placeholder address with your real contact, then remove the note -->
         <a href="mailto:hello@example.com">Get in touch <span class="note">address pending</span></a>
       </nav>
       <p class="frame-copy">&copy; 2026 Jason. Man is not truly one, but truly two.</p>
     </div>
   </footer>
-</body>
-</html>
+</Diptych>
