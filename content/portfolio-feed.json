@@ -7,28 +7,34 @@
       "name": "Know Your Vote",
       "summary": "A nonpartisan Florida voter guide: enter an address and see every race on your ballot side by side, with candidate news and deadlines.",
       "status": "live",
-      "last_active": "2026-10-15",
       "session_count": 92,
-      "tags": ["Next.js", "Supabase", "Pelias geocoding"]
+      "tags": [
+        "Next.js",
+        "Supabase",
+        "Pelias geocoding"
+      ]
     },
     {
       "slug": "open-thoughts",
       "name": "Open Thoughts",
       "summary": "A desktop app that reads my Claude Code work and notes, and drafts updates I approve.",
       "status": "active",
-      "last_active": "2026-10-16",
       "session_count": 12,
-      "tags": ["Tauri", "Python"]
+      "tags": [
+        "Tauri",
+        "Python"
+      ]
     },
     {
       "slug": "portfolio",
       "name": "This site",
       "summary": "A static two-sided portfolio, art and tech, on GitHub Pages with no framework and no build step.",
       "status": "paused",
-      "last_active": "2026-09-12",
       "session_count": 4,
-      "tags": ["HTML", "CSS"],
-      "repo_url": "https://github.com/JasonJosephIT"
+      "tags": [
+        "HTML",
+        "CSS"
+      ]
     }
   ]
 }

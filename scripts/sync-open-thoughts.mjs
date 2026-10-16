@@ -10,14 +10,12 @@ const START = "<!-- open-thoughts:projects:start -->";
 const END = "<!-- open-thoughts:projects:end -->";
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-const month = (d) => new Date(d + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 
 const card = (p) => `      <article class="project-card">
         <h3>${esc(p.name)}</h3>
         <p>${esc(p.summary)}</p>
         <div class="tech-tags">${(p.tags ?? []).map((t) => `<span>${esc(t)}</span>`).join("")}</div>
-        <p class="project-meta">${esc(p.status)} · last worked ${month(p.last_active)}</p>${
-  p.repo_url ? `\n        <a href="${esc(p.repo_url)}" class="project-link">Source</a>` : ""}
+        <p class="project-meta">${esc(p.status)}</p>
       </article>`;
 
 const { projects } = JSON.parse(readFileSync(feedPath, "utf8"));
