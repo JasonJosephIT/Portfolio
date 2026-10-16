@@ -14,5 +14,3 @@ dist/
 .astro/
 node_modules/
 .vscode/
-# Draft bundles stay local until approved (the repo is public); approved ones get committed by the pull PR
-content/bundle/
