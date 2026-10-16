@@ -1,0 +1,44 @@
+---
+import { marked } from "marked";
+import Tech from "@/layouts/Tech.astro";
+import ProjectIndex from "@/components/ProjectIndex";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { profile, projects } from "@/lib/bundle";
+
+const list = await projects();
+const bio = await marked.parse(profile.bio);
+---
+
+<Tech title="Tech · Jason Joseph" description={profile.headline}>
+  <section class="grid gap-10 pt-14 pb-16 sm:pt-20 lg:grid-cols-[1.4fr_1fr] lg:items-end">
+    <div class="grid gap-6">
+      <p class="label-section text-tech">Tech</p>
+      <h1 class="display text-[clamp(3rem,8vw,6rem)] text-foreground">SOFTWARE</h1>
+      <p class="title max-w-2xl text-[clamp(1.25rem,2.4vw,1.6rem)] text-foreground/90">{profile.headline}</p>
+      <div class="prose-board max-w-2xl" set:html={bio} />
+    </div>
+    <Card class="gap-4 py-5">
+      <CardHeader class="px-5"><CardTitle class="label-section text-foreground">Skills</CardTitle></CardHeader>
+      <CardContent class="flex flex-wrap gap-1.5 px-5">
+        {profile.skills.map((s) => <Badge variant="secondary" class="rounded-sm font-normal">{s}</Badge>)}
+      </CardContent>
+      {
+        profile.interests.length > 0 && (
+          <>
+            <CardHeader class="px-5 pt-2"><CardTitle class="label-section text-foreground">Interests</CardTitle></CardHeader>
+            <CardContent class="px-5 text-sm text-muted-foreground">{profile.interests.join(" · ")}</CardContent>
+          </>
+        )
+      }
+    </Card>
+  </section>
+
+  <section aria-labelledby="work" class="grid gap-6">
+    <div class="flex items-baseline justify-between border-b pb-3">
+      <h2 id="work" class="label-section text-foreground">Selected work</h2>
+      <p class="label">{list.length} projects</p>
+    </div>
+    <ProjectIndex client:load projects={list.map(({ slug, name, summary, tags }) => ({ slug, name, summary, tags }))} />
+  </section>
+</Tech>

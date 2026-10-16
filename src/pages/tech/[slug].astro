@@ -1,0 +1,72 @@
+---
+import { marked } from "marked";
+import { ArrowLeft, Play } from "lucide-react";
+import Tech from "@/layouts/Tech.astro";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { projects, relationsFor, RELATION_LABEL } from "@/lib/bundle";
+
+export async function getStaticPaths() {
+  const all = await projects();
+  return all.map((p, i) => ({ params: { slug: p.slug }, props: { project: p, index: i + 1, all } }));
+}
+
+const { project: p, index, all } = Astro.props;
+const html = await marked.parse(p.description);
+const name = (slug: string) => all.find((x) => x.slug === slug)?.name ?? slug;
+const related = await relationsFor(p.slug);
+---
+
+<Tech title={`${p.name} · Jason Joseph`} description={p.summary}>
+  <a href="/tech" class="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-tech">
+    <ArrowLeft class="size-4" /> All work
+  </a>
+
+  <header class="grid gap-4 pt-8 pb-10">
+    <p class="label">Project {String(index).padStart(2, "0")}</p>
+    <h1 class="display text-[clamp(2.25rem,6vw,4.5rem)] text-foreground">{p.name}</h1>
+    <p class="title max-w-3xl text-[clamp(1.1rem,2vw,1.4rem)] font-normal text-foreground/85">{p.summary}</p>
+  </header>
+
+  <div class="grid gap-10 lg:grid-cols-[1fr_20rem]">
+    <div class="grid content-start gap-10">
+      <figure class="grid gap-2">
+        <div class="relative grid aspect-video place-items-center overflow-hidden rounded-sm border bg-card">
+          <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_30%,color-mix(in_srgb,var(--accent-tech)_14%,transparent),transparent_60%)]"></div>
+          <div class="relative grid place-items-center gap-3 text-center">
+            <span class="grid size-14 place-items-center rounded-full border border-tech/40 text-tech"><Play class="size-6" /></span>
+            <p class="label">Prototype video · coming soon</p>
+          </div>
+        </div>
+        <figcaption class="text-xs text-pencil">Placeholder. Prototypes are hosted video first (prototype-hosting ticket, deferred).</figcaption>
+      </figure>
+      <article class="prose-board max-w-prose text-[1.02rem]" set:html={html} />
+    </div>
+
+    <aside class="grid content-start gap-4 lg:sticky lg:top-20">
+      <Card class="gap-4 py-5">
+        <CardHeader class="px-5"><CardTitle class="label-section text-foreground">Built with</CardTitle></CardHeader>
+        <CardContent class="flex flex-wrap gap-1.5 px-5">
+          {p.tags.map((t) => <Badge variant="outline" class="rounded-sm font-normal">{t}</Badge>)}
+        </CardContent>
+        {
+          related.length > 0 && (
+            <>
+              <Separator />
+              <CardHeader class="px-5"><CardTitle class="label-section text-foreground">Connected work</CardTitle></CardHeader>
+              <CardContent class="grid gap-2 px-5">
+                {related.map((r) => (
+                  <a href={`/tech/${r.other}`} class="group grid gap-0.5 rounded-sm py-1">
+                    <span class="label">{RELATION_LABEL[r.type][r.outgoing ? 0 : 1]}</span>
+                    <span class="text-foreground group-hover:text-tech">{name(r.other)}</span>
+                  </a>
+                ))}
+              </CardContent>
+            </>
+          )
+        }
+      </Card>
+    </aside>
+  </div>
+</Tech>

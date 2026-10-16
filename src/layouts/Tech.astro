@@ -1,0 +1,52 @@
+---
+import "@/styles/global.css";
+import { isDraft, manifest } from "@/lib/bundle";
+import ChatPlaceholder from "@/components/ChatPlaceholder";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = "Software by Jason Joseph." } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="preload" href="/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin />
+  </head>
+  <body class="min-h-dvh">
+    {
+      isDraft && (
+        <div class="border-b border-tech/30 bg-tech/10 px-4 py-2 text-center text-xs tracking-wide text-tech">
+          Preview · drafts from Open Thoughts, not yet approved ({manifest.generated_at.slice(0, 10)})
+        </div>
+      )
+    }
+    <header class="sticky top-0 z-20 border-b bg-background/85 backdrop-blur">
+      <nav class="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
+        <a href="/tech" class="wordmark text-foreground">JASON</a>
+        <ul class="flex items-center gap-1 text-sm">
+          <li><span class="px-3 py-2 text-pencil" title="Coming with the full Astro port">Home</span></li>
+          <li><span class="px-3 py-2 text-pencil" title="Art stays hand-managed; ported separately">Art</span></li>
+          <li>
+            <a href="/tech" aria-current="page" class="rounded-sm px-3 py-2 text-tech underline decoration-tech/40 underline-offset-8">Tech</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main class="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
+      <slot />
+    </main>
+    <footer class="border-t">
+      <div class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <p class="italic">Man is not truly one, but truly two.</p>
+        <p class="label">Contact · placeholder until Jason picks an address</p>
+      </div>
+    </footer>
+    <ChatPlaceholder client:idle />
+  </body>
+</html>

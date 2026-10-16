@@ -1,0 +1,128 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-tech: var(--accent-tech);
+    --color-art: var(--accent-art);
+    --color-pencil: var(--pencil);
+    --color-board: var(--board);
+    --font-sans: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+@font-face {
+  font-family: "Archivo";
+  src: url("/fonts/archivo-var.woff2") format("woff2-variations"), url("/fonts/archivo-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+}
+
+/* One dark theme: the brand pins a near-black ground (DESIGN.md). Tech pages use the cool accent. */
+:root {
+  --radius: 0.125rem;
+  --bg: #08090b;
+  --board: #101115;
+  --text: #ece8de;
+  --muted-text: #a5a197;
+  --pencil: #8a8479;
+  --accent-tech: #48c4dc;
+  --accent-art: #e98a3e;
+
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--board);
+  --card-foreground: var(--text);
+  --popover: #14161b;
+  --popover-foreground: var(--text);
+  --primary: var(--accent-tech);
+  --primary-foreground: #061317;
+  --secondary: #16181d;
+  --secondary-foreground: var(--text);
+  --muted: #14161b;
+  --muted-foreground: var(--muted-text);
+  --accent: #16181d;
+  --accent-foreground: var(--text);
+  --destructive: oklch(0.65 0.2 27);
+  --border: rgba(236, 232, 222, 0.09);
+  --input: rgba(236, 232, 222, 0.12);
+  --ring: var(--accent-tech);
+  --chart-1: var(--accent-tech);
+  --chart-2: var(--accent-art);
+  --chart-3: var(--muted-text);
+  --chart-4: var(--pencil);
+  --chart-5: var(--text);
+  --sidebar: var(--board);
+  --sidebar-foreground: var(--text);
+  --sidebar-primary: var(--accent-tech);
+  --sidebar-primary-foreground: #061317;
+  --sidebar-accent: #16181d;
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: rgba(236, 232, 222, 0.09);
+  --sidebar-ring: var(--accent-tech);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+/* Typographic roles from DESIGN.md */
+.wordmark { font-weight: 800; letter-spacing: 0.24em; font-variation-settings: "wdth" 125; font-size: 0.9rem; }
+.display { font-weight: 800; letter-spacing: 0.05em; line-height: 0.9; font-variation-settings: "wdth" 125; }
+.label { font-weight: 500; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; font-variation-settings: "wdth" 108; color: var(--pencil); }
+.label-section { font-weight: 600; font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; font-variation-settings: "wdth" 108; }
+.title { font-weight: 700; letter-spacing: 0.01em; line-height: 1.1; font-variation-settings: "wdth" 118; }
+.prose-board p { margin: 0 0 1em; line-height: 1.6; color: var(--muted-text); }
+.prose-board ul { margin: 0 0 1em; padding-left: 1.1em; list-style: square; color: var(--muted-text); }
+.prose-board li { margin: 0.3em 0; line-height: 1.55; }
+.prose-board li::marker { color: var(--accent-tech); }
+.prose-board strong { color: var(--text); font-weight: 600; }
+.prose-board h2, .prose-board h3 { color: var(--text); font-weight: 700; margin: 1.4em 0 0.5em; }
