@@ -3,12 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "vitest run",
+    "test": "vitest run && node --test test/index-build.test.mjs",
+    "test:index": "node --test test/index-build.test.mjs",
     "types": "wrangler types --include-runtime=false --strict-vars=false src/worker-configuration.d.ts"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "1.4.3",
     "@cloudflare/workers-types": "^5.20261015.1",
+    "github-slugger": "2.0.0",
     "typescript": "^7.0.2",
     "vitest": "5.0.5",
     "wrangler": "4.151.0"
