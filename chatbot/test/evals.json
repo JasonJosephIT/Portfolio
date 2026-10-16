@@ -1,0 +1,416 @@
+[
+	{
+		"name": "500-char message answers",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "REPEAT:a:500",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 200,
+			"bodyIncludes": "I don't know yet"
+		}
+	},
+	{
+		"name": "501-char message is too large",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "REPEAT:a:501",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 413
+		}
+	},
+	{
+		"name": "3 history turns answers",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": [
+					{
+						"role": "user",
+						"content": "hi"
+					},
+					{
+						"role": "assistant",
+						"content": "hi"
+					},
+					{
+						"role": "user",
+						"content": "hi"
+					}
+				]
+			}
+		},
+		"expect": {
+			"status": 200
+		}
+	},
+	{
+		"name": "4 history turns is rejected",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": [
+					{
+						"role": "user",
+						"content": "hi"
+					},
+					{
+						"role": "assistant",
+						"content": "hi"
+					},
+					{
+						"role": "user",
+						"content": "hi"
+					},
+					{
+						"role": "assistant",
+						"content": "hi"
+					}
+				]
+			}
+		},
+		"expect": {
+			"status": 400
+		}
+	},
+	{
+		"name": "history turn over 500 chars is rejected",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": [
+					{
+						"role": "user",
+						"content": "REPEAT:a:501"
+					}
+				]
+			}
+		},
+		"expect": {
+			"status": 400
+		}
+	},
+	{
+		"name": "history turn with unknown role is rejected",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": [
+					{
+						"role": "system",
+						"content": "hi"
+					}
+				]
+			}
+		},
+		"expect": {
+			"status": 400
+		}
+	},
+	{
+		"name": "non-JSON body is rejected",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "text/plain"
+			},
+			"body": "not json"
+		},
+		"expect": {
+			"status": 400
+		}
+	},
+	{
+		"name": "missing message is rejected",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 400
+		}
+	},
+	{
+		"name": "missing history is rejected",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi"
+			}
+		},
+		"expect": {
+			"status": 400
+		}
+	},
+	{
+		"name": "kill switch off answers 503 for a valid request",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": []
+			}
+		},
+		"env": {
+			"CHAT_ENABLED": "false"
+		},
+		"expect": {
+			"status": 503,
+			"bodyIncludes": "\"off\":true"
+		}
+	},
+	{
+		"name": "kill switch off answers 503 before parsing a bad body",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": "not json"
+		},
+		"env": {
+			"CHAT_ENABLED": "false"
+		},
+		"expect": {
+			"status": 503
+		}
+	},
+	{
+		"name": "unknown path is 404",
+		"request": {
+			"method": "POST",
+			"path": "/nope",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 404
+		}
+	},
+	{
+		"name": "GET /chat is 405",
+		"request": {
+			"method": "GET"
+		},
+		"expect": {
+			"status": 405
+		}
+	},
+	{
+		"name": "listed origin gets the CORS allow header",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json",
+				"origin": "http://localhost:4321"
+			},
+			"body": {
+				"message": "hi",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 200,
+			"headers": {
+				"access-control-allow-origin": "http://localhost:4321",
+				"vary": "Origin"
+			}
+		}
+	},
+	{
+		"name": "unlisted origin gets no CORS allow header",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json",
+				"origin": "https://evil.example"
+			},
+			"body": {
+				"message": "hi",
+				"history": []
+			}
+		},
+		"expect": {
+			"status": 200,
+			"headers": {
+				"access-control-allow-origin": null
+			}
+		}
+	},
+	{
+		"name": "listed origin sees the kill switch through CORS",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json",
+				"origin": "http://localhost:4321"
+			},
+			"body": {
+				"message": "hi",
+				"history": []
+			}
+		},
+		"env": {
+			"CHAT_ENABLED": "false"
+		},
+		"expect": {
+			"status": 503,
+			"headers": {
+				"access-control-allow-origin": "http://localhost:4321"
+			}
+		}
+	},
+	{
+		"name": "preflight from a listed origin is allowed",
+		"request": {
+			"method": "OPTIONS",
+			"headers": {
+				"origin": "http://localhost:4321",
+				"access-control-request-method": "POST",
+				"access-control-request-headers": "content-type"
+			}
+		},
+		"expect": {
+			"status": 204,
+			"headers": {
+				"access-control-allow-origin": "http://localhost:4321",
+				"access-control-allow-methods": "POST",
+				"access-control-allow-headers": "content-type"
+			}
+		}
+	},
+	{
+		"name": "preflight from an unlisted origin gets no allow header",
+		"request": {
+			"method": "OPTIONS",
+			"headers": {
+				"origin": "https://evil.example",
+				"access-control-request-method": "POST"
+			}
+		},
+		"expect": {
+			"status": 204,
+			"headers": {
+				"access-control-allow-origin": null
+			}
+		}
+	},
+	{
+		"name": "origins list is comma-separated",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json",
+				"origin": "https://site.example"
+			},
+			"body": {
+				"message": "hi",
+				"history": []
+			}
+		},
+		"env": {
+			"ALLOWED_ORIGINS": "http://localhost:4321, https://site.example"
+		},
+		"expect": {
+			"status": 200,
+			"headers": {
+				"access-control-allow-origin": "https://site.example"
+			}
+		}
+	},
+	{
+		"name": "body over 32768 bytes is rejected before parsing",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": [
+					{
+						"role": "user",
+						"content": "REPEAT:a:40000"
+					}
+				]
+			}
+		},
+		"expect": {
+			"status": 413
+		}
+	},
+	{
+		"name": "500-char non-ASCII message and 3 full non-ASCII turns answer",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "REPEAT:é:500",
+				"history": [
+					{
+						"role": "user",
+						"content": "REPEAT:漢:500"
+					},
+					{
+						"role": "assistant",
+						"content": "REPEAT:漢:500"
+					},
+					{
+						"role": "user",
+						"content": "REPEAT:漢:500"
+					}
+				]
+			}
+		},
+		"expect": {
+			"status": 200
+		}
+	}
+]
