@@ -1,7 +1,7 @@
 ---
 id: P14
 title: "Chatbot Worker skeleton: endpoint, cap, kill switch, eval harness"
-status: open
+status: closed
 type: AFK
 phase: F
 repo: Portfolio, branch redesign/chatbot

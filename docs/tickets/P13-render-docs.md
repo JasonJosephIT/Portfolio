@@ -1,7 +1,7 @@
 ---
 id: P13
 title: Render features and decisions docs under each project
-status: open
+status: closed
 type: AFK
 phase: E
 repo: Portfolio, branch redesign/astro-docs
