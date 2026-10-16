@@ -1,7 +1,7 @@
 ---
 id: P07
 title: Vendor the schema; the build fails on an invalid, too-new or pending bundle
-status: open
+status: closed
 type: AFK
 phase: C
 repo: Portfolio, branch redesign/astro-bundle (cut from redesign/astro-tech)

@@ -1,7 +1,7 @@
 ---
 id: P03
 title: Deploy as a Cloudflare Worker with static assets; preview per PR
-status: open
+status: closed
 type: HITL
 phase: B
 repo: Portfolio, branch redesign/astro-tech

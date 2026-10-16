@@ -1,7 +1,7 @@
 ---
 id: P10
 title: Daily launchd job runs the pull
-status: open
+status: closed
 type: HITL
 phase: C
 repo: Portfolio, branch redesign/astro-bundle

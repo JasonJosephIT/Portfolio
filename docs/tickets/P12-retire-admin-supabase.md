@@ -1,7 +1,7 @@
 ---
 id: P12
 title: Retire admin/, the Supabase pipeline, Instatic and place-image
-status: open
+status: closed
 type: AFK
 phase: D
 repo: Portfolio, branch redesign/retire-admin

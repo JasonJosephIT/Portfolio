@@ -1,7 +1,7 @@
 ---
 id: P08
 title: Tech cards, project pages, related projects and profile from the bundle
-status: open
+status: closed
 type: AFK
 phase: C
 repo: Portfolio, branch redesign/astro-bundle

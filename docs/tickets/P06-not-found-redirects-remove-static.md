@@ -1,7 +1,7 @@
 ---
 id: P06
 title: Not-found page, .html 301s, remove the static and generated pages
-status: open
+status: closed
 type: AFK
 phase: B
 repo: Portfolio, branch redesign/astro-tech

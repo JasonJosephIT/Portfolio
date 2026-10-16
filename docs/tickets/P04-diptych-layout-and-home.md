@@ -1,7 +1,7 @@
 ---
 id: P04
 title: Diptych base layout and the Home page in Astro
-status: open
+status: closed
 type: AFK
 phase: B
 repo: Portfolio, branch redesign/astro-tech

@@ -1,7 +1,7 @@
 ---
 id: P05
 title: Art page and piece pages in Astro
-status: open
+status: closed
 type: AFK
 phase: B
 repo: Portfolio, branch redesign/astro-tech

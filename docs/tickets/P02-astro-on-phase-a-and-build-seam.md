@@ -1,7 +1,7 @@
 ---
 id: P02
 title: Fixture bundle and build-seam tests
-status: open
+status: closed
 type: AFK
 phase: B
 repo: Portfolio, branch redesign/astro-tech (~/Projects/Portfolio-astro)

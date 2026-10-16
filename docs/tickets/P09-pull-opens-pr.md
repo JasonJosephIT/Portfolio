@@ -1,7 +1,7 @@
 ---
 id: P09
 title: Pull command validates and opens a PR; quiet on no change
-status: open
+status: closed
 type: AFK
 phase: C
 repo: Portfolio, branch redesign/astro-bundle
