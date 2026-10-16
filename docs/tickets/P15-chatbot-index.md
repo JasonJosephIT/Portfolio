@@ -1,7 +1,7 @@
 ---
 id: P15
 title: Chunk the bundle, embed, namespace per bundle hash, switch and roll back
-status: open
+status: closed
 type: AFK
 phase: F
 repo: Portfolio, branch redesign/chatbot
