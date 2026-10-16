@@ -47,6 +47,10 @@
     --color-art: var(--accent-art);
     --color-pencil: var(--pencil);
     --color-board: var(--board);
+    --color-bevel: var(--bevel);
+    --color-hairline: var(--hairline);
+    --color-ink: var(--ink-display);
+    --color-muted-text: var(--muted-text);
     --font-sans: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
@@ -68,6 +72,15 @@
   --pencil: #8a8479;
   --accent-tech: #48c4dc;
   --accent-art: #e98a3e;
+  --board-edge: #030304;
+  --board-raised: #17181d;
+  --ink-display: #d9d4c8;
+  --hairline: rgba(236, 232, 222, 0.07);
+  /* Tech pages are the cool half: the bevel is the cyan cut into the board. */
+  --bevel: color-mix(in srgb, var(--accent-tech) 58%, var(--board));
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --mat: clamp(14px, 2.4vw, 32px);
+  --mat-sm: clamp(10px, 1.4vw, 16px);
 
   --background: var(--bg);
   --foreground: var(--text);
@@ -114,15 +127,98 @@
   }
 }
 
-/* Typographic roles from DESIGN.md */
-.wordmark { font-weight: 800; letter-spacing: 0.24em; font-variation-settings: "wdth" 125; font-size: 0.9rem; }
-.display { font-weight: 800; letter-spacing: 0.05em; line-height: 0.9; font-variation-settings: "wdth" 125; }
-.label { font-weight: 500; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; font-variation-settings: "wdth" 108; color: var(--pencil); }
-.label-section { font-weight: 600; font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; font-variation-settings: "wdth" 108; }
-.title { font-weight: 700; letter-spacing: 0.01em; line-height: 1.1; font-variation-settings: "wdth" 118; }
-.prose-board p { margin: 0 0 1em; line-height: 1.6; color: var(--muted-text); }
-.prose-board ul { margin: 0 0 1em; padding-left: 1.1em; list-style: square; color: var(--muted-text); }
-.prose-board li { margin: 0.3em 0; line-height: 1.55; }
-.prose-board li::marker { color: var(--accent-tech); }
+/* ---------- Typographic roles (DESIGN.md: one family, hierarchy from the width axis) ---------- */
+body { font-variant-numeric: tabular-nums; }
+.wordmark { font-weight: 800; letter-spacing: 0.24em; font-variation-settings: "wdth" 125; font-size: 0.9rem; line-height: 1.4; }
+.display { font-weight: 800; letter-spacing: 0.05em; line-height: 0.9; font-variation-settings: "wdth" 125; color: var(--ink-display); text-shadow: 0 4px 14px rgba(0, 0, 0, 0.6); text-wrap: balance; }
+.title { font-weight: 700; letter-spacing: 0.01em; line-height: 1.1; font-variation-settings: "wdth" 118; text-wrap: balance; }
+.lede { font-size: 1.05rem; line-height: 1.55; color: var(--muted-text); text-wrap: pretty; }
+.label { font-weight: 500; font-size: 0.72rem; line-height: 1.4; letter-spacing: 0.16em; text-transform: uppercase; font-variation-settings: "wdth" 108; color: var(--pencil); }
+.label-section { font-weight: 600; font-size: 0.8rem; line-height: 1.4; letter-spacing: 0.2em; text-transform: uppercase; font-variation-settings: "wdth" 108; color: var(--muted-text); }
+/* Anything not yet real: sentence case is what separates a note from a label. */
+.note { font-weight: 500; font-size: 0.75rem; line-height: 1.45; letter-spacing: 0.04em; color: var(--pencil); }
+
+/* Section heading followed by a hairline that fills the row. */
+.rule-head { display: flex; align-items: baseline; gap: 16px; }
+.rule-head::after { content: ""; flex: 1; height: 1px; background: var(--hairline); align-self: center; }
+
+/* ---------- Surfaces (DESIGN.md: cut mats, bevel rings, long soft cast, square corners) ---------- */
+.mat { background: var(--board); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 1px 0 var(--board-edge); }
+.mat-cast { background: var(--board); box-shadow: 0 0 0 1px var(--bevel), inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 1px 0 var(--board-edge), 0 26px 34px -24px rgba(0, 0, 0, 0.95); }
+/* A mat standing off the wall without a bevel ring: the long soft cast only. */
+.mat.cast { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 1px 0 var(--board-edge), 0 40px 60px -40px rgba(0, 0, 0, 0.9); }
+.window { position: relative; background: var(--bg); box-shadow: 0 0 0 1px var(--bevel); }
+.window::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 10px 18px -12px rgba(0, 0, 0, 0.95), inset 0 0 0 1px rgba(0, 0, 0, 0.55); }
+
+/* A matted work that rises off the board: 4px lift, cast, bevel to full accent (The Lift Rule). */
+.lift { position: relative; isolation: isolate; transition: transform 0.7s var(--ease-out); }
+/* The cast lives on a pseudo-element so hover only fades opacity instead of repainting a shadow. */
+.lift::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; box-shadow: 0 26px 34px -22px rgba(0, 0, 0, 0.95); transition: opacity 0.7s var(--ease-out); }
+.lift .window { transition: box-shadow 0.25s ease; }
+.lift .arrow { transition: transform 0.7s var(--ease-out), color 0.25s ease; }
+.lift:focus-visible::before { opacity: 1; }
+.lift:focus-visible .window { box-shadow: 0 0 0 1px var(--accent-tech); }
+.lift:focus-visible .arrow { color: var(--accent-tech); }
+@media (hover: hover) and (pointer: fine) {
+  .lift:hover { transform: translateY(-4px); }
+  .lift:hover::before { opacity: 1; }
+  .lift:hover .window { box-shadow: 0 0 0 1px var(--accent-tech); }
+  .lift:hover .arrow { transform: translate(4px, -4px); color: var(--accent-tech); }
+}
+
+/* Tags are not pills: plain pencil labels split by a 1px, 0.8em rule. */
+.tags { display: flex; flex-wrap: wrap; row-gap: 4px; }
+.tags > li { display: inline-flex; align-items: center; padding-right: 10px; }
+.tags > li + li::before { content: ""; width: 1px; height: 0.8em; margin-right: 10px; background: rgba(236, 232, 222, 0.16); }
+
+/* Text link in the label register, underline drawn as a border on hover. */
+.text-link { display: inline-flex; align-items: center; gap: 8px; color: var(--text); border-bottom: 1px solid transparent; padding: 4px 0 3px; transition: border-color 0.25s ease, color 0.25s ease; }
+.text-link:hover { border-bottom-color: currentColor; }
+.text-link .arrow { transition: transform 0.7s var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  .text-link:hover .arrow { transform: translateY(3px); }
+  .text-link.nudge-left:hover .arrow { transform: translateX(-3px); }
+}
+
+/* A small window that is itself the link: the bevel turns to full accent. */
+.ring-link { transition: box-shadow 0.25s ease; }
+.ring-link .arrow { transition: transform 0.7s var(--ease-out), color 0.25s ease; }
+.ring-link:hover, .ring-link:focus-visible { box-shadow: 0 0 0 1px var(--accent-tech); }
+.ring-link:hover .arrow, .ring-link:focus-visible .arrow { color: var(--accent-tech); }
+@media (hover: hover) and (pointer: fine) { .ring-link:hover .arrow { transform: translate(3px, -3px); } }
+
+:focus-visible { outline: 1px solid var(--accent-tech); outline-offset: 4px; border-radius: 1px; }
+.lift:focus-visible { outline-offset: 2px; }
+
+/* Develop: where scroll timelines exist, each plate comes up out of the dark as it enters (CSS only). */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .develop { animation: develop linear both; animation-timeline: view(); animation-range: entry 0% entry 55%; }
+  }
+}
+@keyframes develop { from { opacity: 0.55; filter: saturate(0.5) brightness(0.8); } to { opacity: 1; filter: none; } }
+
+/* Filtered rows fade back in when they reappear. */
+.plate-item { transition: opacity 0.2s ease, display 0.2s allow-discrete; }
+@starting-style { .plate-item { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation: none !important; }
+  .lift:hover, .lift:focus-visible { transform: none !important; }
+}
+
+/* ---------- Prose from the bundle (markdown) ---------- */
+.prose-board { color: var(--muted-text); font-size: 1rem; line-height: 1.6; }
+.prose-board > * + * { margin-top: 1em; }
+.prose-board p { text-wrap: pretty; }
+.prose-board ul { padding-left: 1.1em; list-style: square; }
+.prose-board li { margin: 0.35em 0; line-height: 1.55; }
+.prose-board li::marker { color: var(--bevel); }
 .prose-board strong { color: var(--text); font-weight: 600; }
-.prose-board h2, .prose-board h3 { color: var(--text); font-weight: 700; margin: 1.4em 0 0.5em; }
+.prose-board h2, .prose-board h3 { color: var(--text); font-weight: 700; font-variation-settings: "wdth" 115; margin-top: 1.6em; }
+
+/* Chat placeholder: native popover, no runtime JS. */
+.chat-panel { position: fixed; inset: auto 16px 76px auto; margin: 0; width: min(22rem, calc(100vw - 32px)); border: 0; padding: 0; color: var(--text); }
+.chat-panel:popover-open { animation: chat-in 0.2s var(--ease-out); }
+@keyframes chat-in { from { opacity: 0; transform: translateY(6px); } }
+@media (min-width: 640px) { .chat-panel { inset: auto 24px 84px auto; } }
