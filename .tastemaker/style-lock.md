@@ -7,7 +7,7 @@ Thesis: quiet, image-led rooms with precise alignment and captions. First viewpo
 Reference board: .tastemaker/reference-board.md (brief-described inspiration, no screenshot/live site available or viewed). Mode Experience; variance3, motion1, density3, art direction7. No global taste profile found or promoted.
 
 ## Palette and contrast
-Art canvas #000000; Tech #0a0a0b preserved; surface #141416; text #f2f2f0; muted #a5a5a0; Art accent #ff7a4d; Tech accent #4dc3ff. All new tokens scoped under gallery page classes; do not modify Home/admin through globals.
+Art canvas #000000; Tech #0a0a0b preserved; surface #141416; text #f2f2f0; muted #a5a5a0; Art accent #ff7a4d; Tech accent #4dc3ff. All new tokens scoped under gallery page classes; do not modify Home through globals.
 Measured using tastemaker check_contrast.py: text/black18.73, text/surface16.41, muted/black8.49, muted/surface7.44, Art accent/black8.14, accent/surface7.13, Tech accent/black10.57, accent/surface9.26. All clear4.5 text floor. Neutral outlined controls; white focus outline on dark backdrops. Light text on accent fills is forbidden (2.30 Art,1.77 Tech); use black on any accent fill. Hairlines decorative only. Full matrix in .superpowers/sdd/contrast.txt. Dark single mode; no theme switch.
 
 ## Typography

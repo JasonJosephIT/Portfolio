@@ -21,8 +21,6 @@ One person, two disciplines, presented as a single identity rather than two site
 ## Operating Context
 
 - Static site: plain HTML and CSS, no build step, no framework, served from GitHub Pages (repo `JasonJosephIT/Portfolio`).
-- Content pipeline: Jason submits photos and projects through a private admin area (`/admin/`, Supabase magic-link auth + storage inbox), drags them into place on the live page with `?edit=1`, and a Claude Code command (`/place-image`, see `.claude/commands/place-image.md`) bakes each placement into the HTML and CSS and commits it.
-- The admin area is out of scope for the 2026-09-05 redesign; it stays functional and inherits tokens from `styles.css`.
 
 ## Capabilities and Constraints
 
@@ -31,7 +29,6 @@ One person, two disciplines, presented as a single identity rather than two site
 - **Markup contracts the pipeline depends on (must not change):**
   - `art.html`: gallery container is `.gallery`; each work is `<a href="assets/photo-NN.jpg"><img src="assets/photo-NN.jpg" alt="..." loading="lazy"></a>` as a direct child of `.gallery`. Placement specs reference `.gallery > :nth-child(n)`.
   - `tech.html`: projects container is `.project-grid` inside `.projects`; each project is `.project-card` containing `h3`, `p`, `.tech-tags` (spans), `.project-link`. Skills are `.skills .skill-pills > .skill-pill`.
-  - `admin/edit.js` resolves `.gallery`, `.projects .project-grid`, and `.page-title` by selector; those hooks must exist.
 - Image files live in `assets/`, named `photo-NN.jpg` (art) or `project-<slug>.jpg` (tech), lazy-loaded, with meaningful alt text.
 - Design tokens live in `styles.css` as CSS custom properties; the admin stylesheet reads `--bg`, `--text`, `--muted`, `--accent-art`, `--accent-tech`, `--space`, `--radius`, `--nav-height`, so those names must survive any token overhaul.
 - Fonts: the original PRD pinned a system stack and forbade font CDNs. Inferred (not confirmed): the intent was "no third-party runtime dependencies on public pages"; self-hosted font files in `assets/fonts/` are acceptable.

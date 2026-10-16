@@ -6,7 +6,7 @@ Design Jason’s Art and Tech portfolios as calm, image-led galleries: museum-li
 
 This brief supersedes the Art and Tech layout, placeholder-content, and freeform-placement guidance in older documents, including `docs/prd.md` and comments in the current page shells. Preserve existing Home navigation, Jason’s name, chosen hero, and quotation unless a later task explicitly changes them. Do not restore previously removed personal photos or invent public projects, skills, testimonials, or outcomes.
 
-This document specifies future implementation; creating it does not authorize deployment or a platform migration. Inspect current code and applicable repository instructions before implementation. The repository now includes admin/editing functionality beyond the original static MVP: preserve those integrations and adapt them deliberately. Use the existing stack where practical; structured layouts do not require a framework migration.
+This document specifies future implementation; creating it does not authorize deployment or a platform migration. Inspect current code and applicable repository instructions before implementation. Use the existing stack where practical; structured layouts do not require a framework migration.
 
 Interpret “no longer freeform” as a structured content system: fixed section types, reusable cards, curated ordering, and predictable detail templates. No absolute-positioned canvas or arbitrary visitor-facing layout controls.
 
@@ -235,12 +235,12 @@ Suggested editorial lengths: titles 2–8 words, summaries 15–30 words. These 
 
 ## Subagent work plan and ownership
 
-1. **Inspect and map:** Read this brief, current pages/styles, and existing content/admin contracts. Report a concise mapping of records, routes, and any conflicts. Do not treat the old PRD’s removed photos/placeholders as source content.
+1. **Inspect and map:** Read this brief, current pages/styles, and existing content contracts. Report a concise mapping of records, routes, and any conflicts. Do not treat the old PRD’s removed photos/placeholders as source content.
 2. **Shared foundation:** One owner implements tokens, shell, anchor navigation, accessible card primitives, and breakpoints. Establish these contracts before parallel page work.
 3. **Art implementation:** Build the rail, Selected Works (Favorites), Projects, Explore by Style, About Me, Contact, monochrome preview interactions, and detail templates using shared components and canonical records. Leave tapestry research deferred.
 4. **Tech implementation:** Build Starred Projects, Projects, and the simpler detail template using the same visual language.
 5. **Content integration:** Connect curation and publication rules to existing owner workflows. Coordinate changes to shared files; do not create competing data stores.
-6. **Review:** A separate reviewer checks the actual implementation against this document, including content integrity, keyboard paths, mobile browsing, and Home/admin regressions.
+6. **Review:** A separate reviewer checks the actual implementation against this document, including content integrity, keyboard paths, mobile browsing, and Home regressions.
 
 Page agents can work in parallel after shared contracts exist. Assign a single owner to shared styles and content schemas to avoid conflicting edits. Each agent reports files changed, decisions, checks actually performed, and remaining issues. Do not invent verification evidence or expand into deployment as part of design work.
 
@@ -262,5 +262,5 @@ Page agents can work in parallel after shared contracts exist. Assign a single o
 - [ ] Layouts are reviewed at 320, 375, 768, 1024, and 1440px, plus zoom and reduced motion.
 - [ ] Keyboard users can reach/open every card and operate any expansion, filtering, or dialog controls.
 - [ ] Contrast, focus visibility, meaningful alt text, image failure, and long content are checked.
-- [ ] Existing Home and admin/editing behavior remains functional.
+- [ ] Existing Home behavior remains functional.
 - [ ] Review captures desktop/mobile screenshots and reports real remaining limitations.
