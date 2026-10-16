@@ -1,7 +1,7 @@
 ---
 id: P16
 title: Grounded answers with citations behind AI Gateway
-status: open
+status: closed
 type: AFK
 phase: F
 repo: Portfolio, branch redesign/chatbot
