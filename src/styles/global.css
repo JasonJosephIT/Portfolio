@@ -1,48 +1,10 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-
-@custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --radius-sm: calc(var(--radius) * 0.6);
-    --radius-md: calc(var(--radius) * 0.8);
-    --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) * 1.4);
-    --radius-2xl: calc(var(--radius) * 1.8);
-    --radius-3xl: calc(var(--radius) * 2.2);
-    --radius-4xl: calc(var(--radius) * 2.6);
     --color-background: var(--background);
     --color-foreground: var(--foreground);
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
-    --color-popover: var(--popover);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-accent: var(--accent);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-destructive: var(--destructive);
     --color-border: var(--border);
-    --color-input: var(--input);
     --color-ring: var(--ring);
-    --color-chart-1: var(--chart-1);
-    --color-chart-2: var(--chart-2);
-    --color-chart-3: var(--chart-3);
-    --color-chart-4: var(--chart-4);
-    --color-chart-5: var(--chart-5);
-    --color-sidebar: var(--sidebar);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-ring: var(--sidebar-ring);
     --color-tech: var(--accent-tech);
     --color-art: var(--accent-art);
     --color-pencil: var(--pencil);
@@ -64,7 +26,6 @@
 
 /* One dark theme: the brand pins a near-black ground (DESIGN.md). Tech pages use the cool accent. */
 :root {
-  --radius: 0.125rem;
   --bg: #08090b;
   --board: #101115;
   --text: #ece8de;
@@ -81,38 +42,10 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --mat: clamp(14px, 2.4vw, 32px);
   --mat-sm: clamp(10px, 1.4vw, 16px);
-
   --background: var(--bg);
   --foreground: var(--text);
-  --card: var(--board);
-  --card-foreground: var(--text);
-  --popover: #14161b;
-  --popover-foreground: var(--text);
-  --primary: var(--accent-tech);
-  --primary-foreground: #061317;
-  --secondary: #16181d;
-  --secondary-foreground: var(--text);
-  --muted: #14161b;
-  --muted-foreground: var(--muted-text);
-  --accent: #16181d;
-  --accent-foreground: var(--text);
-  --destructive: oklch(0.65 0.2 27);
   --border: rgba(236, 232, 222, 0.09);
-  --input: rgba(236, 232, 222, 0.12);
   --ring: var(--accent-tech);
-  --chart-1: var(--accent-tech);
-  --chart-2: var(--accent-art);
-  --chart-3: var(--muted-text);
-  --chart-4: var(--pencil);
-  --chart-5: var(--text);
-  --sidebar: var(--board);
-  --sidebar-foreground: var(--text);
-  --sidebar-primary: var(--accent-tech);
-  --sidebar-primary-foreground: #061317;
-  --sidebar-accent: #16181d;
-  --sidebar-accent-foreground: var(--text);
-  --sidebar-border: rgba(236, 232, 222, 0.09);
-  --sidebar-ring: var(--accent-tech);
 }
 
 @layer base {
