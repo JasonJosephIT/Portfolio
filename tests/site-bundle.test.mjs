@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cpSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { validateBundle } from "../scripts/lib/validate-bundle.mjs";
 import { buildSite, copyFixture as mutated, editJson as edit, fixture } from "./helpers.mjs";
@@ -54,4 +55,30 @@ test("build: a pending bundle fails a normal build and passes with PREVIEW=1", (
   const dir = pending();
   assert.throws(() => buildSite(dir), (e) => /approv/.test(output(e)));
   buildSite(dir, { PREVIEW: "1" });
+});
+
+test("a missing folder or file is a problem naming it, not a raw ENOENT", () => {
+  assert.throws(() => validateBundle(join(fixture, "nope")), (e) => /bundle\.json: missing/.test(e.message) && !/ENOENT/.test(e.message));
+  const dir = mutated((d) => rmSync(join(d, "profile.json")));
+  assert.throws(() => validateBundle(dir), (e) => /profile\.json: missing/.test(e.message) && !/ENOENT/.test(e.message));
+});
+
+test("bad JSON is a problem naming the file", () => {
+  const dir = mutated((d) => writeFileSync(join(d, "relations.json"), "{nope"));
+  assert.throws(() => validateBundle(dir), /relations\.json: not valid JSON/);
+});
+
+test("a file outside the bundle layout is refused; docs/*.md is allowed", () => {
+  const ok = mutated((d) => { mkdirSync(join(d, "docs")); writeFileSync(join(d, "docs", "about.md"), "# hi"); });
+  validateBundle(ok);
+  for (const stray of ["notes.txt", "projects/alpha-tool.md", "docs/secret.json", "extra/x.json"]) {
+    const dir = mutated((d) => { mkdirSync(join(d, stray, ".."), { recursive: true }); writeFileSync(join(d, stray), "x"); });
+    assert.throws(() => validateBundle(dir), new RegExp(`${stray.replace(".", "\\.")}: not part of a bundle`), stray);
+  }
+});
+
+test("build: an empty bundle folder fails with Bundle folder not found", () => {
+  const empty = mkdtempSync(join(tmpdir(), "site-empty-"));
+  try { assert.throws(() => buildSite(empty), (e) => e.status !== 0 && /Bundle folder not found/.test(output(e))); }
+  finally { rmSync(empty, { recursive: true, force: true }); }
 });

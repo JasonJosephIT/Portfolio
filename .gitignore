@@ -3,6 +3,7 @@
 .claude/*
 !.claude/commands/
 .env
+content/bundle-preview/
 node_modules/
 .impeccable/review/
 .impeccable/questions/
