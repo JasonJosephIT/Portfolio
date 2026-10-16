@@ -28,7 +28,7 @@ function setup({ committed = false } = {}) {
   git(repo, "add", "-A"); git(repo, "commit", "-q", "-m", "init"); git(repo, "push", "-q", "-u", "origin", "main");
   mkdirSync(bin);
   const ghLog = join(root, "gh.log");
-  writeFileSync(join(bin, "gh"), `#!/bin/sh\nprintf 'CALL %s\\n' "$*" >> "${ghLog}"\n`);
+  writeFileSync(join(bin, "gh"), `#!/bin/sh\nprintf 'CALL %s\\n' "$*" >> "${ghLog}"\nif [ "$2" = list ]; then if [ -f "${root}/prexists" ]; then echo '[{"number":1}]'; else echo '[]'; fi; fi\nif [ "$2" = create ] && [ -f "${root}/failonce" ]; then rm "${root}/failonce"; exit 1; fi\n`);
   chmodSync(join(bin, "gh"), 0o755);
   cpSync(fixture, exp, { recursive: true });
   const run = (...args) => spawnSync("node", [script, ...args], {
@@ -36,7 +36,8 @@ function setup({ committed = false } = {}) {
     env: { ...process.env, OPEN_THOUGHTS_BUNDLE: exp, PORTFOLIO_REPO: repo, PATH: `${bin}:${process.env.PATH}` },
   });
   const ghCalls = () => (existsSync(ghLog) ? readFileSync(ghLog, "utf8").split(/^CALL /m).slice(1) : []);
-  return { repo, exp, run, ghCalls, origin };
+  const creates = () => ghCalls().filter((c) => c.startsWith("pr create"));
+  return { repo, exp, run, ghCalls, creates, origin, root };
 }
 const change = (exp) => {
   editJson(join(exp, "projects", "alpha-tool.json"), (p) => { p.summary = "changed"; });
@@ -50,10 +51,11 @@ test("changed export: one commit on a bundle branch, one gh pr create naming the
   assert.equal(r.status, 0, r.stderr);
   assert.equal(git(repo, "rev-list", "--count", "origin/main..bundle/bbbbbbbbbbbb"), "1");
   assert.match(git(origin, "branch", "--list", "bundle/*"), /bundle\/bbbbbbbbbbbb/);
-  const calls = ghCalls();
-  assert.equal(calls.length, 1);
-  assert.match(calls[0], /^pr create /);
-  assert.match(calls[0], /alpha-tool/);
+  assert.equal(ghCalls().length, 1);
+  assert.match(ghCalls()[0], /^pr create /);
+  assert.match(ghCalls()[0], /alpha-tool/);
+  assert.equal(git(repo, "rev-parse", "--abbrev-ref", "HEAD"), "main");
+  assert.equal(git(repo, "rev-parse", "--verify", "bundle/bbbbbbbbbbbb^{commit}") !== "", true);
 });
 
 test("unchanged export: exit 0, no commit, no gh", () => {
@@ -86,22 +88,60 @@ test("invalid or pending export: exit 1, content/bundle untouched", () => {
   }
 });
 
-test("a slug removed from the export is removed from content/bundle", () => {
+test("a slug removed from the export is removed from the committed bundle", () => {
   const { repo, exp, run, ghCalls } = setup({ committed: true });
   rmSync(join(exp, "projects", "gamma-lib.json"));
   editJson(join(exp, "relations.json"), (r) => r.splice(1));
   editJson(join(exp, "bundle.json"), (m) => { m.records.projects = ["alpha-tool", "beta-site"]; m.content_hash = "c".repeat(64); });
   const r = run();
   assert.equal(r.status, 0, r.stderr);
-  assert.equal(existsSync(join(repo, "content/bundle/projects/gamma-lib.json")), false);
   assert.match(ghCalls()[0], /gamma-lib/);
+  assert.throws(() => git(repo, "cat-file", "-e", "bundle/cccccccccccc:content/bundle/projects/gamma-lib.json"));
+  git(repo, "cat-file", "-e", "bundle/cccccccccccc:content/bundle/projects/alpha-tool.json");
 });
 
-test("--dry-run: commits locally but neither pushes nor calls gh", () => {
+test("--dry-run: no push, no gh, checkout restored, repeatable", () => {
   const { repo, exp, run, ghCalls, origin } = setup({ committed: true });
   change(exp);
-  const r = run("--dry-run");
-  assert.equal(r.status, 0, r.stderr);
+  for (let i = 0; i < 2; i++) {
+    const r = run("--dry-run");
+    assert.equal(r.status, 0, r.stderr);
+  }
   assert.deepEqual(ghCalls(), []);
   assert.equal(git(origin, "branch", "--list", "bundle/*"), "");
+  assert.equal(git(repo, "branch", "--list", "bundle/*"), "");
+  assert.equal(git(repo, "rev-parse", "--abbrev-ref", "HEAD"), "main");
+});
+
+test("gh fails once after the push: the next run opens the PR", () => {
+  const { exp, run, creates, root, origin } = setup({ committed: true });
+  change(exp);
+  writeFileSync(join(root, "failonce"), "");
+  assert.notEqual(run().status, 0);
+  assert.match(git(origin, "branch", "--list", "bundle/*"), /bbbbbbbbbbbb/);
+  const r = run();
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal(creates().length, 2); // failed attempt + successful retry
+  assert.equal(run().status, 0);
+});
+
+test("branch pushed and PR already open: quiet", () => {
+  const { exp, run, creates, root } = setup({ committed: true });
+  change(exp);
+  assert.equal(run().status, 0);
+  writeFileSync(join(root, "prexists"), "");
+  assert.equal(run().status, 0);
+  assert.equal(creates().length, 1);
+});
+
+test("stale local working tree does not change the baseline", () => {
+  const { repo, exp, run, creates } = setup({ committed: true });
+  change(exp);
+  // local checkout already holds the export's hash and a different alpha-tool, uncommitted
+  editJson(join(repo, "content/bundle/bundle.json"), (m) => { m.content_hash = "b".repeat(64); });
+  editJson(join(repo, "content/bundle/projects/alpha-tool.json"), (p) => { p.summary = "changed"; });
+  const r = run();
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal(creates().length, 1);
+  assert.match(creates()[0], /Changed: alpha-tool/);
 });

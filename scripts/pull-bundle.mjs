@@ -28,25 +28,46 @@ if (preview) {
   process.exit(0);
 }
 
-const hash = manifest.content_hash;
-if (hash === JSON.parse(read(dest, "bundle.json") ?? "{}").content_hash) { console.log("bundle unchanged"); process.exit(0); }
+const git = (...args) => execFileSync("git", args, { cwd: repo, encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] }).trim();
+const tryGit = (...args) => { try { return git(...args); } catch { return null; } };
+git("fetch", "origin");
 
-const was = slugs(dest), now = slugs(src);
-const file = (dir, s) => read(dir, `projects/${s}.json`);
+// Baseline is what origin/main holds, never the local working tree.
+const base = (p) => tryGit("show", `origin/main:content/bundle/${p}`);
+const hash = manifest.content_hash;
+if (hash === JSON.parse(base("bundle.json") ?? "{}").content_hash) { console.log("bundle unchanged"); process.exit(0); }
+
+const stem = (f) => f.split("/").pop().replace(/\.json$/, "");
+const was = (tryGit("ls-tree", "-r", "--name-only", "origin/main", "--", "content/bundle/projects") ?? "").split("\n").filter(Boolean).map(stem).sort();
+const now = slugs(src);
 const added = now.filter((s) => !was.includes(s));
 const removed = was.filter((s) => !now.includes(s));
-const changed = now.filter((s) => was.includes(s) && file(dest, s) !== file(src, s));
+const changed = now.filter((s) => was.includes(s) && base(`projects/${s}.json`) !== read(src, `projects/${s}.json`));
 const list = (title, xs) => `${title}: ${xs.length ? xs.join(", ") : "none"}`;
 const body = [list("Added", added), list("Changed", changed), list("Removed", removed)].join("\n");
 const branch = `bundle/${hash.slice(0, 12)}`;
 const title = `bundle: ${now.length} projects (${hash.slice(0, 12)})`;
+const pr = () => execFileSync("gh", ["pr", "create", "--base", "main", "--head", branch, "--title", title, "--body", body], { cwd: repo, stdio: "inherit" });
 
-const run = (cmd, ...args) => execFileSync(cmd, args, { cwd: repo, stdio: "inherit" });
-run("git", "fetch", "origin");
-run("git", "switch", "-c", branch, "origin/main");
-swap();
-run("git", "add", "content/bundle");
-run("git", "commit", "-m", title);
-if (dryRun) { console.log(`dry run: would push ${branch} and open PR "${title}"\n${body}`); process.exit(0); }
-run("git", "push", "-u", "origin", branch);
-run("gh", "pr", "create", "--base", "main", "--head", branch, "--title", title, "--body", body);
+// Branch already pushed (an earlier run died at gh): open its PR unless one exists.
+if (tryGit("ls-remote", "--exit-code", "--heads", "origin", branch) !== null) {
+  if (dryRun) { console.log(`dry run: ${branch} is on origin; would open its PR if none exists`); process.exit(0); }
+  const open = JSON.parse(execFileSync("gh", ["pr", "list", "--head", branch, "--json", "number"], { cwd: repo, encoding: "utf8" }).trim() || "[]");
+  if (open.length) { console.log(`PR for ${branch} already open`); process.exit(0); }
+  pr();
+  process.exit(0);
+}
+
+const start = git("rev-parse", "--abbrev-ref", "HEAD");
+const startRef = start === "HEAD" ? git("rev-parse", "HEAD") : start;
+git("switch", "-C", branch, "origin/main");
+try {
+  swap();
+  git("add", "content/bundle");
+  git("commit", "-m", title);
+  if (dryRun) console.log(`dry run: would push ${branch} and open PR "${title}"\n${body}`);
+  else { git("push", "-u", "origin", branch); pr(); }
+} finally {
+  git(...(start === "HEAD" ? ["switch", "--detach", startRef] : ["switch", start])); // leave the checkout where we found it
+  if (dryRun) git("branch", "-D", branch);
+}
