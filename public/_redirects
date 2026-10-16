@@ -1,0 +1,4 @@
+/index.html / 301
+/art.html /art 301
+/tech.html /tech 301
+/art/pieces/:slug/index.html /art/pieces/:slug 301

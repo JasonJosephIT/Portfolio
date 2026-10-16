@@ -3,7 +3,7 @@ import "@/styles/global.css";
 import { Image } from "astro:assets";
 import { isDraft, manifest } from "@/lib/bundle";
 import ChatPlaceholder from "@/components/ChatPlaceholder.astro";
-import bard from "../../assets/bard-mark.png";
+import bard from "@/assets/bard-mark.png";
 
 interface Props {
   title: string;
@@ -38,8 +38,8 @@ const { title, description = "Software by Jason." } = Astro.props;
           JASON
         </a>
         <ul class="flex items-center gap-[clamp(18px,3vw,36px)]">
-          <li><span class="label" aria-disabled="true" title="Home is ported in a later step">Home</span></li>
-          <li><span class="label" aria-disabled="true" title="Art is ported in a later step">Art</span></li>
+          <li><a href="/" class="label">Home</a></li>
+          <li><a href="/art" class="label">Art</a></li>
           <li>
             <a href="/tech" aria-current="page" class="label inline-block border-b border-tech pt-2 pb-1.5 !text-foreground">Tech</a>
           </li>
