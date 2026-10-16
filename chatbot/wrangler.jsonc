@@ -27,5 +27,26 @@
 	"ai": { "binding": "AI" },
 	"vectorize": [{ "binding": "VECTORIZE", "index_name": "portfolio-chat" }],
 	// TODO(Jason): the KV namespace build-index.mjs writes ACTIVE_NS to (same id as the KV_NAMESPACE_ID secret).
-	"kv_namespaces": [{ "binding": "INDEX_KV", "id": "00000000000000000000000000000000" }]
+	"kv_namespaces": [{ "binding": "INDEX_KV", "id": "00000000000000000000000000000000" }],
+	// Set with `pnpm wrangler secret put <NAME>`, never here. TURNSTILE_SECRET: the widget's secret key.
+	// SESSION_SECRET: any long random string (e.g. `openssl rand -hex 32`); rotating it ends every session.
+	"secrets": { "required": ["TURNSTILE_SECRET", "SESSION_SECRET"] },
+	// 10 messages a minute per session (keyed by session id). Counters are per Cloudflare location and eventually
+	// consistent, so a burst can slip a message or two over. namespace_id: any integer unique in the account.
+	"ratelimits": [{ "name": "CHAT_LIMIT", "namespace_id": "1001", "simple": { "limit": 10, "period": 60 } }],
+	// The only store of chat text: emails and phones scrubbed before insert.
+	// TODO(Jason): `pnpm wrangler d1 create portfolio-chats`, paste its id here, then
+	// `pnpm wrangler d1 migrations apply portfolio-chats --remote`.
+	"d1_databases": [
+		{ "binding": "CHATS", "database_name": "portfolio-chats", "database_id": "00000000-0000-0000-0000-000000000000" }
+	]
+	// Dashboard settings code cannot hold (TODO(Jason), listed in the PR):
+	// - AI Gateway "portfolio-chat" (AI > AI Gateway > Settings): Logs off. The Worker also sends collectLog: false
+	//   on every call, so chat text stays out of gateway logs even if the setting is flipped.
+	// - Same gateway, Settings > Spend limits: one rule, no dimensions, $1 per day (fixed window). Over budget the
+	//   gateway answers 429, which the Worker turns into 502 { error: "unavailable" }. Kill switch stays CHAT_ENABLED.
+	// - Turnstile widget (Turnstile > Add widget) for the site's hostnames; site key goes in the chat widget,
+	//   secret key via `wrangler secret put TURNSTILE_SECRET`.
+	// - Workers Logs: the Worker never calls console, and invocation logs carry no request bodies; leave
+	//   head-sampling as is.
 }

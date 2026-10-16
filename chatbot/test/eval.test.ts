@@ -12,10 +12,12 @@ type Case = {
 	modelReply?: string;
 	// Reply shape the fake chat model uses: Workers AI (default), OpenAI-compatible or Anthropic.
 	modelShape?: "openai" | "anthropic";
-	// Which fake binding throws.
-	fail?: "ai" | "vectorize";
+	// Which binding throws (d1: a fake CHATS replaces the local D1).
+	fail?: "ai" | "vectorize" | "d1";
 	// "none": no ACTIVE_NS in KV. Otherwise the fixture index is active.
 	index?: "none";
+	// A JSON object body gets a valid session unless it carries its own, a turnstileToken, or this says otherwise.
+	session?: "none" | "forged" | "expired";
 	expect: {
 		status: number;
 		bodyIncludes?: string;
@@ -38,8 +40,39 @@ const expand = (v: unknown): unknown =>
 				? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, expand(x)]))
 				: v;
 
-function toRequest(c: Case) {
-	const { method, path = "/chat", headers, body } = c.request;
+// A session as the spec defines it: <id>.<expiry ms>.<hex HMAC-SHA256(id.expiry, SESSION_SECRET)>.
+async function mint(expiry = Date.now() + 3_600_000, id = crypto.randomUUID()) {
+	const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(env.SESSION_SECRET), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+	const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${id}.${expiry}`));
+	return `${id}.${expiry}.${[...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, "0")).join("")}`;
+}
+
+async function sessionFor(c: Case) {
+	if (c.session === "expired") return mint(Date.now() - 1);
+	const s = await mint();
+	return c.session === "forged" ? s.replace(/.$/, (ch) => (ch === "0" ? "1" : "0")) : s;
+}
+
+// Turnstile siteverify, stubbed: Turnstile's published test secrets decide (1x...AA passes, 2x...AA fails).
+const PASS_SECRET = "1x0000000000000000000000000000000AA";
+const siteverify = vi.fn(async (url: RequestInfo | URL, init?: RequestInit) => {
+	expect(String(url)).toBe("https://challenges.cloudflare.com/turnstile/v0/siteverify");
+	const form = new URLSearchParams(init?.body as URLSearchParams);
+	const success = form.get("secret") === PASS_SECRET && !!form.get("response");
+	return Response.json({ success, "error-codes": success ? [] : ["invalid-input-response"] });
+});
+vi.stubGlobal("fetch", siteverify);
+const TOKEN = "XXXX.DUMMY.TOKEN.XXXX";
+
+async function toRequest(c: Case) {
+	const { method, path = "/chat", headers } = c.request;
+	let body = c.request.body;
+	if (body && typeof body === "object" && !Array.isArray(body)) {
+		const obj = body as Record<string, unknown>;
+		// "SESSION" inside a body's own session string stands for a freshly minted valid one.
+		if (typeof obj.session === "string") body = { ...obj, session: obj.session.replace("SESSION", await mint()) };
+		else if (!("turnstileToken" in obj) && c.session !== "none") body = { ...obj, session: await sessionFor(c) };
+	}
 	const raw = body === undefined ? undefined : typeof body === "string" ? body : JSON.stringify(expand(body));
 	// Set content-length as an HTTP client would; a Request built in-process has none.
 	const length: Record<string, string> = raw === undefined ? {} : { "content-length": String(new TextEncoder().encode(raw).length) };
@@ -61,8 +94,9 @@ function fakes(c: Partial<Case> = {}, activeNs: string | null = index.namespace)
 		return n ? a.reduce((s, x, i) => s + x * b[i], 0) / n : 0;
 	};
 	const AI = {
-		async run(model: string, input: { text?: string[]; messages?: Msg[] }, opts?: { gateway?: { id: string } }) {
+		async run(model: string, input: { text?: string[]; messages?: Msg[] }, opts?: { gateway?: { id: string; collectLog?: boolean } }) {
 			expect(opts?.gateway?.id).toBe(env.AI_GATEWAY_ID);
+			expect(opts?.gateway?.collectLog).toBe(false); // chat text never lands in AI Gateway logs
 			if (fail === "ai") throw new Error(BOOM);
 			if (model === env.EMBED_MODEL) return { shape: [1, index.vocab.length], data: input.text!.map(embed) };
 			expect(model).toBe(env.CHAT_MODEL);
@@ -85,14 +119,15 @@ function fakes(c: Partial<Case> = {}, activeNs: string | null = index.namespace)
 		},
 	};
 	const INDEX_KV = { get: async (k: string) => (k === "ACTIVE_NS" ? activeNs : null) };
-	return { bindings: { AI, VECTORIZE, INDEX_KV } as unknown as Partial<Env>, chats };
+	const CHATS = fail === "d1" ? { prepare: () => { throw new Error(BOOM); } } : env.CHATS;
+	return { bindings: { AI, VECTORIZE, INDEX_KV, CHATS } as unknown as Partial<Env>, chats };
 }
 
 // Every case goes through the Worker's fetch with fakes wired in: the real AI binding is remote and costs money.
 for (const c of cases as Case[]) {
 	it(c.name, async () => {
 		const { bindings, chats } = fakes(c, c.index === "none" ? null : undefined);
-		const res = await worker.fetch(toRequest(c), { ...env, ...bindings, ...c.env } as Env);
+		const res = await worker.fetch(await toRequest(c), { ...env, ...bindings, ...c.env } as Env);
 		const text = await res.text();
 		expect(res.status).toBe(c.expect.status);
 		for (const [k, v] of Object.entries(c.expect.headers ?? {})) expect(res.headers.get(k)).toBe(v);
@@ -109,19 +144,74 @@ for (const c of cases as Case[]) {
 	});
 }
 
-it("never logs message or history text", async () => {
+it("never logs question, history or answer text over full requests", async () => {
 	const secret = "SECRET-7f3a";
+	const answerText = "ANSWER-c41d about alpha";
 	const spies = (["log", "info", "warn", "error", "debug"] as const).map((m) => vi.spyOn(console, m));
+	const session = await mint();
 	const bodies = [
-		{ message: `${secret} alpha`, history: [{ role: "user", content: secret }] },
-		{ message: secret.repeat(40), history: [] },
-		{ message: "hi", history: [1, 2, 3, { role: "user", content: secret }] },
+		// Turnstile first message, then a full answered request (model called, row stored), then rate-limited ones.
+		{ message: `${secret} alpha`, history: [], turnstileToken: TOKEN },
+		...Array(11).fill({ message: `${secret} alpha`, history: [{ role: "user", content: secret }], session }),
+		{ message: secret.repeat(40), history: [], session },
+		{ message: "hi", history: [1, 2, 3, { role: "user", content: secret }], session },
+		{ message: secret, history: [] },
 	];
+	const statuses: number[] = [];
+	let answered = false;
 	for (const body of bodies) {
 		const req = new Request("https://chat.test/chat", { method: "POST", body: JSON.stringify(body) });
-		await worker.fetch(req as Request<unknown, IncomingRequestCfProperties>, { ...env, ...fakes().bindings } as Env);
+		const res = await worker.fetch(req as Request<unknown, IncomingRequestCfProperties>, {
+			...env,
+			...fakes({ modelReply: answerText }).bindings,
+		} as Env);
+		statuses.push(res.status);
+		answered ||= (await res.text()).includes(answerText);
 	}
 	const logged = JSON.stringify(spies.flatMap((s) => s.mock.calls));
 	spies.forEach((s) => s.mockRestore());
+	expect(answered).toBe(true); // the model was called and its answer stored, not only short-circuited
+	expect(statuses).toContain(429);
+	expect(statuses).toContain(403);
 	expect(logged).not.toContain(secret);
+	expect(logged).not.toContain("ANSWER-c41d");
+});
+
+const post = (body: unknown) =>
+	worker.fetch(
+		new Request("https://chat.test/chat", { method: "POST", body: JSON.stringify(body) }) as Request<unknown, IncomingRequestCfProperties>,
+		{ ...env, ...fakes().bindings } as Env,
+	);
+
+it("a session from a test token carries the next message without Turnstile", async () => {
+	const first = (await (await post({ message: "hi", history: [], turnstileToken: TOKEN })).json()) as { session: string };
+	const calls = siteverify.mock.calls.length;
+	const next = await post({ message: "hi", history: [], session: first.session });
+	expect(next.status).toBe(200);
+	expect(await next.json()).not.toHaveProperty("session");
+	expect(siteverify.mock.calls.length).toBe(calls);
+});
+
+// Uses the real local Rate Limiting binding from wrangler.jsonc (Miniflare), not a fake.
+it("the 11th message in a minute on one session is 429", async () => {
+	const session = await mint();
+	const statuses: number[] = [];
+	let last: Response | undefined;
+	for (let i = 0; i < 11; i++) statuses.push((last = await post({ message: "hi", history: [], session })).status);
+	expect(statuses).toEqual([...Array(10).fill(200), 429]);
+	expect(await last!.json()).toEqual({ error: "slow down" });
+	expect((await post({ message: "hi", history: [], session: await mint() })).status).toBe(200); // other sessions unaffected
+});
+
+// The real local D1 with migrations/ applied (test/apply-migrations.ts).
+it("a chat stores one row with the question's email and phone scrubbed", async () => {
+	const session = await mint();
+	const res = await post({ message: "Is jason@example.com or +1 (555) 123-4567 on alpha?", history: [], session });
+	expect(res.status).toBe(200);
+	const { results } = await env.CHATS.prepare("SELECT * FROM chats WHERE session_id = ?").bind(session.split(".")[0]).all<Record<string, string>>();
+	expect(results).toHaveLength(1);
+	expect(results[0].question).toBe("Is [email removed] or [phone removed] on alpha?");
+	expect(results[0].answer).toBe(((await res.json()) as { answer: string }).answer);
+	expect(results[0].answer).not.toContain("jason@example.com");
+	expect(Array.isArray(JSON.parse(results[0].citations))).toBe(true);
 });
