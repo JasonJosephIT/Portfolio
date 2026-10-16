@@ -3,7 +3,7 @@ import "@/styles/global.css";
 import Head from "@/layouts/Head.astro";
 import { Image } from "astro:assets";
 import { isDraft, manifest } from "@/lib/bundle";
-import ChatPlaceholder from "@/components/ChatPlaceholder.astro";
+import Chat from "@/components/Chat.astro";
 import bard from "@/assets/bard-mark.png";
 
 interface Props {
@@ -53,6 +53,6 @@ const { title, description = "Software by Jason." } = Astro.props;
         <p class="note sm:mb-20 sm:text-right">Contact address pending.</p>
       </div>
     </footer>
-    <ChatPlaceholder />
+    <Chat />
   </body>
 </html>

@@ -150,7 +150,7 @@ body { font-variant-numeric: tabular-nums; }
 .prose-board strong { color: var(--text); font-weight: 600; }
 .prose-board h2, .prose-board h3 { color: var(--text); font-weight: 700; font-variation-settings: "wdth" 115; margin-top: 1.6em; }
 
-/* Chat placeholder: native popover, no runtime JS. */
+/* Chat panel: native popover. */
 .chat-panel { position: fixed; inset: auto 16px 76px auto; margin: 0; width: min(22rem, calc(100vw - 32px)); border: 0; padding: 0; color: var(--text); }
 .chat-panel:popover-open { animation: chat-in 0.2s var(--ease-out); }
 @keyframes chat-in { from { opacity: 0; transform: translateY(6px); } }
