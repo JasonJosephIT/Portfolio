@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-thoughts.local/schemas/bundle.schema.json",
+  "title": "Open Thoughts bundle: the root is the manifest (bundle.json); $defs describe the other files",
+  "$ref": "#/$defs/manifest",
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[0-9a-f]+$"},
+    "timestamp_or_null": {"type": ["string", "null"]},
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "generated_at", "approval", "content_hash", "records"],
+      "properties": {
+        "schema_version": {"type": "integer", "minimum": 1},
+        "generated_at": {"type": "string"},
+        "approval": {"enum": ["approved", "pending"]},
+        "content_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "records": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["projects", "profile", "relations"],
+          "properties": {
+            "projects": {"type": "array", "items": {"type": "string"}},
+            "profile": {"type": "string"},
+            "relations": {"type": "string"}
+          }
+        }
+      }
+    },
+    "media": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "kind", "checksum"],
+      "properties": {
+        "key": {"type": "string"},
+        "kind": {"enum": ["image", "video"]},
+        "checksum": {"type": "string"},
+        "poster_key": {"type": ["string", "null"]},
+        "caption": {"type": "string"}
+      }
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "name", "summary", "tags", "description", "media", "part_of", "approved_at", "source_hash"],
+      "properties": {
+        "slug": {"type": "string"},
+        "name": {"type": "string"},
+        "summary": {"type": "string"},
+        "tags": {"type": "array", "items": {"type": "string"}},
+        "description": {"type": "string"},
+        "media": {"type": "array", "items": {"$ref": "#/$defs/media"}},
+        "part_of": {"type": ["string", "null"]},
+        "approved_at": {"$ref": "#/$defs/timestamp_or_null"},
+        "source_hash": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["headline", "bio", "skills", "interests", "approved_at", "source_hash"],
+      "properties": {
+        "headline": {"type": "string"},
+        "bio": {"type": "string"},
+        "skills": {"type": "array", "items": {"type": "string"}},
+        "interests": {"type": "array", "items": {"type": "string"}},
+        "approved_at": {"$ref": "#/$defs/timestamp_or_null"},
+        "source_hash": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "type"],
+      "properties": {
+        "from": {"type": "string"},
+        "to": {"type": "string"},
+        "type": {"enum": ["uses", "part-of", "built-with", "related-to"]},
+        "evidence": {"type": "string"}
+      }
+    },
+    "doc_frontmatter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "parent", "kind", "approved_at", "source_hash"],
+      "properties": {
+        "slug": {"type": "string"},
+        "parent": {"type": "string"},
+        "kind": {"enum": ["features", "decisions"]},
+        "approved_at": {"$ref": "#/$defs/timestamp_or_null"},
+        "source_hash": {"$ref": "#/$defs/hash"}
+      }
+    }
+  }
+}
