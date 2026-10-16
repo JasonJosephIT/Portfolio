@@ -166,9 +166,9 @@ Confirmed rejections: no name-over-hero-plus-grids arrangement; no accent fills,
 A monochrome board-and-paper palette with two saturated hues confined to hairlines and the light inside the photographs.
 
 ### Primary
-- **Amber Core** (`accent-art`): the Art accent. Appears as the bevel hairline around Art prints, the label color on Art hover, the arrow glyph in the Art caption, the current-page underline on art.html, focus rings, and text selection on Art surfaces. Never a fill.
-- **Ice-Cyan Core** (`accent-tech`): the Tech accent, same roles on Tech surfaces: project-card window bevels, Tech panel label hover, arrow glyph, current-page underline on tech.html.
-- **Bone** (`accent-home`): the home page's resting accent, a neutral warm grey. Drives the focus ring, current-nav underline, and selection on index.html so the home surface carries no hue outside the two panels.
+- **Amber Core** (`accent-art`): the Art accent. Appears as the bevel hairline around Art prints, the label color on Art hover, the arrow glyph in the Art caption, the current-page underline on /art, focus rings, and text selection on Art surfaces. Never a fill.
+- **Ice-Cyan Core** (`accent-tech`): the Tech accent, same roles on Tech surfaces: project-card window bevels, Tech panel label hover, arrow glyph, current-page underline on /tech.
+- **Bone** (`accent-home`): the home page's resting accent, a neutral warm grey. Drives the focus ring, current-nav underline, and selection on the home page (/) so the home surface carries no hue outside the two panels.
 
 ### Neutral
 - **Backing Board** (`bg`): page background, nav background, and the "window" plate behind each project title. Also the `theme-color`.
@@ -183,18 +183,16 @@ A monochrome board-and-paper palette with two saturated hues confined to hairlin
 ### Derived
 - **Bevel** (`bevel`): the resting hairline around every gallery print, project window, and page-title rule, computed as 58% of the in-force accent mixed into the mat face. The home diptych windows carry no bevel. It is re-declared on `body`, `.panel`, and `.project-card` so it recomputes wherever `--accent` is re-scoped.
 
-`--board-raised` (#17181d) is declared in the token block but no public surface paints it; treat it as reserved for the admin area.
-
 ### Named Rules
 **The Bevel Rule.** Color lives only on bevels and in the light on the prints. An accent may draw a 1px line, tint a glyph, or color a hovered label; it never fills a surface, a button, or a block of text.
 
 **The Accent Scope Rule.** `--accent` is set once per scope (`body.home` bone, `body.tech` cyan, `.panel-art` / `.panel-tech` / `.project-card` per half) and `--bevel` is recomputed inside that scope. New surfaces inherit their hue by declaring which half they belong to, never by hard-coding a hex.
 
-**The Home Is Bone Rule.** On index.html the two hues appear only inside the two panels. Everything outside the diptych (nav, focus, selection, wall label, footer) uses the neutral bone accent.
+**The Home Is Bone Rule.** On the home page (/) the two hues appear only inside the two panels. Everything outside the diptych (nav, focus, selection, wall label, footer) uses the neutral bone accent.
 
 ## Typography
 
-**Display Font:** Archivo variable, self-hosted (`assets/fonts/archivo-var.woff2`, weight 100-900, width 62-125%), with Helvetica Neue / Helvetica / Arial fallback
+**Display Font:** Archivo variable, self-hosted (`public/fonts/archivo-var.woff2`, weight 100-900, width 62-125%), with Helvetica Neue / Helvetica / Arial fallback
 **Body Font:** Archivo (same file)
 **Label Font:** Archivo (same file), width 108%
 
@@ -251,14 +249,14 @@ Depth is physical and monochrome. A mat reads as a cut piece of board through th
 
 ## Shapes
 
-Square-cut throughout. Mats, windows, prints, cards, and the hinge are all right-angled; the only rounding on public surfaces is the 1px radius on the focus ring. The `rounded.base` token (2px) is declared for the admin area's inputs and is not used on the public pages. Borders are hairlines only: 1px in `hairline` for dividers and separators, 1px in `bevel` (or accent on hover) drawn as a spread shadow around windows so it sits inside the mat without adding to layout. Windows are strict portrait rectangles (7:10 on the home page). Pills are not pills: skills are plain text separated by a left hairline; tags are plain text separated by a 1px, 0.8em-tall rule. Arrows are 24-unit stroke SVG paths at 1.5 stroke width, drawn inline or as a `currentColor` mask; there are no icon fonts or glyph characters.
+Square-cut throughout. Mats, windows, prints, cards, and the hinge are all right-angled; the only rounding on public surfaces is the 1px radius on the focus ring. Borders are hairlines only: 1px in `hairline` for dividers and separators, 1px in `bevel` (or accent on hover) drawn as a spread shadow around windows so it sits inside the mat without adding to layout. Windows are strict portrait rectangles (7:10 on the home page). Pills are not pills: skills are plain text separated by a left hairline; tags are plain text separated by a 1px, 0.8em-tall rule. Arrows are 24-unit stroke SVG paths at 1.5 stroke width, drawn inline or as a `currentColor` mask; there are no icon fonts or glyph characters.
 
 ## Components
 
-There are no buttons or form fields on the public pages; every call to action is a text link in the label register. The admin area is out of scope and only inherits token names.
+There are no buttons or form fields on the public pages; every call to action is a text link in the label register.
 
 ### Navigation
-- **Style:** 72px bar on the backing board with a hairline beneath; sticky on inner pages, absolute and transparent over the wall on the home page. Brand mark and wordmark left (the painted drummer `assets/bard-mark.png` at 36px, paper white on the board, 12px before the wordmark), three links right with a `clamp(18px, 3vw, 36px)` gap.
+- **Style:** 72px bar on the backing board with a hairline beneath; sticky on inner pages, absolute and transparent over the wall on the home page. Brand mark and wordmark left (the painted drummer `src/assets/bard-mark.png` at 36px, paper white on the board, 12px before the wordmark), three links right with a `clamp(18px, 3vw, 36px)` gap.
 - **Links:** label register, graphite at rest, paper white on hover (0.25s ease). The current page is paper white with a 1px accent underline drawn as a bottom border (padding `8px 0 6px`).
 - **Mobile:** no collapse; three short labels fit at 390px.
 
@@ -313,8 +311,6 @@ There are no buttons or form fields on the public pages; every call to action is
 - **Do** give every work a counter-generated plate number in soft pencil, with an optional title after a spaced middle dot.
 - **Do** set every label on a mat in the pencil register (0.72rem, 500, width 108%, tracking 0.16em, uppercase).
 - **Do** use the 0.7s / 0.9s `cubic-bezier(0.16, 1, 0.3, 1)` ease-out for lifts, swings, and arrow nudges, and remove transforms entirely under `prefers-reduced-motion: reduce`.
-- **Do** keep the pipeline contracts intact: `.gallery > a > img`, `.projects .project-grid > .project-card` with `h3`, `p`, `.tech-tags`, `.project-link`, `.skills .skill-pills > .skill-pill`, and a `.page-title` on inner pages.
-- **Do** keep the token names `--bg --text --muted --accent-art --accent-tech --space --radius --nav-height`; the admin stylesheet reads them.
 - **Do** draw arrows as inline 24-unit stroke SVG (1.5 stroke, round caps) or a `currentColor` mask, sized 16-22px.
 
 ### Don't:
