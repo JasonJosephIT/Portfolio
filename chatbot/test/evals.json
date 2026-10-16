@@ -362,5 +362,26 @@
 				"access-control-allow-origin": "https://site.example"
 			}
 		}
+	},
+	{
+		"name": "body over 4096 bytes is rejected before parsing",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "hi",
+				"history": [
+					{
+						"role": "user",
+						"content": "REPEAT:a:5000"
+					}
+				]
+			}
+		},
+		"expect": {
+			"status": 413
+		}
 	}
 ]
