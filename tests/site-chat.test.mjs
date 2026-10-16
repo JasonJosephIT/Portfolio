@@ -74,8 +74,12 @@ before(async () => {
     if (await fetch(base).then((r) => r.ok, () => false)) break;
     await new Promise((r) => setTimeout(r, 100));
   }
-  // ponytail: the borrowed Playwright may want a browser revision that is not cached; fall back to the newest cached shell.
-  browser = await chromium.launch().catch(() => chromium.launch({ executablePath: newestShell() }));
+  // ponytail: the borrowed Playwright may want a browser revision that is not cached; only then fall back to the
+  // newest cached macOS shell. Any other launch failure (and CI, where the right browser is installed) stays loud.
+  browser = await chromium.launch().catch((e) => {
+    if (!/Executable doesn't exist/.test(e.message)) throw e;
+    return chromium.launch({ executablePath: newestShell() });
+  });
 });
 after(async () => {
   await browser?.close();
