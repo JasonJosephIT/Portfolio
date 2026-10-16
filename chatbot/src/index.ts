@@ -1,6 +1,6 @@
 const CAP = 500;
 const MAX_TURNS = 3;
-const MAX_BYTES = 4096; // fits 4 x 500 ASCII chars plus JSON; long non-ASCII text (3 bytes/char) can exceed it
+const MAX_BYTES = 32768; // worst case 2000 chars x 12 bytes (\uXXXX escapes) + envelope ~ 24 KB
 
 type Turn = { role: "user" | "assistant"; content: string };
 type Reply = [body: unknown, status: number];

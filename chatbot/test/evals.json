@@ -364,7 +364,7 @@
 		}
 	},
 	{
-		"name": "body over 4096 bytes is rejected before parsing",
+		"name": "body over 32768 bytes is rejected before parsing",
 		"request": {
 			"method": "POST",
 			"headers": {
@@ -375,13 +375,42 @@
 				"history": [
 					{
 						"role": "user",
-						"content": "REPEAT:a:5000"
+						"content": "REPEAT:a:40000"
 					}
 				]
 			}
 		},
 		"expect": {
 			"status": 413
+		}
+	},
+	{
+		"name": "500-char non-ASCII message and 3 full non-ASCII turns answer",
+		"request": {
+			"method": "POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": {
+				"message": "REPEAT:é:500",
+				"history": [
+					{
+						"role": "user",
+						"content": "REPEAT:漢:500"
+					},
+					{
+						"role": "assistant",
+						"content": "REPEAT:漢:500"
+					},
+					{
+						"role": "user",
+						"content": "REPEAT:漢:500"
+					}
+				]
+			}
+		},
+		"expect": {
+			"status": 200
 		}
 	}
 ]
