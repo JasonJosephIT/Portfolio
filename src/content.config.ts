@@ -1,9 +1,10 @@
 import { defineCollection, z } from "astro:content";
 import { file, glob } from "astro/loaders";
+import { BUNDLE_DIR } from "./lib/bundle-dir";
 
 // content/bundle/ is the Open Thoughts public bundle (bundle-format ticket), pulled by scripts/pull-bundle.mjs.
 const projects = defineCollection({
-  loader: glob({ pattern: "*.json", base: "./content/bundle/projects" }),
+  loader: glob({ pattern: "*.json", base: `${BUNDLE_DIR}/projects` }),
   schema: z.object({
     slug: z.string(),
     name: z.string(),
@@ -17,7 +18,7 @@ const projects = defineCollection({
 });
 
 const relations = defineCollection({
-  loader: file("./content/bundle/relations.json", {
+  loader: file(`${BUNDLE_DIR}/relations.json`, {
     parser: (text) => JSON.parse(text).map((e: { from: string; to: string }, i: number) => ({ id: `${e.from}-${e.to}-${i}`, ...e })),
   }),
   schema: z.object({

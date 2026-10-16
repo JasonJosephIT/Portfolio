@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { BUNDLE_DIR } from "./bundle-dir";
 import { getCollection } from "astro:content";
 
-const root = join(process.cwd(), "content", "bundle"); // builds run from the repo root
+const root = resolve(BUNDLE_DIR); // builds run from the repo root
 
 export interface Profile {
   headline: string;

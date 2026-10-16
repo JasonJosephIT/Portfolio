@@ -1,0 +1,1 @@
+[{"from": "beta-site", "to": "alpha-tool", "type": "uses", "evidence": "Beta calls Alpha's API"}, {"from": "alpha-tool", "to": "gamma-lib", "type": "built-with", "evidence": "Alpha parses config with Gamma"}]
