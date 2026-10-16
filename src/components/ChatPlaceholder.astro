@@ -1,0 +1,39 @@
+---
+/**
+ * Placeholder for the RAG chatbot (phase F). It answers nothing yet; it shows where the chat will live.
+ * Native popover API: no runtime JavaScript.
+ */
+---
+
+<button
+  type="button"
+  popovertarget="chat-soon"
+  aria-label="Ask about my work (coming soon)"
+  class="mat-cast label fixed right-4 bottom-4 z-30 flex min-h-11 items-center gap-3 px-4 !text-foreground transition-colors hover:!text-tech sm:right-6 sm:bottom-6"
+>
+  <svg aria-hidden="true" viewBox="0 0 24 24" class="size-4 text-tech" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 5h16v11H9l-5 4z" />
+  </svg>
+  <span>Ask<span class="hidden sm:inline">&nbsp;about my work</span></span>
+  <span class="note normal-case tracking-[0.04em]">soon</span>
+</button>
+
+<div id="chat-soon" popover class="chat-panel mat-cast" aria-labelledby="chat-soon-title">
+  <div class="grid gap-4 p-5">
+    <div class="flex items-start justify-between gap-4">
+      <h2 id="chat-soon-title" class="label-section !text-foreground">Ask about my work</h2>
+      <button type="button" popovertarget="chat-soon" popovertargetaction="hide" class="-m-2 grid size-9 place-items-center text-muted-text hover:text-foreground" aria-label="Close">
+        <svg aria-hidden="true" viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      </button>
+    </div>
+    <p class="text-sm leading-relaxed text-muted-text">
+      A chatbot that answers only from the public projects on this site, with citations. It is not built yet.
+    </p>
+    <div class="window flex items-center gap-3 px-3 py-2.5">
+      <label for="chat-soon-q" class="sr-only">Question (disabled)</label>
+      <input id="chat-soon-q" disabled placeholder="What did Jason build on Cloudflare?" class="min-w-0 flex-1 bg-transparent text-sm text-muted-text placeholder:text-pencil" />
+      <span class="label">Soon</span>
+    </div>
+    <p class="note">Placeholder. Coming in a later phase.</p>
+  </div>
+</div>
