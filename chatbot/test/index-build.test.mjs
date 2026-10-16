@@ -11,7 +11,8 @@ import { rollbackIndex } from "../scripts/rollback-index.mjs";
 
 const FIXTURE = fileURLToPath(new URL("../../tests/fixtures/bundle", import.meta.url));
 const HASH = "a".repeat(64);
-const tokens = (s) => Math.ceil(s.split(/\s+/).filter(Boolean).length * 1.3);
+const tokens = (s) => Math.ceil(Math.max(s.split(/\s+/).filter(Boolean).length * 1.3, s.length / 4));
+const CAP = 400;
 
 test("chunkBundle: chunks from indexed projects, profile and docs, each capped and fully labelled", () => {
   const chunks = chunkBundle(FIXTURE);
@@ -19,7 +20,7 @@ test("chunkBundle: chunks from indexed projects, profile and docs, each capped a
     assert.deepEqual(Object.keys(c.metadata).sort(), ["bundle_hash", "kind", "section", "slug", "url"]);
     for (const v of Object.values(c.metadata)) assert.ok(v, `empty metadata in ${JSON.stringify(c.metadata)}`);
     assert.equal(c.metadata.bundle_hash, HASH);
-    assert.ok(tokens(c.text) <= 500);
+    assert.ok(tokens(c.text) <= CAP);
   }
   const bySlug = (s) => chunks.filter((c) => c.metadata.slug === s);
   assert.deepEqual([...new Set(chunks.map((c) => c.metadata.slug))].sort(),
@@ -63,14 +64,6 @@ kind: features
 approved_at: "2026-01-01T00:00:00Z"
 source_hash: 2222222222222222
 ---
-## Long one
-
-${words(200, "alpha")}
-
-${words(200, "beta")}
-
-${words(766, "gamma")}
-
 ### Tiny A
 
 One line.
@@ -82,11 +75,21 @@ Same heading again.
 \`\`\`
 ## not a heading
 \`\`\`
+
+## Long one
+
+${words(200, "alpha")}
+
+${words(200, "beta")}
+
+${words(900, "gamma")}
+
+${"x".repeat(5000)}
 `);
   const chunks = chunkBundle(dir).filter((c) => c.metadata.slug === "alpha-tool-features");
-  for (const c of chunks) assert.ok(tokens(c.text) <= 500, `${tokens(c.text)} tokens`);
+  for (const c of chunks) assert.ok(tokens(c.text) <= CAP, `${tokens(c.text)} tokens`);
   assert.ok(chunks.filter((c) => c.metadata.section === "Long one").length >= 3);
-  assert.ok(chunks.every((c) => !c.text.includes("gamma") || c.metadata.url.endsWith("#long-one")));
+  assert.ok(chunks.every((c) => !/gamma|xxx/.test(c.text) || c.metadata.url.endsWith("#long-one")));
   // the tiny sections merge into one chunk labelled by the first
   const tiny = chunks.find((c) => c.metadata.section === "Tiny A");
   assert.equal(tiny.metadata.url, "/tech/alpha-tool/features#tiny-a");
@@ -95,9 +98,9 @@ Same heading again.
 });
 
 // In-memory stand-in for the three Cloudflare REST endpoints the runner uses.
-function fakeCloudflare({ failUpsert = 0 } = {}) {
+function fakeCloudflare({ failUpsert = 0, lag = 1, stuck = false, dims = 3 } = {}) {
   const kv = new Map(), vectors = [], calls = [];
-  let upserts = 0;
+  let upserts = 0, processed = null, infoCalls = 0;
   const json = (body, status = 200) => new Response(JSON.stringify(body), { status });
   const fetch = async (url, init = {}) => {
     const u = new URL(url), method = init.method ?? "GET";
@@ -106,12 +109,17 @@ function fakeCloudflare({ failUpsert = 0 } = {}) {
     let m;
     if ((m = /\/accounts\/acc\/ai\/run\/(.+)$/.exec(u.pathname))) {
       const { text } = JSON.parse(init.body);
-      return json({ success: true, result: { shape: [text.length, 3], data: text.map(() => [0.1, 0.2, 0.3]) } });
+      return json({ success: true, result: { shape: [text.length, dims], data: text.map(() => [0.1, 0.2, 0.3].slice(0, dims)) } });
     }
     if (u.pathname === "/client/v4/accounts/acc/vectorize/v2/indexes/portfolio-chat/upsert") {
       if (++upserts === failUpsert) return json({ success: false, errors: [{ code: 1000, message: "boom" }] }, 500);
       vectors.push(...init.body.trim().split("\n").map((l) => JSON.parse(l)));
-      return json({ success: true, result: { mutationId: "m" } });
+      return json({ success: true, result: { mutationId: `m${upserts}` } });
+    }
+    if (u.pathname === "/client/v4/accounts/acc/vectorize/v2/indexes/portfolio-chat/info") {
+      // the index catches up with the latest mutation after `lag` polls (never, when stuck)
+      if (upserts && !stuck && ++infoCalls > lag) processed = `m${upserts}`;
+      return json({ success: true, result: { dimensions: 3, vectorCount: 0, processedUpToMutation: processed } });
     }
     if ((m = /\/accounts\/acc\/storage\/kv\/namespaces\/kvid\/values\/(.+)$/.exec(u.pathname))) {
       if (method === "PUT") { kv.set(m[1], init.body); return json({ success: true }); }
@@ -123,24 +131,42 @@ function fakeCloudflare({ failUpsert = 0 } = {}) {
 }
 const ENV = { CLOUDFLARE_ACCOUNT_ID: "acc", CLOUDFLARE_API_TOKEN: "tok", KV_NAMESPACE_ID: "kvid" };
 const NS = `b-${"a".repeat(16)}`;
+const fast = { pollMs: 1, timeoutMs: 50, sleep: async () => {} };
 
 test("buildIndex: full success upserts every chunk into the bundle namespace, then switches ACTIVE_NS", async () => {
   const cf = fakeCloudflare();
   cf.kv.set("ACTIVE_NS", "b-old");
-  const ns = await buildIndex({ dir: FIXTURE, env: ENV, fetch: cf.fetch, batch: 2 });
+  const ns = await buildIndex({ dir: FIXTURE, env: ENV, fetch: cf.fetch, batch: 2, ...fast });
   assert.equal(ns, NS);
   const chunks = chunkBundle(FIXTURE);
   assert.equal(cf.vectors.length, chunks.length);
   assert.deepEqual(cf.vectors[0], { id: `${NS}:0`, namespace: NS, values: [0.1, 0.2, 0.3], metadata: { ...chunks[0].metadata, text: chunks[0].text } });
   assert.ok(cf.calls.some((c) => c.includes("/ai/run/@cf/baai/bge-base-en-v1.5")));
   assert.equal(cf.kv.get("ACTIVE_NS"), NS);
-  assert.ok(cf.calls.indexOf(`PUT /client/v4/accounts/acc/storage/kv/namespaces/kvid/values/ACTIVE_NS`) > cf.calls.findLastIndex((c) => c.endsWith("/upsert")));
+  // the switch waits for an info poll after the last upsert (the fake reports it processed on the 2nd poll)
+  const put = cf.calls.indexOf(`PUT /client/v4/accounts/acc/storage/kv/namespaces/kvid/values/ACTIVE_NS`);
+  const lastUpsert = cf.calls.findLastIndex((c) => c.endsWith("/upsert"));
+  assert.ok(cf.calls.slice(lastUpsert, put).filter((c) => c.endsWith("/info")).length >= 2);
+});
+
+test("buildIndex: if the index never processes the last mutation, it times out without switching", async () => {
+  const cf = fakeCloudflare({ stuck: true });
+  cf.kv.set("ACTIVE_NS", "b-old");
+  await assert.rejects(buildIndex({ dir: FIXTURE, env: ENV, fetch: cf.fetch, batch: 2, ...fast }), /not processed/);
+  assert.equal(cf.kv.get("ACTIVE_NS"), "b-old");
+  assert.ok(!cf.calls.some((c) => c.startsWith("PUT")));
+});
+
+test("buildIndex: an embed response with the wrong dims fails before any upsert", async () => {
+  const cf = fakeCloudflare({ dims: 2 });
+  await assert.rejects(buildIndex({ dir: FIXTURE, env: ENV, fetch: cf.fetch, batch: 2, ...fast }), /embed/);
+  assert.ok(!cf.calls.some((c) => c.endsWith("/upsert") || c.startsWith("PUT")));
 });
 
 test("buildIndex: a failed upsert leaves ACTIVE_NS unchanged", async () => {
   const cf = fakeCloudflare({ failUpsert: 2 });
   cf.kv.set("ACTIVE_NS", "b-old");
-  await assert.rejects(buildIndex({ dir: FIXTURE, env: ENV, fetch: cf.fetch, batch: 2 }), /upsert.*500/);
+  await assert.rejects(buildIndex({ dir: FIXTURE, env: ENV, fetch: cf.fetch, batch: 2, ...fast }), /upsert.*500/);
   assert.equal(cf.kv.get("ACTIVE_NS"), "b-old");
   assert.ok(!cf.calls.some((c) => c.startsWith("PUT")));
 });

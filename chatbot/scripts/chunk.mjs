@@ -5,9 +5,20 @@ import { join } from "node:path";
 import GithubSlugger from "github-slugger";
 import { validateBundle } from "../../scripts/lib/validate-bundle.mjs";
 
-const CAP = 500, AIM = 300;
-// ponytail: words x 1.3 estimate, no tokenizer; bge's real limit is 512 so the cap leaves headroom
-export const tokens = (s) => Math.ceil(s.split(/\s+/).filter(Boolean).length * 1.3);
+const CAP = 400, AIM = 300;
+// ponytail: no tokenizer; words x 1.3 with a chars/4 ceiling (code, URLs), and the cap sits well under bge's 512
+export const tokens = (s) => Math.ceil(Math.max(s.split(/\s+/).filter(Boolean).length * 1.3, s.length / 4));
+
+// A paragraph over the cap: pack words greedily, slicing any single word longer than the cap allows.
+const hardSplit = (p) => {
+  const out = [];
+  let cur = "";
+  for (const w of p.split(/\s+/).filter(Boolean).flatMap((w) => w.match(/.{1,1200}/gs))) {
+    const next = cur ? `${cur} ${w}` : w;
+    if (cur && tokens(next) > CAP) { out.push(cur); cur = w; } else cur = next;
+  }
+  return cur ? [...out, cur] : out;
+};
 
 export function chunkBundle(dir) {
   validateBundle(dir);
@@ -59,12 +70,8 @@ function split(md, preface) {
   for (const s of sections) {
     const text = s.lines.join("\n").trim();
     if (!text) continue;
-    // oversize: break at paragraphs, and a lone giant paragraph at word counts
-    const paras = text.split(/\n\s*\n/).flatMap((p) => {
-      const w = p.split(/\s+/);
-      const n = Math.floor(CAP / 1.3) - 1;
-      return tokens(p) <= CAP ? [p] : Array.from({ length: Math.ceil(w.length / n) }, (_, i) => w.slice(i * n, (i + 1) * n).join(" "));
-    });
+    // oversize: break at paragraphs, and a lone giant paragraph at words
+    const paras = text.split(/\n\s*\n/).flatMap((p) => tokens(p) <= CAP ? [p] : hardSplit(p));
     let cur = null;
     for (const p of paras) {
       if (cur && tokens(cur.text) < AIM && tokens(`${cur.text}\n\n${p}`) <= CAP) cur.text += `\n\n${p}`;

@@ -2,7 +2,7 @@
 // Only namespaces build-index recorded in KV `NAMESPACES` (i.e. fully upserted) are accepted.
 // ponytail: the KV list, not a Vectorize query, decides "exists"; a pruned namespace must be dropped from it too
 import { fileURLToPath } from "node:url";
-import { cloudflare } from "./build-index.mjs";
+import { cloudflare } from "./cloudflare.mjs";
 
 export async function rollbackIndex({ ns, env, fetch = globalThis.fetch }) {
   const cf = cloudflare(env, fetch);
