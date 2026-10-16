@@ -11,3 +11,9 @@ it("shipped config answers 503 { off: true }", async () => {
 	expect(res.status).toBe(503);
 	expect(await res.json()).toEqual({ off: true });
 });
+
+// Shipped ACCESS_AUD / ACCESS_TEAM_DOMAIN are empty: the admin route refuses until Jason sets them.
+it("shipped config refuses /admin/chats with 403", async () => {
+	const res = await exports.default.fetch("https://chat.test/admin/chats", { headers: { "cf-access-jwt-assertion": "a.b.c" } });
+	expect(res.status).toBe(403);
+});
