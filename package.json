@@ -12,7 +12,8 @@
     "astro": "astro",
     "test": "node --test tests/site.test.mjs",
     "pull": "node scripts/pull-bundle.mjs",
-    "pull:preview": "node scripts/pull-bundle.mjs --preview"
+    "pull:preview": "node scripts/pull-bundle.mjs --preview",
+    "deploy": "astro build && wrangler deploy"
   },
   "dependencies": {
     "@astrojs/react": "^7.1.0",
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "shadcn": "^4.21.5",
-    "tw-animate-css": "^1.4.0"
+    "tw-animate-css": "^1.4.0",
+    "wrangler": "^4.151.0"
   }
 }
