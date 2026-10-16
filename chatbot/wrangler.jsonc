@@ -22,8 +22,13 @@
 		// 0.6: bge-base-en-v1.5 scores unrelated text around 0.4-0.55 and on-topic text 0.7+; the test fixture
 		// (test/fake-index.json) puts on-topic questions at 0.7-1.0 and off-topic ones at 0-0.5, either side of it.
 		// ponytail: a guess until real traffic; retune from AI Gateway logs once the index is live.
-		"MIN_SCORE": "0.6"
+		"MIN_SCORE": "0.6",
+		// Cloudflare Access for /admin/chats. Empty refuses every admin call. TODO(Jason): see the checklist below.
+		"ACCESS_AUD": "",
+		"ACCESS_TEAM_DOMAIN": ""
 	},
+	// Daily at 03:00 UTC: the scheduled handler deletes chats older than 90 days.
+	"triggers": { "crons": ["0 3 * * *"] },
 	"ai": { "binding": "AI" },
 	"vectorize": [{ "binding": "VECTORIZE", "index_name": "portfolio-chat" }],
 	// TODO(Jason): the KV namespace build-index.mjs writes ACTIVE_NS to (same id as the KV_NAMESPACE_ID secret).
@@ -47,6 +52,14 @@
 	//   gateway answers 429, which the Worker turns into 502 { error: "unavailable" }. Kill switch stays CHAT_ENABLED.
 	// - Turnstile widget (Turnstile > Add widget) for the site's hostnames; site key goes in the chat widget,
 	//   secret key via `wrangler secret put TURNSTILE_SECRET`.
+	// - Cloudflare Access for /admin/* (Zero Trust > Access > Applications > Add > Self-hosted): one application
+	//   covering the chat Worker's hostname with path admin/* (or, on workers.dev, Worker > Settings > Domains &
+	//   Routes > Enable Cloudflare Access, then Manage Cloudflare Access). One Allow policy: Include > Emails >
+	//   Jason's email only. Copy the application's Application Audience (AUD) tag into ACCESS_AUD and
+	//   "https://<team-name>.cloudflareaccess.com" (Settings > Team name) into ACCESS_TEAM_DOMAIN, then deploy.
+	//   Check: open https://<worker-host>/admin/chats in a browser, log in, see { chats: [...] }; a private window
+	//   without login never reaches the Worker, and a direct call without the Access header gets 403.
+	//   Delete on request: curl -X DELETE through Access (or the browser console) to /admin/chats?session=<id>.
 	// - Workers Logs: the Worker never calls console, and invocation logs carry no request bodies; leave
 	//   head-sampling as is.
 }

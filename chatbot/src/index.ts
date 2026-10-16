@@ -148,9 +148,66 @@ async function answer(message: string, history: Turn[], env: Env) {
 	return { answer: unlink(scrub(text)), citations };
 }
 
+const RETAIN_MS = 90 * 86_400_000;
+
+// Jason's view of the log. Cloudflare Access guards /admin/* in front; the Worker checks the Access JWT itself too,
+// so a missing or misconfigured Access route still refuses. No kill switch, Turnstile, CORS or rate limit here.
+async function admin(request: Request, env: Env): Promise<Reply> {
+	if (!(await accessOk(request.headers.get("cf-access-jwt-assertion"), env))) return [{ error: "forbidden" }, 403];
+	const q = new URL(request.url).searchParams;
+	if (request.method === "GET") {
+		// ponytail: keyset on created_at alone; rows sharing a millisecond across a page edge can be skipped.
+		const limit = Math.min(Math.max(Number(q.get("limit")) || 50, 1), 500);
+		const before = Number(q.get("before")) || Number.MAX_SAFE_INTEGER;
+		const { results } = await env.CHATS.prepare("SELECT * FROM chats WHERE created_at < ? ORDER BY created_at DESC, id DESC LIMIT ?")
+			.bind(before, limit)
+			.all();
+		return [{ chats: results }, 200];
+	}
+	if (request.method === "DELETE") {
+		const session = q.get("session");
+		if (!session) return [{ error: "session required" }, 400];
+		const { meta } = await env.CHATS.prepare("DELETE FROM chats WHERE session_id = ?").bind(session).run();
+		return [{ deleted: meta.changes }, 200];
+	}
+	return [{ error: "method not allowed" }, 405];
+}
+
+// Access application token: RS256, signed by a key from <team>/cdn-cgi/access/certs (matched by kid),
+// aud includes ACCESS_AUD, iss is the team domain, exp in the future. Unset vars refuse everyone.
+// ponytail: fetches certs on every admin call (a handful a month); cache them if this ever gets traffic.
+async function accessOk(token: string | null, env: Env) {
+	const team = env.ACCESS_TEAM_DOMAIN?.replace(/\/+$/, "");
+	if (!token || !team || !env.ACCESS_AUD) return false;
+	try {
+		const [head, body, sig, extra] = token.split(".");
+		if (extra !== undefined || !sig) return false;
+		const json = (s: string) => JSON.parse(new TextDecoder().decode(b64(s)));
+		const { alg, kid } = json(head);
+		if (alg !== "RS256") return false;
+		const res = await fetch(`${team}/cdn-cgi/access/certs`);
+		const { keys } = (await res.json()) as { keys: (JsonWebKey & { kid?: string })[] };
+		const jwk = keys.find((k) => k.kid === kid);
+		if (!jwk) return false;
+		const key = await crypto.subtle.importKey("jwk", jwk, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
+		if (!(await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, b64(sig), new TextEncoder().encode(`${head}.${body}`)))) return false;
+		const { aud, iss, exp } = json(body);
+		return [aud].flat().includes(env.ACCESS_AUD) && iss === team && typeof exp === "number" && exp * 1000 > Date.now();
+	} catch {
+		return false; // malformed token, unreachable certs, bad JSON: all refuse
+	}
+}
+
+const b64 = (s: string) => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0));
+
 export default {
 	async fetch(request, env): Promise<Response> {
-		if (new URL(request.url).pathname !== "/chat") return Response.json({ error: "not found" }, { status: 404 });
+		const path = new URL(request.url).pathname;
+		if (path === "/admin/chats") {
+			const [body, status] = await admin(request, env);
+			return Response.json(body, { status, headers: { "cache-control": "no-store" } });
+		}
+		if (path !== "/chat") return Response.json({ error: "not found" }, { status: 404 });
 
 		const origin = request.headers.get("origin") ?? "";
 		const allowed = (env.ALLOWED_ORIGINS ?? "").split(",").map((o) => o.trim());
@@ -164,5 +221,10 @@ export default {
 
 		const [body, status] = await chat(request, env);
 		return Response.json(body, { status, headers });
+	},
+
+	// Daily (triggers.crons in wrangler.jsonc): chats live 90 days (story 27).
+	async scheduled(_controller, env) {
+		await env.CHATS.prepare("DELETE FROM chats WHERE created_at < ?").bind(Date.now() - RETAIN_MS).run();
 	},
 } satisfies ExportedHandler<Env>;
