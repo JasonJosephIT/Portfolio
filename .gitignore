@@ -1,8 +1,8 @@
 .DS_Store
 .superpowers/
 .claude/*
-!.claude/commands/
 .env
+content/bundle-preview/
 node_modules/
 .impeccable/review/
 .impeccable/questions/
@@ -12,5 +12,4 @@ node_modules/
 # Astro
 dist/
 .astro/
-node_modules/
 .vscode/

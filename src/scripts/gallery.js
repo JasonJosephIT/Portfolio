@@ -1,19 +1,15 @@
 /**
- * Gallery runtime — progressive enhancement only.
+ * Art pages runtime (loaded by src/layouts/Rail.astro) — progressive enhancement only.
  *
- * Every page this file touches is complete static HTML: all cards, sections,
- * pieces and links are already in the DOM and readable with JavaScript
- * disabled or broken. This script only adds conveniences on top:
+ * Every Art page is complete static HTML and works with JavaScript off.
+ * This script only adds conveniences on top:
  *
  *   - the "Show original colors" toggle for Art previews
- *   - collapsing a curated list to four entries behind a Show all control
- *   - filtering Explore by Style, with an announced result count
  *   - a quiet "Image unavailable" state when an image fails to load
- *   - upgrading a detail page's Back link to the section the visitor came from
+ *   - upgrading a piece page's Back link to the /art section the visitor came from
  *
- * It never loads an admin or authentication module. Scroll position is left to
- * the browser: history.scrollRestoration already puts a visitor back where they
- * were when they press Back.
+ * Scroll position is left to the browser: history.scrollRestoration already
+ * puts a visitor back where they were when they press Back.
  */
 
 const RETURN_KEY = 'portfolio:return';
@@ -22,14 +18,9 @@ const RETURN_KEY = 'portfolio:return';
 const SECTION_LABELS = {
   art: {
     'selected-works': 'Selected Works',
-    projects: 'Projects',
     explore: 'Explore by Style',
     about: 'About Me',
     contact: 'Contact',
-  },
-  tech: {
-    starred: 'Starred Projects',
-    projects: 'Projects',
   },
 };
 
@@ -84,67 +75,6 @@ function wireColorToggle() {
 }
 
 /* ------------------------------------------------------------------ *
- * Curated expansion: up to four entries, the rest one click away
- * ------------------------------------------------------------------ */
-
-function wireExpansion() {
-  for (const button of document.querySelectorAll('[data-expand]')) {
-    const grid = document.getElementById(button.dataset.expand);
-    if (grid === null || grid.querySelector('[data-overflow="true"]') === null) continue;
-
-    const showAll = button.textContent;
-    const showFewer = showAll.replace(/^Show all\b/, 'Show fewer');
-    grid.classList.add('is-collapsed');
-    button.hidden = false;
-
-    button.addEventListener('click', () => {
-      const expanded = button.getAttribute('aria-expanded') === 'true';
-      button.setAttribute('aria-expanded', String(!expanded));
-      grid.classList.toggle('is-collapsed', expanded);
-      button.textContent = expanded ? showAll : showFewer;
-    });
-  }
-}
-
-/* ------------------------------------------------------------------ *
- * Explore by Style filtering
- * ------------------------------------------------------------------ */
-
-function wireFilters() {
-  for (const bar of document.querySelectorAll('[data-filters]')) {
-    const gridId = bar.dataset.filters;
-    const grid = document.getElementById(gridId);
-    if (grid === null) continue;
-
-    const cards = [...grid.querySelectorAll('.card')];
-    const buttons = [...bar.querySelectorAll('[data-style]')];
-    if (cards.length === 0 || buttons.length === 0) continue;
-
-    const status = document.querySelector(`[data-filter-status="${CSS.escape(gridId)}"]`);
-    bar.hidden = false;
-
-    const apply = (style) => {
-      let shown = 0;
-      for (const card of cards) {
-        const styleIds = (card.dataset.styleIds ?? '').split(' ').filter(Boolean);
-        const visible = style === 'all' || styleIds.includes(style);
-        card.hidden = !visible;
-        if (visible) shown += 1;
-      }
-      for (const button of buttons) button.setAttribute('aria-pressed', String(button.dataset.style === style));
-      if (status !== null) {
-        status.textContent =
-          shown === 0
-            ? 'No published pieces carry this style yet.'
-            : `Showing ${shown} of ${cards.length} ${cards.length === 1 ? 'piece' : 'pieces'}.`;
-      }
-    };
-
-    for (const button of buttons) button.addEventListener('click', () => apply(button.dataset.style));
-  }
-}
-
-/* ------------------------------------------------------------------ *
  * Return context: an ordinary link, remembered
  * ------------------------------------------------------------------ */
 
@@ -155,13 +85,7 @@ function wireListingReturn(page) {
       if (sectionLabel(page, section) === null) return;
       // The target is recorded so a stale context from an earlier click cannot
       // relabel the Back link of a detail page reached some other way.
-      let target;
-      try {
-        target = new URL(link.getAttribute('href'), location.href).pathname;
-      } catch {
-        return;
-      }
-      writeStore(RETURN_KEY, { page, section, target });
+      writeStore(RETURN_KEY, { page, section, target: link.pathname });
     });
   }
 }
@@ -170,14 +94,12 @@ function wireDetailReturn() {
   const link = document.querySelector('[data-back-link]');
   if (link === null) return;
 
-  const href = link.getAttribute('href') ?? '';
-  // Astro port: links are clean (/art), and a host may add a trailing slash to the piece path.
-  const match = href.match(/^\/(art|tech)$/);
-  if (match === null) return;
+  if (link.getAttribute('href') !== '/art') return;
 
+  // A host may add a trailing slash to the piece path.
   const context = readStore(RETURN_KEY);
   const here = location.pathname.replace(/\/$/, '');
-  if (context === null || context.page !== match[1] || context.target.replace(/\/$/, '') !== here) return;
+  if (context === null || context.page !== 'art' || context.target.replace(/\/$/, '') !== here) return;
   const label = sectionLabel(context.page, context.section);
   if (label === null) return;
 
@@ -191,9 +113,6 @@ function wireDetailReturn() {
 
 watchImages();
 wireColorToggle();
-wireExpansion();
-wireFilters();
 
-const returnPage = document.body.dataset.returnPage ?? '';
-if (returnPage === 'art' || returnPage === 'tech') wireListingReturn(returnPage);
+if (document.body.dataset.returnPage) wireListingReturn('art');
 else wireDetailReturn();

@@ -1,18 +1,11 @@
-import { after, before, test } from "node:test";
+import { before, test } from "node:test";
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { readdirSync } from "node:fs";
+import { buildSite, page as read } from "./helpers.mjs";
 
-const fixture = resolve("tests/fixtures/bundle");
-const out = mkdtempSync(join(tmpdir(), "site-routes-"));
-const page = (p) => readFileSync(join(out, p), "utf8");
-
-before(() => {
-  execFileSync("pnpm", ["astro", "build", "--outDir", out], { env: { ...process.env, BUNDLE_DIR: fixture }, stdio: "pipe" });
-});
-after(() => rmSync(out, { recursive: true, force: true }));
+let out;
+const page = (p) => read(out, p);
+before(() => { out = buildSite(); });
 
 test("_redirects 301s the old .html paths", () => {
   const r = page("_redirects");

@@ -1,15 +1,15 @@
 ---
 version: 1
 slug: "index-html"
-primary_target: "index.html"
-related_targets: ["art.html","tech.html"]
+primary_target: "/"
+related_targets: ["/art","/tech"]
 ---
 
-# Surface brief: public site (index.html, art.html, tech.html)
+# Surface brief: public site (/, /art, /tech)
 
 ## Scope and mode
 
-Whole public site, three pages, one visual world. Visitor mode: Experience (the work leads, the interface recedes). The Tech page borrows Read scanability for project labels. Admin area out of scope; it inherits tokens only.
+Whole public site, three pages, one visual world. Visitor mode: Experience (the work leads, the interface recedes). The Tech page borrows Read scanability for project labels.
 
 ## Audience, job, action
 
@@ -17,8 +17,7 @@ Prospective clients for photography (portraits, available light) and for softwar
 
 ## Constraints
 
-- Markup contracts in PRODUCT.md (`.gallery > a > img`, `.projects .project-grid > .project-card` with `h3`, `p`, `.tech-tags`, `.project-link`; `.skills .skill-pills > .skill-pill`; `.page-title` present) must survive.
-- No runtime JavaScript for visitors. Fonts self-hosted in `assets/fonts/`.
+- Progressive enhancement only: every page works with JavaScript off. Fonts self-hosted in `public/fonts/`.
 
 ## Direction contract
 

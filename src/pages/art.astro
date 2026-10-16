@@ -1,14 +1,12 @@
 ---
 import { Image } from "astro:assets";
 import Rail from "@/layouts/Rail.astro";
-import art from "@/data/art.json";
+import { pieces, selected } from "@/lib/art";
 import bard from "@/assets/bard-mark.png";
 
-const images = import.meta.glob<{ default: ImageMetadata }>("/src/assets/art/*.jpg", { eager: true });
-const bySlug = Object.fromEntries(art.pieces.map((p) => [p.slug, p]));
 const grids = [
-  { id: "selected-works", pieces: art.selected.map((s) => bySlug[s]), kind: true },
-  { id: "explore", pieces: art.pieces, kind: false },
+  { id: "selected-works", pieces: selected, kind: true },
+  { id: "explore", pieces, kind: false },
 ];
 ---
 
@@ -40,7 +38,7 @@ const grids = [
             {kind && <button type="button" class="control color-toggle" data-color-toggle aria-pressed="false" hidden>Show original colors</button>}
             <div class={`grid grid--${kind ? "selected" : "explore"}`} id={`${id}-grid`}>
               {pieces.map((p, i) => (
-                <article class="card card--piece"><a class="card__link" href={`/art/pieces/${p.slug}`} aria-label={`${p.title} — art piece`} data-detail-link data-return-section={id}><span class="card__frame" style={`aspect-ratio: ${p.image.width} / ${p.image.height}`}><Image class="card__image" src={images[`/src/assets/art/${p.image.src}`].default} alt={p.image.alt} width={p.image.width} height={p.image.height} loading={kind && i === 0 ? "eager" : "lazy"} decoding="async" /><span class="image-fallback" aria-hidden="true">Image unavailable</span></span><span class="card__body">{kind && <span class="card__kind">Piece</span>}<span class="card__title">{p.title}</span></span></a></article>
+                <article class="card card--piece"><a class="card__link" href={`/art/pieces/${p.slug}`} aria-label={`${p.title} — art piece`} data-detail-link data-return-section={id}><span class="card__frame" style={`aspect-ratio: ${p.img.width} / ${p.img.height}`}><Image class="card__image" src={p.img} alt={p.image.alt} width={p.img.width} height={p.img.height} loading={kind && i === 0 ? "eager" : "lazy"} decoding="async" /><span class="image-fallback" aria-hidden="true">Image unavailable</span></span><span class="card__body">{kind && <span class="card__kind">Piece</span>}<span class="card__title">{p.title}</span></span></a></article>
               ))}
             </div>
           </section>

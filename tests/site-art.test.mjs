@@ -1,24 +1,19 @@
-import { after, before, test } from "node:test";
+import { before, test } from "node:test";
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { buildSite, page as read } from "./helpers.mjs";
 
-const fixture = resolve("tests/fixtures/bundle");
-const out = mkdtempSync(join(tmpdir(), "site-art-"));
+let out;
 const slugs = [
   "placeholder-split-light-study", "placeholder-warm-half", "placeholder-amber-light-study",
   "placeholder-mono-contrast-study", "placeholder-cool-half", "placeholder-the-hinge",
   "placeholder-cyan-light-study", "placeholder-warm-eye", "placeholder-mono-jaw-study",
 ];
-const page = (p) => readFileSync(join(out, p), "utf8");
+const page = (p) => read(out, p);
 const artPages = () => ["art/index.html", ...slugs.map((s) => `art/pieces/${s}/index.html`)];
 
-before(() => {
-  execFileSync("pnpm", ["astro", "build", "--outDir", out], { env: { ...process.env, BUNDLE_DIR: fixture }, stdio: "pipe" });
-});
-after(() => rmSync(out, { recursive: true, force: true }));
+before(() => { out = buildSite(); });
 
 test("/art has the heading, side rail, skip link and a link per piece", () => {
   const html = page("art/index.html");
