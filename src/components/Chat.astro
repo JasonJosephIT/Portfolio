@@ -96,18 +96,29 @@ const contact = "/#about-heading";
 
     let widget: string | undefined;
     let waiting: { resolve: (t: string) => void; reject: (e: Error) => void } | undefined;
+    // Always settles: a token, a Turnstile failure callback, a throwing render, or a 30 s timer (room for a human challenge).
     const token = async () => {
       await loadTurnstile();
       const ts = (window as any).turnstile;
       return new Promise<string>((resolve, reject) => {
-        waiting = { resolve, reject };
-        if (widget === undefined)
-          widget = ts.render("#chat-turnstile", {
-            sitekey,
-            callback: (t: string) => waiting?.resolve(t),
-            "error-callback": () => waiting?.reject(new Error("turnstile")),
-          });
-        else ts.reset(widget); // tokens are single use; reset runs a fresh challenge
+        const timer = setTimeout(() => waiting?.reject(new Error("turnstile timeout")), (window as any).CHAT_TS_MS ?? 30_000);
+        const done = () => (clearTimeout(timer), (waiting = undefined));
+        waiting = { resolve: (t) => (done(), resolve(t)), reject: (e) => (done(), reject(e)) };
+        const fail = () => waiting?.reject(new Error("turnstile"));
+        try {
+          if (widget === undefined)
+            widget = ts.render("#chat-turnstile", {
+              sitekey,
+              callback: (t: string) => waiting?.resolve(t),
+              "error-callback": fail,
+              "expired-callback": fail,
+              "timeout-callback": fail,
+              "unsupported-callback": fail,
+            });
+          else ts.reset(widget); // tokens are single use; reset runs a fresh challenge
+        } catch {
+          fail();
+        }
       });
     };
 
@@ -126,7 +137,13 @@ const contact = "/#about-heading";
       p.textContent = content;
       p.className = "whitespace-pre-line";
       li.append(p);
-      const safe = citations.filter((c) => /^https?:$/.test(new URL(c.url, location.href).protocol));
+      const safe = citations.filter((c) => {
+        try {
+          return typeof c.title === "string" && typeof c.url === "string" && /^https?:$/.test(new URL(c.url, location.href).protocol);
+        } catch {
+          return false; // a bad citation is skipped, never fails a good answer
+        }
+      });
       if (safe.length) {
         const ul = document.createElement("ul");
         ul.className = "mt-1 grid gap-1";
@@ -151,6 +168,7 @@ const contact = "/#about-heading";
       else body.turnstileToken = await token();
       let res = await post(body);
       if (res.status === 403) {
+        session = undefined;
         delete body.session;
         body.turnstileToken = await token();
         res = await post(body);

@@ -31,7 +31,10 @@ const PW_FROM = process.env.PLAYWRIGHT_FROM ?? "/Users/jsloth/Projects/Chazak St
 let chromium;
 try {
   ({ chromium } = createRequire(PW_FROM)("playwright"));
-} catch {}
+} catch (e) {
+  if (process.env.PLAYWRIGHT_FROM) throw e; // asked for explicitly: fail loudly rather than skip
+  console.warn("site-chat: Playwright not found, browser checks SKIPPED (set PLAYWRIGHT_FROM to a package.json that has it)");
+}
 const browserTest = chromium ? test : test.skip;
 const newestShell = () => {
   const cache = join(homedir(), "Library/Caches/ms-playwright");
@@ -80,10 +83,10 @@ after(async () => {
   stub.close();
 });
 
-async function open(path = "/tech") {
+async function open(path = "/tech", turnstile = FAKE_TURNSTILE) {
   const page = await browser.newPage();
   await page.route("https://challenges.cloudflare.com/**", (route) => (cfHits++, route.abort()));
-  await page.addInitScript(FAKE_TURNSTILE);
+  await page.addInitScript(turnstile);
   await page.goto(base + path);
   return page;
 }
@@ -191,5 +194,33 @@ browserTest("keyboard only: open, type, send, read the answer, close", async () 
   assert.equal(await focused(), "chat-q", "focus back in the input to read on or ask again");
   await page.keyboard.press("Escape");
   assert.equal(await page.evaluate(() => document.getElementById("chat").matches(":popover-open")), false);
+  await page.close();
+});
+
+for (const [name, fake] of [
+  ["never calls back", `window.CHAT_TS_MS = 300; window.turnstile = { render() { return "w1"; }, reset() {} };`],
+  ["render throws", `window.turnstile = { render() { throw new Error("boom"); }, reset() {} };`],
+  ["fires timeout-callback", `window.turnstile = { render(el, o) { setTimeout(() => o["timeout-callback"]()); return "w1"; }, reset() {} };`],
+]) {
+  browserTest(`Turnstile ${name}: unavailable, and Send works again`, async () => {
+    calls.length = 0;
+    const page = await open("/tech", fake);
+    await page.click("button[popovertarget=chat]");
+    await ask(page, "hi");
+    await page.locator("#chat-down").waitFor();
+    assert.equal(await page.isDisabled("#chat-form button[type=submit]"), false);
+    assert.equal(calls.length, 0, "no chat request without a token");
+    await page.close();
+  });
+}
+
+browserTest("a malformed citation is skipped; the answer and good citations still show", async () => {
+  reply = () => [200, { answer: "Still here.", citations: [null, { title: 5, url: "/x" }, { title: "bad", url: "http://[" }, { title: "obj", url: {} }, { title: "Good", url: "/tech/alpha-tool" }] }];
+  const page = await open();
+  await page.click("button[popovertarget=chat]");
+  await ask(page, "hi");
+  await page.locator("#chat-log", { hasText: "Still here." }).waitFor();
+  assert.deepEqual(await page.locator("#chat-log a").allInnerTexts(), ["Good"]);
+  assert.equal(await page.isVisible("#chat-down"), false);
   await page.close();
 });
