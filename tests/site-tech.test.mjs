@@ -29,33 +29,33 @@ test("each card holds name, summary and tags, and nothing else", () => {
   }
 });
 
-// The links in the list under a relation heading in "Connected work".
-const group = (html, label) => {
-  const at = html.indexOf(`>${label}</h3>`);
+// The slugs linked inside the "Related projects" section.
+const related = (html) => {
+  const at = html.indexOf('id="related"');
   if (at < 0) return null;
-  const list = html.slice(at, html.indexOf("</ul>", at));
-  return [...list.matchAll(/href="\/tech\/([a-z-]+)"/g)].map((m) => m[1]);
+  return [...html.slice(at, html.indexOf("</section>", at)).matchAll(/href="\/tech\/([a-z-]+)"/g)].map((m) => m[1]);
 };
 
-test("project page renders description markdown, tags under Tags, and relations grouped by label", () => {
+test("project page uses visitor labels and one plain Related projects list", () => {
   const alpha = page(out, "tech/alpha-tool/index.html");
   assert.match(alpha, /Alpha Tool sorts files into folders by type\./);
-  assert.match(alpha, />Tags<\/h2>/);
-  assert.doesNotMatch(alpha, />Built with<\/h2>/);
-  // alpha: incoming "uses" from beta-site, outgoing "built-with" gamma-lib
-  assert.deepEqual(group(alpha, "Used by"), ["beta-site"]);
-  assert.deepEqual(group(alpha, "Built with"), ["gamma-lib"]);
-  assert.deepEqual(group(page(out, "tech/beta-site/index.html"), "Uses"), ["alpha-tool"]);
-  assert.deepEqual(group(page(out, "tech/gamma-lib/index.html"), "Used to build"), ["alpha-tool"]);
+  for (const l of ["What it is", "Made with", "Related projects", "See it working"]) assert.ok(alpha.includes(`>${l}<`), l);
+  const headings = [...alpha.matchAll(/<h[23][^>]*>([^<]*)</g)].map((m) => m[1].trim());
+  for (const old of ["Overview", "Tags", "Docs", "Connected work", "Prototype video", "Used by", "Uses", "Built with", "Used to build", "Part of", "Includes"]) assert.ok(!headings.includes(old), old);
+  assert.ok(text(alpha).includes("Plate 01 · See it working") || /Plate \d\d · See it working/.test(text(alpha)));
+  assert.doesNotMatch(text(alpha), /prototype/i);
+  assert.match(alpha, /aria-label="Placeholder for a video of it working/);
+  assert.doesNotMatch(alpha, /<h3/);
+  assert.deepEqual(related(alpha).sort(), ["beta-site", "gamma-lib"]);
+  assert.deepEqual(related(page(out, "tech/beta-site/index.html")), ["alpha-tool"]);
+  assert.deepEqual(related(page(out, "tech/gamma-lib/index.html")), ["alpha-tool"]);
 });
 
-test("edges of one type and direction share one heading", () => {
+test("a project related twice appears once", () => {
   const o = build({
-    edit: (d) => write(join(d, "relations.json"), [...read(join(d, "relations.json")), { from: "beta-site", to: "gamma-lib", type: "built-with", evidence: "x" }]),
+    edit: (d) => write(join(d, "relations.json"), [...read(join(d, "relations.json")), { from: "alpha-tool", to: "beta-site", type: "related-to", evidence: "x" }]),
   });
-  const gamma = page(o, "tech/gamma-lib/index.html");
-  assert.equal(gamma.split(">Used to build</h3>").length, 2);
-  assert.deepEqual(group(gamma, "Used to build").sort(), ["alpha-tool", "beta-site"]);
+  assert.deepEqual(related(page(o, "tech/alpha-tool/index.html")).sort(), ["beta-site", "gamma-lib"]);
 });
 
 test("breadcrumb counts plates as N of total", () => {
