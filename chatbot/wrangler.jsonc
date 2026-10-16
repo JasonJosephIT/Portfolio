@@ -2,6 +2,9 @@
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "jason-portfolio-chat",
 	"main": "src/index.ts",
+	// Production deploy of main (Workers Builds, not previews), with CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN,
+	// KV_NAMESPACE_ID secrets set: pnpm wrangler deploy && node chatbot/scripts/build-index.mjs
+	// Roll back the search index: node chatbot/scripts/rollback-index.mjs <b-namespace>
 	"compatibility_date": "2026-10-13",
 	"vars": {
 		// Kill switch: anything but "true" answers 503 { off: true }. Ships off.
