@@ -1,7 +1,7 @@
 ---
 import { marked } from "marked";
 import Tech from "@/layouts/Tech.astro";
-import { projects, relationsFor, RELATION_LABEL } from "@/lib/bundle";
+import { DOC_TITLE, docsFor, projects, relationsFor, RELATION_LABEL } from "@/lib/bundle";
 
 export async function getStaticPaths() {
   const all = await projects();
@@ -13,6 +13,7 @@ const html = await marked.parse(p.description);
 const name = (slug: string) => all.find((x) => x.slug === slug)?.name ?? slug;
 // One heading per relation type and direction ("related-to" reads the same both ways).
 const related = Object.entries(Object.groupBy(await relationsFor(p.slug), (r) => RELATION_LABEL[r.type][r.outgoing ? 0 : 1]));
+const docs = await docsFor(p.slug);
 const plate = (i: number) => String(i + 1).padStart(2, "0");
 const prev = all[(index - 1 + all.length) % all.length];
 const next = all[(index + 1) % all.length];
@@ -67,6 +68,23 @@ const next = all[(index + 1) % all.length];
             {p.tags.map((t) => <li class="border-b border-hairline py-2 text-[0.95rem] text-foreground/90 first-letter:uppercase">{t}</li>)}
           </ul>
         </section>
+        {
+          docs.length > 0 && (
+            <section aria-labelledby="docs" class="grid gap-3">
+              <h2 id="docs" class="label">Docs</h2>
+              <ul class="grid gap-2">
+                {docs.map((d) => (
+                  <li>
+                    <a href={`/tech/${p.slug}/${d.data.kind}`} class="window ring-link flex items-center justify-between gap-3 px-4 py-3 text-foreground">
+                      {DOC_TITLE[d.data.kind]}
+                      <svg aria-hidden="true" viewBox="0 0 24 24" class="arrow size-4 shrink-0 text-pencil" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
         {
           related.length > 0 && (
             <section aria-labelledby="connected" class="grid gap-3">

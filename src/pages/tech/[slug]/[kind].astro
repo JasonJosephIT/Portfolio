@@ -1,0 +1,54 @@
+---
+import { getCollection, render } from "astro:content";
+import Tech from "@/layouts/Tech.astro";
+import { DOC_TITLE, projects } from "@/lib/bundle";
+
+export async function getStaticPaths() {
+  const all = await projects();
+  return (await getCollection("docs")).map((doc) => ({
+    params: { slug: doc.data.parent, kind: doc.data.kind },
+    props: { doc, project: all.find((p) => p.slug === doc.data.parent)! },
+  }));
+}
+
+const { doc, project: p } = Astro.props;
+const { Content, headings } = await render(doc);
+const kind = DOC_TITLE[doc.data.kind];
+const outline = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+<Tech title={`${p.name} · ${kind}`} description={`${kind} of ${p.name}.`}>
+  <nav aria-label="Breadcrumb" class="pt-8">
+    <a href={`/tech/${p.slug}`} class="label text-link nudge-left !text-muted-text hover:!text-foreground">
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="arrow size-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+      {p.name}
+    </a>
+  </nav>
+
+  <header class="grid gap-5 border-b border-bevel pt-[clamp(32px,6vh,64px)] pb-[clamp(28px,5vh,48px)]">
+    <p class="label">{p.name}</p>
+    <h1 class="display text-[clamp(2.25rem,6vw,4.75rem)]">{kind}</h1>
+  </header>
+
+  <div class="grid gap-x-[clamp(32px,5vw,72px)] gap-y-12 pt-[clamp(32px,6vh,64px)] lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <article aria-label={kind} class="prose-board min-w-0 max-w-[62ch] text-[1.03rem]">
+      <Content />
+    </article>
+    {
+      outline.length > 0 && (
+        <aside aria-label="On this page" class="lg:sticky lg:top-[104px] lg:self-start">
+          <nav class="mat-cast grid gap-3 p-[clamp(20px,2.4vw,28px)]">
+            <h2 class="label">On this page</h2>
+            <ul class="grid border-t border-hairline">
+              {outline.map((h) => (
+                <li class:list={["border-b border-hairline py-2 text-[0.95rem]", h.depth === 3 && "pl-4"]}>
+                  <a href={`#${h.slug}`} class="text-link text-foreground/90">{h.text}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </aside>
+      )
+    }
+  </div>
+</Tech>
