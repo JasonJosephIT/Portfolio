@@ -18,8 +18,7 @@ Prospective clients for photography (portraits, available light) and for softwar
 ## Constraints
 
 - Markup contracts in PRODUCT.md (`.gallery > a > img`, `.projects .project-grid > .project-card` with `h3`, `p`, `.tech-tags`, `.project-link`; `.skills .skill-pills > .skill-pill`; `.page-title` present) must survive.
-- No runtime JavaScript for visitors beyond the `?edit=1` loader. Fonts self-hosted in `assets/fonts/`.
-- Token names read by `styles.css` must survive: `--bg --text --muted --accent-art --accent-tech --space --radius --nav-height`.
+- No runtime JavaScript for visitors. Fonts self-hosted in `assets/fonts/`.
 
 ## Direction contract
 

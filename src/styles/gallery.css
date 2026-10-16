@@ -7,7 +7,7 @@
    same matted object as the hand-written half.
 
    Everything is scoped under `.gallery-page` (plus `--art` / `--tech` /
-   `--notfound` variants) so Home and the admin pages keep what they have.
+   `--notfound` variants) so Home keeps what they have.
    styles.css is linked first on every generated page: it owns the reset, the
    Archivo @font-face, the :root tokens, the board and its rag texture, the
    shared top navigation and the focus ring. Nothing here redeclares any of it.

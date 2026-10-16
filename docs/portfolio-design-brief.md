@@ -154,7 +154,7 @@ Start with the existing dark palette to connect these pages to Home. Let the art
 | `--gallery-section-gap` | `64px / 80px / 112px` | Space between sections |
 | `--gallery-radius` | `8px` | Image corners; avoid pill-shaped cards |
 
-Alias existing tokens where possible rather than creating conflicting global definitions. Scope new page styling so it does not regress Home or admin pages.
+Alias existing tokens where possible rather than creating conflicting global definitions. Scope new page styling so it does not regress Home.
 
 Use the system sans-serif stack. Page title: `clamp(2.5rem, 5vw, 4.5rem)`, weight 600, line-height 1.08. Section title: `clamp(1.75rem, 3vw, 2.5rem)`, weight 500–600. Card title: 18–20px. Body: 16–18px, line-height 1.5–1.65. Metadata: at least 14px. Avoid long all-caps passages and ultra-light type. Reading text should stay near 65 characters per line.
 
@@ -230,7 +230,7 @@ Suggested editorial lengths: titles 2–8 words, summaries 15–30 words. These 
 - Keep visual order aligned with DOM order. Never require hover, drag, swipe, or precise pointer movement to browse.
 - Test text zoom and reflow, including 200% zoom and a 320px-wide viewport. Content must remain reachable without horizontal page scrolling.
 - Use responsive image sources, explicit width/height or aspect ratio, efficient formats with fallbacks as needed, and native lazy loading below the fold. Do not lazy-load the primary visible image.
-- Public browsing must not depend on admin authentication or editor scripts. Avoid shipping full-resolution originals as every thumbnail.
+- Public browsing must not depend on editor scripts. Avoid shipping full-resolution originals as every thumbnail.
 - Prefer ordinary links and server/static-rendered content so essential browsing survives JavaScript failure.
 
 ## Subagent work plan and ownership

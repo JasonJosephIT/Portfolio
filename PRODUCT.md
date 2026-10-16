@@ -25,7 +25,7 @@ One person, two disciplines, presented as a single identity rather than two site
 ## Capabilities and Constraints
 
 - Three public pages: `index.html` (home), `art.html` (photography), `tech.html` (software). Shared nav markup on all three.
-- Public pages carry no runtime JavaScript for visitors except the three-line `?edit=1` loader on `art.html` and `tech.html`. No analytics, no lightbox, no dark/light toggle.
+- Public pages carry no runtime JavaScript for visitors. No analytics, no lightbox, no dark/light toggle.
 - **Markup contracts the pipeline depends on (must not change):**
   - `art.html`: gallery container is `.gallery`; each work is `<a href="assets/photo-NN.jpg"><img src="assets/photo-NN.jpg" alt="..." loading="lazy"></a>` as a direct child of `.gallery`. Placement specs reference `.gallery > :nth-child(n)`.
   - `tech.html`: projects container is `.project-grid` inside `.projects`; each project is `.project-card` containing `h3`, `p`, `.tech-tags` (spans), `.project-link`. Skills are `.skills .skill-pills > .skill-pill`.
