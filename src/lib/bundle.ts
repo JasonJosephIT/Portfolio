@@ -38,3 +38,11 @@ export const RELATION_LABEL: Record<string, [string, string]> = {
   uses: ["Uses", "Used by"],
   "related-to": ["Related", "Related"],
 };
+
+/** A project's docs (features first), empty when the bundle ships none. */
+export async function docsFor(slug: string) {
+  const all = await getCollection("docs");
+  return all.filter((d) => d.data.parent === slug).sort((a, b) => b.data.kind.localeCompare(a.data.kind));
+}
+
+export const DOC_TITLE = { features: "Features", decisions: "Decisions" } as const;

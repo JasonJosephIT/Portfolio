@@ -43,4 +43,11 @@ const relations = defineCollection({
   }),
 });
 
-export const collections = { projects, relations };
+// docs/<parent>-<kind>.md; validateBundle already checked the frontmatter (parent, kind, slug == stem).
+const docs = defineCollection({
+  loader: glob({ pattern: "*.md", base: `${BUNDLE_DIR}/docs` }),
+  // ponytail: loose, YAML may turn an unquoted approved_at into a Date; the strict check is validateBundle's
+  schema: z.object({ parent: z.string(), kind: z.enum(["features", "decisions"]) }).passthrough(),
+});
+
+export const collections = { projects, relations, docs };

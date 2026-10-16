@@ -9,7 +9,7 @@ export const SUPPORTED_SCHEMA_VERSION = 1;
 const SCHEMA = JSON.parse(readFileSync(new URL("../../schemas/bundle.schema.json", import.meta.url), "utf8"));
 const ajv = new Ajv2020({ allErrors: true });
 const checker = (name) => ajv.compile({ $ref: `#/$defs/${name}`, $defs: SCHEMA.$defs });
-const check = { manifest: checker("manifest"), project: checker("project"), profile: checker("profile"), relation: checker("relation") };
+const check = { manifest: checker("manifest"), project: checker("project"), profile: checker("profile"), relation: checker("relation"), doc: checker("doc_frontmatter") };
 
 const shape = (name, data, where) =>
   check[name](data) ? [] : check[name].errors.map((e) =>
@@ -60,5 +60,25 @@ export function validateBundle(dir, { allowPending = false } = {}) {
     for (const end of [e.from, e.to])
       if (!listed.has(end)) problems.push(`relations.json: edge end ${JSON.stringify(end)} is not a listed project`);
 
+
+  for (const p of all.filter((p) => /^docs\/[^/]+\.md$/.test(p))) {
+    const fm = frontmatter(readFileSync(join(dir, p), "utf8"));
+    if (!fm) { problems.push(`${p}: no frontmatter`); continue; }
+    problems.push(...shape("doc", fm, p));
+    if (fm.slug !== basename(p, ".md")) problems.push(`${p}: slug ${JSON.stringify(fm.slug)} != filename stem`);
+    if (!listed.has(fm.parent)) problems.push(`${p}: parent ${JSON.stringify(fm.parent)} is not a listed project`);
+  }
+
   if (problems.length) fail();
+}
+
+// ponytail: flat `key: value` lines only (all doc_frontmatter is); a YAML parser if Open Thoughts ever nests
+function frontmatter(text) {
+  const m = /^---\r?\n([\s\S]*?)\r?\n---(\r?\n|$)/.exec(text);
+  if (!m) return null;
+  return Object.fromEntries(m[1].split(/\r?\n/).filter((l) => l.trim()).map((l) => {
+    const i = l.indexOf(":");
+    const v = l.slice(i + 1).trim();
+    return [l.slice(0, i).trim(), v === "null" ? null : v.replace(/^(["'])(.*)\1$/, "$2")];
+  }));
 }

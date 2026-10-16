@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { validateBundle } from "../scripts/lib/validate-bundle.mjs";
@@ -68,9 +68,7 @@ test("bad JSON is a problem naming the file", () => {
   assert.throws(() => validateBundle(dir), /relations\.json: not valid JSON/);
 });
 
-test("a file outside the bundle layout is refused; docs/*.md is allowed", () => {
-  const ok = mutated((d) => { mkdirSync(join(d, "docs")); writeFileSync(join(d, "docs", "about.md"), "# hi"); });
-  validateBundle(ok);
+test("a file outside the bundle layout is refused (docs/*.md is allowed: the fixture has two)", () => {
   for (const stray of ["notes.txt", "projects/alpha-tool.md", "docs/secret.json", "extra/x.json"]) {
     const dir = mutated((d) => { mkdirSync(join(d, stray, ".."), { recursive: true }); writeFileSync(join(d, stray), "x"); });
     assert.throws(() => validateBundle(dir), new RegExp(`${stray.replace(".", "\\.")}: not part of a bundle`), stray);
@@ -81,4 +79,34 @@ test("build: an empty bundle folder fails with Bundle folder not found", () => {
   const empty = mkdtempSync(join(tmpdir(), "site-empty-"));
   try { assert.throws(() => buildSite(empty), (e) => e.status !== 0 && /Bundle folder not found/.test(output(e))); }
   finally { rmSync(empty, { recursive: true, force: true }); }
+});
+
+const editDoc = (d, fn) => {
+  const f = join(d, "docs/alpha-tool-features.md");
+  writeFileSync(f, fn(readFileSync(f, "utf8")));
+};
+
+test("a doc missing a frontmatter field is refused, naming the file and field", () => {
+  const dir = mutated((d) => editDoc(d, (s) => s.replace(/^source_hash:.*\n/m, "")));
+  assert.throws(() => validateBundle(dir), /docs\/alpha-tool-features\.md.*source_hash/);
+});
+
+test("a doc with an unknown kind is refused", () => {
+  const dir = mutated((d) => editDoc(d, (s) => s.replace("kind: features", "kind: roadmap")));
+  assert.throws(() => validateBundle(dir), /docs\/alpha-tool-features\.md.*kind/);
+});
+
+test("a doc whose slug is not its filename stem is refused", () => {
+  const dir = mutated((d) => editDoc(d, (s) => s.replace("slug: alpha-tool-features", "slug: other")));
+  assert.throws(() => validateBundle(dir), /docs\/alpha-tool-features\.md: slug "other" != filename stem/);
+});
+
+test("a doc whose parent is not a listed project is refused", () => {
+  const dir = mutated((d) => editDoc(d, (s) => s.replace("parent: alpha-tool", "parent: nope")));
+  assert.throws(() => validateBundle(dir), /docs\/alpha-tool-features\.md: parent "nope" is not a listed project/);
+});
+
+test("a doc without frontmatter is refused", () => {
+  const dir = mutated((d) => editDoc(d, (s) => s.replace(/^---[\s\S]*?---\n/, "")));
+  assert.throws(() => validateBundle(dir), /docs\/alpha-tool-features\.md: no frontmatter/);
 });
