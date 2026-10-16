@@ -1,7 +1,7 @@
 ---
 id: P17
 title: Turnstile, rate and spend limits, D1 storage with scrubbing
-status: open
+status: closed
 type: AFK
 phase: F
 repo: Portfolio, branch redesign/chatbot
