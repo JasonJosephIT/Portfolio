@@ -1,7 +1,7 @@
 ---
 id: P22
 title: Visitor-facing labels on project pages; a build page per project
-status: open
+status: closed
 type: AFK
 phase: E
 repo: Portfolio, branch redesign/astro-tech
