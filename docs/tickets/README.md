@@ -81,4 +81,4 @@ The `revise` proposal kind with diff, staleness marking, enrichment relations an
 ## Status (2026-10-16)
 - OT01 is merged on Open Thoughts `build/enrichment`. OT02 and OT03 are merged there too, but Jason moved the enrichment build to the T30–T39 tickets (`build/enrichment-app`): OT04 and OT05 are not built here, and P11/P13 will point at that work instead.
 
-- Built on `redesign/astro-tech` (2026-10-16, not pushed): P02-P10, P12, P13, P14, P15, P16 and P17 closed, plus a final-review fix pass. P03, P10 and P11 still need Jason's hands-on steps.
+- Built on `redesign/astro-tech` (2026-10-16, not pushed): P02-P10, P12, P13, P14, P15, P16, P17, P18 and P19 closed, plus a final-review fix pass. P03, P10 and P11 still need Jason's hands-on steps.

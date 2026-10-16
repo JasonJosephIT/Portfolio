@@ -1,7 +1,7 @@
 ---
 id: P18
 title: 90-day deletion, Access-gated reading, delete on request
-status: open
+status: closed
 type: HITL
 phase: F
 repo: Portfolio, branch redesign/chatbot

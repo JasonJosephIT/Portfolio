@@ -1,7 +1,7 @@
 ---
 id: P19
 title: "Chat on the site: notice, Turnstile, citations, works when off"
-status: open
+status: closed
 type: AFK
 phase: F
 repo: Portfolio, branch redesign/chatbot
