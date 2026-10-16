@@ -37,6 +37,7 @@ HITL = needs Jason (a click, a dashboard, a judgment). AFK = an agent can do it 
 | [P18](P18-chatbot-retention-access-delete.md) | 90-day deletion, Access-gated reading, delete on request | F | HITL | P17 |
 | [P19](P19-site-chat-ui.md) | Chat on the site: notice, Turnstile, citations, works when off | F | AFK | P17 |
 | [P20](P20-eval-set-in-ci.md) | Full fixed eval set and site tests in CI | F | AFK | P17, P19 |
+| [P22](P22-visitor-labels-and-build-pages.md) | Visitor-facing labels; a build page per project | E | AFK | P08, P13 |
 | [P21](P21-launch-gate-and-cutover.md) | Launch gate: red-team pass, unverified facts, custom domain cutover | F | HITL | P18, P20, P11 |
 
 ```
