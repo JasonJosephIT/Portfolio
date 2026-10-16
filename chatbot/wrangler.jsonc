@@ -1,0 +1,13 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "jason-portfolio-chat",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-10-13",
+	"vars": {
+		// Kill switch: anything but "true" answers 503 { off: true }. Ships off.
+		"CHAT_ENABLED": "false",
+		// Comma-separated site origins allowed by CORS.
+		// TODO(Jason): append ",https://jason-portfolio.<account>.workers.dev" (and the custom domain).
+		"ALLOWED_ORIGINS": "http://localhost:4321"
+	}
+}
