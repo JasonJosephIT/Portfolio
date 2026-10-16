@@ -1,21 +1,17 @@
 import { before, test } from "node:test";
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { buildSite, page } from "./helpers.mjs";
 
-const fixture = resolve("tests/fixtures/bundle");
-const out = mkdtempSync(join(tmpdir(), "site-"));
+let out;
 const slugs = ["alpha-tool", "beta-site", "gamma-lib"];
 const names = ["Alpha Tool", "Beta Site", "Gamma Lib"];
 
-before(() => {
-  execFileSync("pnpm", ["astro", "build", "--outDir", out], { env: { ...process.env, BUNDLE_DIR: fixture }, stdio: "pipe" });
-});
+before(() => { out = buildSite(); });
 
 test("/tech lists exactly the fixture's projects", () => {
-  const html = readFileSync(join(out, "tech/index.html"), "utf8");
+  const html = page(out, "tech/index.html");
   for (const n of names) assert.ok(html.includes(n), `missing ${n}`);
   const linked = [...new Set([...html.matchAll(/href="\/tech\/([a-z0-9-]+)"/g)].map((m) => m[1]))].sort();
   assert.deepEqual(linked, slugs);

@@ -1,32 +1,18 @@
-import { after, before, test } from "node:test";
+import { before, test } from "node:test";
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { buildSite, copyFixture, fixture, page } from "./helpers.mjs";
 
-const fixture = resolve("tests/fixtures/bundle");
-const tmp = mkdtempSync(join(tmpdir(), "site-tech-"));
 const read = (p) => JSON.parse(readFileSync(p, "utf8"));
 const write = (p, v) => writeFileSync(p, JSON.stringify(v));
-
-// Build a (possibly edited) copy of the fixture bundle; edit(dir) mutates the copy.
-function build(name, { edit = () => {}, env = {} } = {}) {
-  const bundle = join(tmp, `${name}-bundle`);
-  const out = join(tmp, name);
-  cpSync(fixture, bundle, { recursive: true });
-  edit(bundle);
-  execFileSync("pnpm", ["astro", "build", "--outDir", out], { env: { ...process.env, BUNDLE_DIR: bundle, ...env }, stdio: "pipe" });
-  return out;
-}
-const page = (out, p) => readFileSync(join(out, p), "utf8");
+const build = ({ edit, env } = {}) => buildSite(copyFixture(edit), env);
 const text = (html) => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
 let out;
 before(() => {
-  out = build("main");
+  out = buildSite();
 });
-after(() => rmSync(tmp, { recursive: true, force: true }));
 
 test("each card holds name, summary and tags, and nothing else", () => {
   const html = page(out, "tech/index.html");
@@ -71,7 +57,7 @@ test("About shows the profile headline and every skill", () => {
 
 test("a relation to a slug outside the bundle fails the build", () => {
   assert.throws(() =>
-    build("badrel", {
+    build({
       edit: (d) => {
         const rel = read(join(d, "relations.json"));
         rel.push({ from: "alpha-tool", to: "ghost", type: "uses", evidence: "x" });
@@ -82,7 +68,7 @@ test("a relation to a slug outside the bundle fails the build", () => {
 });
 
 test("removing a project leaves no page or card for it", () => {
-  const o = build("removed", {
+  const o = build({
     edit: (d) => {
       const b = read(join(d, "bundle.json"));
       b.records.projects = b.records.projects.filter((s) => s !== "gamma-lib");
@@ -97,7 +83,7 @@ test("removing a project leaves no page or card for it", () => {
 
 test("draft banner shows only in a PREVIEW build of a pending bundle", () => {
   assert.doesNotMatch(page(out, "tech/index.html"), /not yet approved/);
-  const o = build("pending", {
+  const o = build({
     env: { PREVIEW: "1" },
     edit: (d) => {
       const b = read(join(d, "bundle.json"));

@@ -4,14 +4,13 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { editJson, fixture } from "./helpers.mjs";
 
-const fixture = resolve("tests/fixtures/bundle");
 const script = resolve("scripts/pull-bundle.mjs");
 const tmp = mkdtempSync(join(tmpdir(), "site-pull-"));
 after(() => rmSync(tmp, { recursive: true, force: true }));
 
 const git = (cwd, ...args) => execFileSync("git", args, { cwd, encoding: "utf8" }).trim();
-const editJson = (p, fn) => { const d = JSON.parse(readFileSync(p, "utf8")); fn(d); writeFileSync(p, JSON.stringify(d)); };
 
 let n = 0;
 /** Temp origin + clone (main holds `committed` as content/bundle, if given), a stub gh, and an export copy of the fixture. */
