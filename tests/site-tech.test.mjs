@@ -16,7 +16,8 @@ before(() => {
 
 test("each card holds name, summary and tags, and nothing else", () => {
   const html = page(out, "tech/index.html");
-  const cards = html.split('class="plate-item"').slice(1); // tag <li>s nest inside, so split rather than match
+  const list = html.slice(0, html.indexOf("</ol>", html.indexOf('class="plate-item"'))); // stop at the end of the card list
+  const cards = list.split('class="plate-item"').slice(1); // tag <li>s nest inside, so split rather than match
   assert.equal(cards.length, 3);
   for (const slug of ["alpha-tool", "beta-site", "gamma-lib"]) {
     const rec = read(join(fixture, "projects", `${slug}.json`));

@@ -1,0 +1,212 @@
+---
+/**
+ * "Ask about my work": native popover, enhanced by a small script that talks to the chat Worker.
+ * PUBLIC_CHAT_URL empty at build, or JS off: the panel is a contact link only.
+ */
+const url = import.meta.env.PUBLIC_CHAT_URL ?? "";
+const sitekey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? "";
+const contact = "/#about-heading";
+---
+
+<button
+  type="button"
+  popovertarget="chat"
+  class="mat-cast label fixed right-4 bottom-4 z-30 flex min-h-11 items-center gap-3 px-4 !text-foreground transition-colors hover:!text-tech sm:right-6 sm:bottom-6"
+>
+  <svg aria-hidden="true" viewBox="0 0 24 24" class="size-4 text-tech" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 5h16v11H9l-5 4z" />
+  </svg>
+  <span>Ask<span class="hidden sm:inline">&nbsp;about my work</span></span>
+</button>
+
+<div id="chat" popover class="chat-panel mat-cast" aria-labelledby="chat-title" data-url={url} data-sitekey={sitekey}>
+  <div class="grid gap-4 p-5">
+    <div class="flex items-start justify-between gap-4">
+      <h2 id="chat-title" class="label-section !text-foreground">Ask about my work</h2>
+      <button type="button" popovertarget="chat" popovertargetaction="hide" class="-m-2 grid size-9 place-items-center text-muted-text hover:text-foreground" aria-label="Close">
+        <svg aria-hidden="true" viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      </button>
+    </div>
+    <p id="chat-contact" class="text-sm leading-relaxed text-muted-text">
+      Questions about my work? <a href={contact} class="underline hover:text-foreground">Get in touch</a>.
+    </p>
+    {
+      url && (
+        <form id="chat-form" hidden class="grid gap-3">
+          <p id="chat-notice" class="text-sm leading-relaxed text-muted-text">
+            This is an AI assistant. It answers only from published work on this site. Chats are stored for 90 days. Don't share personal information.
+          </p>
+          <ol id="chat-log" aria-live="polite" class="grid max-h-[50vh] gap-3 overflow-y-auto text-sm leading-relaxed empty:hidden" />
+          <p id="chat-status" role="status" class="note empty:hidden" />
+          <p id="chat-down" hidden class="text-sm text-muted-text">
+            Chat is unavailable right now. <a href={contact} class="underline hover:text-foreground">Contact me instead</a>.
+          </p>
+          <div id="chat-turnstile" />
+          <div class="window flex items-center gap-3 px-3 py-2.5">
+            <label for="chat-q" class="sr-only">Question</label>
+            <input id="chat-q" name="q" required maxlength="500" autocomplete="off" autofocus placeholder="What did Jason build on Cloudflare?" class="min-w-0 flex-1 bg-transparent text-sm placeholder:text-pencil" />
+            <button type="submit" class="label hover:!text-tech">Send</button>
+          </div>
+          <p id="chat-id" hidden class="note">
+            Your chat id: <span></span>. To have it deleted, send it via the <a href={contact} class="underline">contact page</a>.
+          </p>
+        </form>
+      )
+    }
+  </div>
+</div>
+
+<script>
+  const panel = document.getElementById("chat")!;
+  const form = document.getElementById("chat-form") as HTMLFormElement | null;
+  if (form) {
+    const $ = (id: string) => document.getElementById(id)!;
+    const { url, sitekey } = panel.dataset as { url: string; sitekey: string };
+    const input = $("chat-q") as HTMLInputElement;
+    const send = form.querySelector("button[type=submit]") as HTMLButtonElement;
+    const log = $("chat-log");
+    const status = $("chat-status");
+    const down = $("chat-down");
+    const idLine = $("chat-id");
+    form.hidden = false;
+    $("chat-contact").hidden = true;
+
+    type Turn = { role: "user" | "assistant"; content: string };
+    const turns: Turn[] = [];
+    let session: string | undefined; // ponytail: memory only; a reload starts a new session
+
+    // Turnstile: the script loads when the panel first opens, never on page load.
+    let loaded: Promise<void> | undefined;
+    const loadTurnstile = () =>
+      (loaded ??= (window as any).turnstile
+        ? Promise.resolve()
+        : new Promise((resolve, reject) => {
+            const s = document.createElement("script");
+            s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+            s.onload = () => resolve();
+            s.onerror = () => {
+              loaded = undefined;
+              reject(new Error("turnstile"));
+            };
+            document.head.append(s);
+          }));
+    panel.addEventListener("toggle", (e) => {
+      if ((e as ToggleEvent).newState === "open") loadTurnstile().catch(() => {});
+    });
+
+    let widget: string | undefined;
+    let waiting: { resolve: (t: string) => void; reject: (e: Error) => void } | undefined;
+    // Always settles: a token, a Turnstile failure callback, a throwing render, or a 30 s timer (room for a human challenge).
+    const token = async () => {
+      await loadTurnstile();
+      const ts = (window as any).turnstile;
+      return new Promise<string>((resolve, reject) => {
+        const timer = setTimeout(() => waiting?.reject(new Error("turnstile timeout")), (window as any).CHAT_TS_MS ?? 30_000);
+        const done = () => (clearTimeout(timer), (waiting = undefined));
+        waiting = { resolve: (t) => (done(), resolve(t)), reject: (e) => (done(), reject(e)) };
+        const fail = () => waiting?.reject(new Error("turnstile"));
+        try {
+          if (widget === undefined)
+            widget = ts.render("#chat-turnstile", {
+              sitekey,
+              callback: (t: string) => waiting?.resolve(t),
+              "error-callback": fail,
+              "expired-callback": fail,
+              "timeout-callback": fail,
+              "unsupported-callback": fail,
+            });
+          else ts.reset(widget); // tokens are single use; reset runs a fresh challenge
+        } catch {
+          fail();
+        }
+      });
+    };
+
+    const post = (body: object) =>
+      fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(10_000),
+      });
+
+    const say = (role: Turn["role"], content: string, citations: { title: string; url: string }[] = []) => {
+      const li = document.createElement("li");
+      li.className = role === "user" ? "justify-self-end text-muted-text" : "";
+      const p = document.createElement("p");
+      p.textContent = content;
+      p.className = "whitespace-pre-line";
+      li.append(p);
+      const safe = citations.filter((c) => {
+        try {
+          return typeof c.title === "string" && typeof c.url === "string" && /^https?:$/.test(new URL(c.url, location.href).protocol);
+        } catch {
+          return false; // a bad citation is skipped, never fails a good answer
+        }
+      });
+      if (safe.length) {
+        const ul = document.createElement("ul");
+        ul.className = "mt-1 grid gap-1";
+        for (const c of safe) {
+          const a = document.createElement("a");
+          a.href = c.url;
+          a.textContent = c.title;
+          a.className = "note underline hover:text-foreground";
+          const item = document.createElement("li");
+          item.append(a);
+          ul.append(item);
+        }
+        li.append(ul);
+      }
+      log.append(li);
+      li.scrollIntoView({ block: "nearest" });
+    };
+
+    const ask = async (message: string) => {
+      const body: Record<string, unknown> = { message, history: turns.slice(-3).map((t) => ({ ...t, content: t.content.slice(0, 500) })) };
+      if (session) body.session = session;
+      else body.turnstileToken = await token();
+      let res = await post(body);
+      if (res.status === 403) {
+        session = undefined;
+        delete body.session;
+        body.turnstileToken = await token();
+        res = await post(body);
+      }
+      return res;
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const message = input.value.trim();
+      if (!message || send.disabled) return;
+      $("chat-notice").hidden = true;
+      down.hidden = true;
+      send.disabled = true;
+      status.textContent = "Thinking…";
+      say("user", message);
+      input.value = "";
+      try {
+        const res = await ask(message);
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && typeof data.answer === "string") {
+          turns.push({ role: "user", content: message }, { role: "assistant", content: data.answer });
+          say("assistant", data.answer, Array.isArray(data.citations) ? data.citations : []);
+          if (typeof data.session === "string") {
+            session = data.session;
+            idLine.querySelector("span")!.textContent = session.split(".")[0];
+            idLine.hidden = false;
+          }
+          status.textContent = "";
+        } else if (res.status === 429) status.textContent = "Too many questions; wait a minute.";
+        else throw new Error(String(res.status));
+      } catch {
+        status.textContent = "";
+        down.hidden = false;
+      } finally {
+        send.disabled = false;
+        input.focus();
+      }
+    });
+  }
+</script>

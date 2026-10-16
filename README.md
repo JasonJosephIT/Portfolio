@@ -10,3 +10,5 @@ Astro site, fully prerendered, served from a Cloudflare Worker.
 - Deploys run on Cloudflare Workers Builds (commands in `wrangler.jsonc`)
 - Chatbot production deploy command: `pnpm wrangler deploy && node chatbot/scripts/build-index.mjs` (rebuilds the search index from `content/bundle/`; roll back with `node chatbot/scripts/rollback-index.mjs <b-namespace>`)
 - Daily pull: launchd setup in `scripts/launchd/README`
+- `PUBLIC_CHAT_URL` (build env): the chat Worker endpoint, e.g. `https://<worker>/chat`; empty means the Tech chat panel is a contact link only
+- `PUBLIC_TURNSTILE_SITEKEY` (build env): the Turnstile site key the chat panel renders on first send
