@@ -39,7 +39,7 @@ const contact = "/#about-heading";
           <ol id="chat-log" aria-live="polite" class="grid max-h-[50vh] gap-3 overflow-y-auto text-sm leading-relaxed empty:hidden" />
           <p id="chat-status" role="status" class="note empty:hidden" />
           <p id="chat-down" hidden class="text-sm text-muted-text">
-            Chat is unavailable right now. <a href={contact} class="underline hover:text-foreground">Contact me instead</a>.
+            Or <a href={contact} class="underline hover:text-foreground">get in touch</a> instead.
           </p>
           <div id="chat-turnstile" />
           <div class="window flex items-center gap-3 px-3 py-2.5">
@@ -48,8 +48,9 @@ const contact = "/#about-heading";
             <input id="chat-q" name="q" required maxlength="500" autocomplete="off" autofocus placeholder="What did Jason build on Cloudflare?" class="min-w-0 flex-1 bg-transparent text-sm placeholder:text-pencil" />
             <button type="submit" class="label hover:!text-tech">Send</button>
           </div>
+          {/* TODO: drop "(address pending)" once the home page carries the real contact address. */}
           <p id="chat-id" hidden class="note">
-            Your chat id: <span></span>. To have it deleted, send it via the <a href={contact} class="underline">contact page</a>.
+            Your chat ID: <span></span>. To have this chat deleted, send this ID through <a href={contact} class="underline">Get in touch</a> (address pending).
           </p>
         </form>
       )
@@ -161,6 +162,7 @@ const contact = "/#about-heading";
       }
       log.append(li);
       li.scrollIntoView({ block: "nearest" });
+      return li;
     };
 
     const ask = async (message: string) => {
@@ -186,8 +188,13 @@ const contact = "/#about-heading";
       down.hidden = true;
       send.disabled = true;
       status.textContent = "Thinking…";
-      say("user", message);
+      const asked = say("user", message);
       input.value = "";
+      // Unanswered: the question leaves the log and goes back in the input, ready to send again.
+      const giveBack = () => {
+        asked.remove();
+        input.value = message;
+      };
       try {
         const res = await ask(message);
         const data = await res.json().catch(() => ({}));
@@ -200,10 +207,14 @@ const contact = "/#about-heading";
             idLine.hidden = false;
           }
           status.textContent = "";
-        } else if (res.status === 429) status.textContent = "Too many questions; wait a minute.";
-        else throw new Error(String(res.status));
+        } else if (res.status === 429) {
+          giveBack();
+          status.textContent = "Too many questions at once. Wait a minute, then send again.";
+        } else throw new Error(String(res.status));
       } catch {
-        status.textContent = "";
+        giveBack();
+        // In the status line (role="status"), so screen readers hear the failure too.
+        status.textContent = "Couldn't get an answer right now. Try again in a moment.";
         down.hidden = false;
       } finally {
         send.disabled = false;

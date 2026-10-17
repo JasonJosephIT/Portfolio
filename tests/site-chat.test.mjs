@@ -89,7 +89,7 @@ test("a question gets an answer with a citation link; no chat request on load", 
   assert.ok(await page.locator("#chat-log").innerText().then((t) => t.includes("Alpha Tool sorts files.")));
   assert.deepEqual(calls[0], { message: "What is Alpha Tool?", history: [], turnstileToken: "tok1" });
   assert.equal(await page.isVisible("#chat-notice"), false, "notice gone after first send");
-  assert.equal((await page.innerText("#chat-id")).replace(/\s+/g, " ").trim(), "Your chat id: abc123. To have it deleted, send it via the contact page.");
+  assert.equal((await page.innerText("#chat-id")).replace(/\s+/g, " ").trim(), "Your chat ID: abc123. To have this chat deleted, send this ID through Get in touch (address pending).");
 
   await ask(page, "And then?");
   await page.locator("#chat-log > li").nth(3).waitFor();
@@ -125,13 +125,15 @@ test("a 403 re-runs Turnstile once and retries", async () => {
 });
 
 for (const [name, r] of [["503 off", () => [503, { off: true }]], ["network error", () => "drop"]]) {
-  test(`${name}: the panel says unavailable with a contact link; navigation still works`, async () => {
+  test(`${name}: the status says try again, the question stays to resend, a contact link shows; navigation still works`, async () => {
     reply = r;
     const page = await open();
     await page.click("button[popovertarget=chat]");
     await ask(page, "hi");
     await page.locator("#chat-down").waitFor();
-    assert.ok((await page.innerText("#chat-down")).includes("Chat is unavailable right now."));
+    assert.equal(await page.innerText("#chat-status"), "Couldn't get an answer right now. Try again in a moment.");
+    assert.equal(await page.inputValue("#chat-q"), "hi", "question kept for resending");
+    assert.equal(await page.locator("#chat-log > li").count(), 0, "the unanswered question leaves the log");
     assert.equal(await page.locator("#chat-down a").getAttribute("href"), "/#about-heading");
     await page.keyboard.press("Escape");
     await page.click("nav >> text=Art");
@@ -140,12 +142,40 @@ for (const [name, r] of [["503 off", () => [503, { off: true }]], ["network erro
   });
 }
 
-test("429 asks to wait", async () => {
+test("429 asks to wait and keeps the question", async () => {
   reply = () => [429, { error: "slow down" }];
   const page = await open();
   await page.click("button[popovertarget=chat]");
   await ask(page, "hi");
-  await page.locator("#chat-status", { hasText: "Too many questions; wait a minute." }).waitFor();
+  await page.locator("#chat-status", { hasText: "Too many questions at once. Wait a minute, then send again." }).waitFor();
+  assert.equal(await page.inputValue("#chat-q"), "hi");
+  await page.close();
+});
+
+test("a long chat stays on a short screen: the panel scrolls, its title and Close stay reachable", async () => {
+  reply = () => [200, { answer: "A long answer. ".repeat(40), citations: [] }];
+  const page = await open();
+  await page.setViewportSize({ width: 640, height: 360 });
+  await page.click("button[popovertarget=chat]");
+  for (const q of ["one", "two", "three"]) {
+    await ask(page, q);
+    await page.locator("#chat-status:empty").waitFor({ state: "attached" });
+  }
+  const box = await page.locator("#chat").boundingBox();
+  assert.ok(box.y >= 0, `panel top ${box.y}`);
+  await page.locator("#chat button[aria-label=Close]").click();
+  assert.equal(await page.evaluate(() => document.getElementById("chat").matches(":popover-open")), false);
+  await page.close();
+});
+
+test("no page scrolls sideways from phone to laptop widths", async () => {
+  const page = await browser.newPage();
+  for (const path of ["/", "/art", "/tech", "/tech/alpha-tool", "/tech/alpha-tool/features"])
+    for (const width of [320, 768, 1024, 1280]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto(base + path);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), width, `${path} at ${width}px`);
+    }
   await page.close();
 });
 

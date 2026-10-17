@@ -151,7 +151,7 @@ body { font-variant-numeric: tabular-nums; }
 .prose-board h2, .prose-board h3 { color: var(--text); font-weight: 700; font-variation-settings: "wdth" 115; margin-top: 1.6em; }
 
 /* Chat panel: native popover. */
-.chat-panel { position: fixed; inset: auto 16px 76px auto; margin: 0; width: min(22rem, calc(100vw - 32px)); border: 0; padding: 0; color: var(--text); }
+.chat-panel { position: fixed; inset: auto 16px 76px auto; margin: 0; width: min(22rem, calc(100vw - 32px)); max-height: calc(100dvh - 92px); overflow-y: auto; overscroll-behavior: contain; border: 0; padding: 0; color: var(--text); }
 .chat-panel:popover-open { animation: chat-in 0.2s var(--ease-out); }
 @keyframes chat-in { from { opacity: 0; transform: translateY(6px); } }
-@media (min-width: 640px) { .chat-panel { inset: auto 24px 84px auto; } }
+@media (min-width: 640px) { .chat-panel { inset: auto 24px 84px auto; max-height: calc(100dvh - 100px); } }
