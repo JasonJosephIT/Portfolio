@@ -46,7 +46,7 @@ const bio = await marked.parse(profile.bio);
   <section id="work" aria-labelledby="work-title" class="grid scroll-mt-24 gap-8 pt-[clamp(40px,7vh,80px)]">
     <div class="rule-head">
       <h2 id="work-title" class="label-section">Selected work</h2>
-      <p class="label order-last">{list.length} plates</p>
+      <p class="label order-last">{list.length} {list.length === 1 ? "plate" : "plates"}</p>
     </div>
     <ProjectIndex client:idle projects={list.map(({ slug, name, summary, tags }) => ({ slug, name, summary, tags }))} />
   </section>

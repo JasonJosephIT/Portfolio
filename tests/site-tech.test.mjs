@@ -106,3 +106,15 @@ test("the filter shows only when two projects share a tag", () => {
   const o = build({ edit: (d) => editJson(join(d, "projects/beta-site.json"), (r) => r.tags.push("python")) });
   assert.match(page(o, "tech/index.html"), />Filter</);
 });
+
+test("the plate count reads 1 plate for a single project", () => {
+  const o = build({
+    edit: (d) => {
+      editJson(join(d, "bundle.json"), (b) => (b.records.projects = ["alpha-tool"]));
+      for (const s of ["beta-site", "gamma-lib"]) rmSync(join(d, "projects", `${s}.json`));
+      editJson(join(d, "relations.json"), (rel) => rel.splice(0, rel.length));
+    },
+  });
+  assert.match(page(o, "tech/index.html"), />1 plate</);
+  assert.match(page(out, "tech/index.html"), />3 plates</);
+});

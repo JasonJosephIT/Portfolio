@@ -109,8 +109,7 @@
 .gallery-page .back-link,
 .gallery-page .rail a:not(.rail__brand),
 .gallery-page .link-list a,
-.gallery-page .gallery-footer__top,
-.gallery-page .skip-link {
+.gallery-page .gallery-footer__top {
   font-size: 0.75rem;
   font-weight: 500;
   font-stretch: 108%;
@@ -194,27 +193,6 @@
    is deliberate: `hidden` must win over every rule in this file. */
 .gallery-page [hidden] {
   display: none !important;
-}
-
-.gallery-page .skip-link {
-  position: absolute;
-  inset-inline-start: -9999px;
-  top: 0;
-}
-
-.gallery-page .skip-link:focus {
-  position: fixed;
-  inset-inline-start: 12px;
-  top: 12px;
-  z-index: 50;
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 0 18px;
-  /* Paper white carrying black: 17.2:1. Never an accent fill. */
-  background: var(--text);
-  color: #000;
-  text-decoration: none;
 }
 
 /* The focus ring is diptych.css's `:focus-visible` — 2px of the accent in force,

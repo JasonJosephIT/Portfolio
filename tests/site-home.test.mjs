@@ -26,3 +26,10 @@ test("diptych CSS resolves the font and carries no Tailwind", () => {
   assert.doesNotMatch(css, /tailwindcss/);
   assert.ok(readdirSync(join(out, "fonts")).includes("archivo-var.woff2"));
 });
+
+test("/ starts with a skip link to main and marks Home as the current page", () => {
+  const html = page(out, "index.html");
+  assert.match(html, /<body class="home">\s*<a class="skip-link" href="#main">Skip to content<\/a>/);
+  assert.match(html, /<main class="wall" id="main">/);
+  assert.match(html, /<a href="\/" class="current" aria-current="page">Home<\/a>/);
+});

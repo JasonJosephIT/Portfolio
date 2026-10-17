@@ -11,7 +11,7 @@ const contact = "/#about-heading";
 <button
   type="button"
   popovertarget="chat"
-  class="mat-cast label fixed right-4 bottom-4 z-30 flex min-h-11 items-center gap-3 px-4 !text-foreground transition-colors hover:!text-tech sm:right-6 sm:bottom-6"
+  class="mat-cast label fixed right-4 bottom-4 z-30 flex min-h-11 items-center gap-3 px-4 !text-foreground transition-colors duration-[250ms] hover:!text-tech sm:right-6 sm:bottom-6"
 >
   <svg aria-hidden="true" viewBox="0 0 24 24" class="size-4 text-tech" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
     <path d="M4 5h16v11H9l-5 4z" />
@@ -23,7 +23,7 @@ const contact = "/#about-heading";
   <div class="grid gap-4 p-5">
     <div class="flex items-start justify-between gap-4">
       <h2 id="chat-title" class="label-section !text-foreground">Ask about my work</h2>
-      <button type="button" popovertarget="chat" popovertargetaction="hide" class="-m-2 grid size-9 place-items-center text-muted-text hover:text-foreground" aria-label="Close">
+      <button type="button" popovertarget="chat" popovertargetaction="hide" class="-m-3.5 grid size-11 place-items-center text-muted-text transition-colors duration-[250ms] hover:text-foreground" aria-label="Close">
         <svg aria-hidden="true" viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
       </button>
     </div>
@@ -46,7 +46,7 @@ const contact = "/#about-heading";
             <label for="chat-q" class="sr-only">Question</label>
             {/* maxlength 500: the chat Worker's CAP (chatbot/src/index.ts) */}
             <input id="chat-q" name="q" required maxlength="500" autocomplete="off" autofocus placeholder="What did Jason build on Cloudflare?" class="min-w-0 flex-1 bg-transparent text-sm placeholder:text-pencil" />
-            <button type="submit" class="label hover:!text-tech">Send</button>
+            <button type="submit" class="label -my-2.5 py-2.5 transition-colors duration-[250ms] hover:!text-tech">Send</button>
           </div>
           {/* TODO: drop "(address pending)" once the home page carries the real contact address. */}
           <p id="chat-id" hidden class="note">

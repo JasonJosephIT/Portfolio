@@ -14,6 +14,7 @@ const { title, description, bodyClass } = Astro.props;
 <html lang="en">
 <Head title={title} description={description} />
 <body class={bodyClass}>
+  <a class="skip-link" href="#main">Skip to content</a>
   <slot />
 </body>
 </html>

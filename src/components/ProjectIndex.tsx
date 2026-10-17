@@ -72,7 +72,7 @@ export default function ProjectIndex({ projects }: { projects: IndexProject[] })
                 <p className="max-w-[60ch] text-pretty text-muted-text">{p.summary}</p>
                 <ul className="tags label pt-1" aria-label="Tags">
                   {p.tags.map((t) => (
-                    <li key={t} className={tagKey(t) === tag ? "!text-tech" : undefined}>
+                    <li key={t} className={tagKey(t) === tag ? "!text-foreground font-semibold" : undefined}>
                       {t}
                     </li>
                   ))}
@@ -92,11 +92,11 @@ function FilterButton({ active, count, onClick, children }: { active: boolean; c
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`group flex min-h-10 items-center gap-2 text-left text-[0.95rem] transition-colors duration-200 hover:text-foreground ${
+      className={`group flex min-h-10 items-center gap-2 text-left text-[0.95rem] transition-colors duration-[250ms] hover:text-foreground ${
         active ? "text-foreground" : "text-muted-text"
       }`}
     >
-      <span aria-hidden="true" className={`h-px transition-[width,background-color] duration-200 ease-out ${active ? "w-4 bg-tech" : "w-2 bg-pencil/40"}`} />
+      <span aria-hidden="true" className={`h-px transition-[width,background-color] duration-[250ms] ease-out ${active ? "w-4 bg-tech" : "w-2 bg-pencil/40"}`} />
       <span>{children}</span>
       <span className="self-start text-[0.75rem] font-medium text-pencil tabular-nums">{count}</span>
     </button>

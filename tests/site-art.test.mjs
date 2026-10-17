@@ -43,3 +43,8 @@ test("every piece page exists and every Art image has alt text", () => {
 test("no Art page loads the editor hook or anything from admin/", () => {
   for (const p of artPages()) assert.doesNotMatch(page(p), /admin\/|[?&]edit=|"edit"/, p);
 });
+
+test("the Art section menu follows the page order", () => {
+  const nav = page("art/index.html").match(/<nav class="rail__nav"[\s\S]*?<\/nav>/)[0];
+  assert.deepEqual([...nav.matchAll(/href="#([a-z-]+)"/g)].map((m) => m[1]), ["selected-works", "explore", "about", "contact"]);
+});

@@ -4,7 +4,7 @@ import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { buildSite, copyFixture, page } from "./helpers.mjs";
 
-const TITLE = { features: "What it does", decisions: "Why it's built this way" };
+const TITLE = { features: "What it does", decisions: "Why it’s built this way" };
 let out;
 before(() => {
   out = buildSite();
@@ -18,7 +18,7 @@ test("the fixture project's features and decisions pages hold its headings with 
     assert.match(html, new RegExp(`<h2 id="${id2}">${h2}</h2>`), kind);
     assert.match(html, new RegExp(`href="#${id1}"`), `${kind} outline`);
     assert.match(html, /href="\/tech\/alpha-tool"/, `${kind} back link`);
-    assert.match(html, new RegExp(`<title>Alpha Tool · ${TITLE[kind]}`.replace("'", "(&#39;|')")), `${kind} title`);
+    assert.match(html, new RegExp(`<title>Alpha Tool · ${TITLE[kind]}`), `${kind} title`);
   }
 });
 
@@ -27,7 +27,7 @@ test("the project page links to its docs only when they exist", () => {
   assert.match(alpha, /href="\/tech\/alpha-tool\/features"/);
   assert.match(alpha, /href="\/tech\/alpha-tool\/decisions"/);
   assert.match(alpha, />\s*What it does\s*</);
-  assert.match(alpha, />\s*Why it(&#39;|')s built this way\s*</);
+  assert.match(alpha, />\s*Why it’s built this way\s*</);
   const beta = page(out, "tech/beta-site/index.html");
   assert.doesNotMatch(beta, /\/tech\/beta-site\/(features|decisions)/);
   assert.ok(!existsSync(join(out, "tech/beta-site/features")));

@@ -106,13 +106,36 @@ svg { display: inline-block; vertical-align: middle; }
 .plate,
 .contact,
 .frame-links a,
-.frame-copy {
+.frame-copy,
+.skip-link {
   font-size: 0.75rem;
   font-weight: 500;
   font-stretch: 108%;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   line-height: 1.4;
+}
+
+/* Skip link (Home and Art): off-screen until focused. */
+.skip-link {
+  position: absolute;
+  inset-inline-start: -9999px;
+  top: 0;
+}
+
+.skip-link:focus {
+  position: fixed;
+  inset-inline-start: 12px;
+  top: 12px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  /* Paper white carrying black: 17.2:1. Never an accent fill. */
+  background: var(--text);
+  color: #000;
+  text-decoration: none;
 }
 
 /* Display register: pale ink on the board, one soft cast shadow */
@@ -329,7 +352,7 @@ body.home { position: relative; }
   font-stretch: 118%;
   letter-spacing: 0.02em;
   line-height: 1.1;
-  transition: color 0.5s ease;
+  transition: color 0.25s ease;
 }
 
 .label svg {
@@ -404,7 +427,7 @@ body.home { position: relative; }
   text-decoration: none;
   padding: 4px 0;
   border-bottom: 1px solid transparent;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.25s ease;
 }
 
 .contact svg {
