@@ -2,30 +2,12 @@
    JASON — diptych stylesheet: Home, plus the base Rail.astro pages build on.
    ========================================================================== */
 
-@font-face {
-  font-family: "Archivo";
-  src: url("/fonts/archivo-var.woff2") format("woff2-variations"),
-       url("/fonts/archivo-var.woff2") format("woff2");
-  font-weight: 100 900;
-  font-stretch: 62% 125%;
-  font-style: normal;
-  font-display: swap;
-}
+@import "./tokens.css";
 
 /* ==========================================================================
    Tokens
    ========================================================================== */
 :root {
-  --bg: #08090b;            /* backing board */
-  --board: #101115;         /* mat face */
-  --board-raised: #17181d;  /* label plate */
-  --board-edge: #030304;    /* cut edge in shadow */
-  --text: #ece8de;          /* paper white */
-  --muted: #a5a197;         /* graphite */
-  --pencil: #8a8479;        /* soft pencil */
-  --hairline: rgba(236, 232, 222, 0.07);
-  --accent-art: #e98a3e;    /* amber core */
-  --accent-tech: #48c4dc;   /* ice-cyan core */
   --accent: var(--accent-art);
   --bevel: color-mix(in srgb, var(--accent) 58%, var(--board));
   --name-h: clamp(2.25rem, 6vw, 5rem);
@@ -34,11 +16,7 @@
   --radius: 2px;
   --nav-height: 72px;
   --max-width: 1240px;
-  --mat: clamp(14px, 2.4vw, 32px);
-  --mat-sm: clamp(10px, 1.4vw, 16px);
   --gutter: clamp(16px, 2vw, 28px);
-  --pad-x: clamp(16px, 4vw, 48px);
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 body.home { --accent: #c9c4b8; }

@@ -158,7 +158,7 @@
 .gallery-page .rail__brand {
   font-weight: 800;
   font-stretch: 125%;
-  color: #d9d4c8;
+  color: var(--ink-display);
   text-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
 }
 
