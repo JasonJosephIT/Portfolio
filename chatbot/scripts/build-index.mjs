@@ -1,6 +1,6 @@
 // Build the chatbot search index from the committed bundle and switch to it only after every upsert succeeded
 // and Vectorize has processed the last one.
-// Production deploy of main runs: pnpm wrangler deploy && node chatbot/scripts/build-index.mjs
+// Production deploy of main runs, from chatbot/: pnpm wrangler deploy && node scripts/build-index.mjs (wrangler.jsonc).
 //
 // Cloudflare REST endpoints (checked 2026-10-16):
 // - Workers AI:  POST /accounts/{id}/ai/run/{model}  body { text: string[] } -> result { shape, data: number[][] }

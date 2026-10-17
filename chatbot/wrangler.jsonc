@@ -2,9 +2,14 @@
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "jason-portfolio-chat",
 	"main": "src/index.ts",
-	// Production deploy of main (Workers Builds, not previews), with CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN,
-	// KV_NAMESPACE_ID secrets set: pnpm wrangler deploy && node chatbot/scripts/build-index.mjs
-	// Roll back the search index: node chatbot/scripts/rollback-index.mjs <b-namespace>
+	// Deploy: a Workers Builds connection of its own (the site Worker deploys from the repo root), production branch
+	// main, non-production builds off. Settings > Build:
+	//   Root directory: chatbot
+	//   Build command:  pnpm install --frozen-lockfile   (the one pnpm workspace: root ajv for the bundle check,
+	//                   chatbot's github-slugger; the lockfile sits at the repo root)
+	//   Deploy command: pnpm wrangler deploy && node scripts/build-index.mjs
+	//   Build variables and secrets: CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN, KV_NAMESPACE_ID
+	// Roll back the search index (from chatbot/): node scripts/rollback-index.mjs <b-namespace>
 	"compatibility_date": "2026-10-13",
 	"vars": {
 		// Kill switch: anything but "true" answers 503 { off: true }. Ships off.
