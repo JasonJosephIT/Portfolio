@@ -61,7 +61,7 @@ export function validateBundle(dir, { allowPending = false } = {}) {
       if (!listed.has(end)) problems.push(`relations.json: edge end ${JSON.stringify(end)} is not a listed project`);
 
   for (const p of all.filter((p) => /^docs\/[^/]+\.md$/.test(p))) {
-    const fm = frontmatter(readFileSync(join(dir, p), "utf8"));
+    const fm = frontmatter(readFileSync(join(dir, p), "utf8"))?.data;
     if (!fm) { problems.push(`${p}: no frontmatter`); continue; }
     problems.push(...shape("doc", fm, p));
     if (fm.slug !== basename(p, ".md")) problems.push(`${p}: slug ${JSON.stringify(fm.slug)} != filename stem`);
@@ -73,13 +73,15 @@ export function validateBundle(dir, { allowPending = false } = {}) {
   if (problems.length) fail();
 }
 
-// ponytail: flat `key: value` lines only (all doc_frontmatter is); a YAML parser if Open Thoughts ever nests
-function frontmatter(text) {
-  const m = /^---\r?\n([\s\S]*?)\r?\n---(\r?\n|$)/.exec(text);
+/** A markdown file's frontmatter fields and body, or null without frontmatter. Skips a BOM and `#` comment lines.
+ * ponytail: flat `key: value` lines only (all doc_frontmatter is); a YAML parser if Open Thoughts ever nests */
+export function frontmatter(text) {
+  const m = /^\uFEFF?---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)([\s\S]*)$/.exec(text);
   if (!m) return null;
-  return Object.fromEntries(m[1].split(/\r?\n/).filter((l) => l.trim()).map((l) => {
+  const data = Object.fromEntries(m[1].split(/\r?\n/).filter((l) => l.trim() && !l.trim().startsWith("#")).map((l) => {
     const i = l.indexOf(":");
     const v = l.slice(i + 1).trim();
     return [l.slice(0, i).trim(), v === "null" ? null : v.replace(/^(["'])(.*)\1$/, "$2")];
   }));
+  return { data, body: m[2] };
 }

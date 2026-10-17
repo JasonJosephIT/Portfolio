@@ -5,19 +5,17 @@ import { cpSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
-import { chunkBundle } from "../scripts/chunk.mjs";
+import { CAP, chunkBundle, tokens } from "../scripts/chunk.mjs";
 import { buildIndex } from "../scripts/build-index.mjs";
 import { rollbackIndex } from "../scripts/rollback-index.mjs";
 
 const FIXTURE = fileURLToPath(new URL("../../tests/fixtures/bundle", import.meta.url));
 const HASH = "a".repeat(64);
-const tokens = (s) => Math.ceil(Math.max(s.split(/\s+/).filter(Boolean).length * 1.3, s.length / 4));
-const CAP = 400;
 
 test("chunkBundle: chunks from indexed projects, profile and docs, each capped and fully labelled", () => {
   const chunks = chunkBundle(FIXTURE);
   for (const c of chunks) {
-    assert.deepEqual(Object.keys(c.metadata).sort(), ["bundle_hash", "kind", "section", "slug", "url"]);
+    assert.deepEqual(Object.keys(c.metadata).sort(), ["bundle_hash", "kind", "section", "slug", "title", "url"]);
     for (const v of Object.values(c.metadata)) assert.ok(v, `empty metadata in ${JSON.stringify(c.metadata)}`);
     assert.equal(c.metadata.bundle_hash, HASH);
     assert.ok(tokens(c.text) <= CAP);
@@ -27,11 +25,14 @@ test("chunkBundle: chunks from indexed projects, profile and docs, each capped a
     ["alpha-tool", "alpha-tool-decisions", "alpha-tool-features", "beta-site", "gamma-lib", "profile"]);
   assert.equal(bySlug("beta-site")[0].metadata.url, "/tech/beta-site");
   assert.equal(bySlug("beta-site")[0].metadata.kind, "project");
+  assert.equal(bySlug("beta-site")[0].metadata.title, "Beta Site · Overview");
+  assert.equal(bySlug("profile")[0].metadata.title, "About");
   assert.equal(bySlug("profile")[0].metadata.url, "/tech#about");
   const feat = bySlug("alpha-tool-features")[0];
   assert.equal(feat.metadata.kind, "features");
   assert.equal(feat.metadata.section, "Sorting by type");
   assert.equal(feat.metadata.url, "/tech/alpha-tool/features#sorting-by-type");
+  assert.equal(feat.metadata.title, "Alpha Tool · Sorting by type");
   // related records ride along on the project chunk, one line each
   const alpha = bySlug("alpha-tool").map((c) => c.text).join("\n");
   assert.match(alpha, /uses: Beta Site: A small site built on Alpha Tool\./);
@@ -95,6 +96,30 @@ ${"x".repeat(5000)}
   assert.equal(tiny.metadata.url, "/tech/alpha-tool/features#tiny-a");
   assert.match(tiny.text, /Same heading again/);
   assert.ok(!chunks.some((c) => c.metadata.section === "not a heading"));
+});
+
+test("chunkBundle: headings with inline markdown anchor like Astro's ids; BOM and # comments in frontmatter", () => {
+  const { dir } = copyFixture();
+  writeFileSync(join(dir, "docs/alpha-tool-features.md"), `\uFEFF---
+# written by Open Thoughts
+slug: alpha-tool-features
+parent: alpha-tool
+kind: features
+approved_at: "2026-01-01T00:00:00Z"
+source_hash: 2222222222222222
+---
+## Works with [Beta Site](/tech/beta-site) and \`sort_files\`
+
+Long enough to stand alone as its own section of the features page here.
+
+## **Fast** _dry_ run
+
+A dry run lists the moves without making them.
+`);
+  const chunks = chunkBundle(dir).filter((c) => c.metadata.slug === "alpha-tool-features");
+  assert.deepEqual(chunks.map((c) => c.metadata.url), ["/tech/alpha-tool/features#works-with-beta-site-and-sort_files"]);
+  assert.equal(chunks[0].metadata.title, "Alpha Tool · Works with Beta Site and sort_files");
+  assert.match(chunks[0].text, /Fast/);
 });
 
 // In-memory stand-in for the three Cloudflare REST endpoints the runner uses.
