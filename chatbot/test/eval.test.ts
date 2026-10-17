@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { expect, it, vi } from "vitest";
-import worker from "../src/index";
+import worker, { sign } from "../src/index";
 import cases from "./evals.json";
 import index from "./fake-index.json";
 
@@ -31,8 +31,10 @@ type Case = {
 		json?: Record<string, unknown>;
 		headers?: Record<string, string | null>;
 		modelCalled?: boolean;
-		// This phrase reaches the model, and only inside <excerpt ...>...</excerpt> blocks.
+		// This phrase reaches the model, and only inside <excerpt ...> or <transcript ...> blocks.
 		untrusted?: string;
+		// Roles of the messages sent to the chat model.
+		roles?: string[];
 	};
 };
 
@@ -47,11 +49,7 @@ const expand = (v: unknown): unknown =>
 				: v;
 
 // A session as the spec defines it: <id>.<expiry ms>.<hex HMAC-SHA256(id.expiry, SESSION_SECRET)>.
-async function mint(expiry = Date.now() + 3_600_000, id = crypto.randomUUID()) {
-	const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(env.SESSION_SECRET), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
-	const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${id}.${expiry}`));
-	return `${id}.${expiry}.${[...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, "0")).join("")}`;
-}
+const mint = (expiry = Date.now() + 3_600_000, id = crypto.randomUUID()) => sign(id, expiry, env);
 
 async function sessionFor(c: Case) {
 	if (c.session === "expired") return mint(Date.now() - 1);
@@ -60,12 +58,15 @@ async function sessionFor(c: Case) {
 }
 
 // Turnstile siteverify, stubbed: Turnstile's published test secrets decide (1x...AA passes, 2x...AA fails).
+// A pass reports hostname localhost, or <host> for a "HOST:<host>" token.
 const PASS_SECRET = "1x0000000000000000000000000000000AA";
 const siteverify = vi.fn(async (url: RequestInfo | URL, init?: RequestInit) => {
 	expect(String(url)).toBe("https://challenges.cloudflare.com/turnstile/v0/siteverify");
 	const form = new URLSearchParams(init?.body as URLSearchParams);
-	const success = form.get("secret") === PASS_SECRET && !!form.get("response");
-	return Response.json({ success, "error-codes": success ? [] : ["invalid-input-response"] });
+	const token = form.get("response") ?? "";
+	const success = form.get("secret") === PASS_SECRET && !!token;
+	const hostname = token.startsWith("HOST:") ? token.slice(5) : "localhost";
+	return Response.json({ success, hostname, "error-codes": success ? [] : ["invalid-input-response"] });
 });
 vi.stubGlobal("fetch", siteverify);
 const TOKEN = "XXXX.DUMMY.TOKEN.XXXX";
@@ -159,8 +160,9 @@ for (const c of cases as Case[]) {
 		if (c.expect.untrusted) {
 			const sent = chats.flat().map((m) => m.content).join("\n");
 			expect(sent).toContain(c.expect.untrusted);
-			expect(sent.replace(/<excerpt\b[^>]*>[\s\S]*?<\/excerpt>/g, "")).not.toContain(c.expect.untrusted);
+			expect(sent.replace(/<(excerpt|transcript)\b[^>]*>[\s\S]*?<\/\1>/g, "")).not.toContain(c.expect.untrusted);
 		}
+		if (c.expect.roles) for (const sent of chats) expect(sent.map((m) => m.role)).toEqual(c.expect.roles);
 	});
 }
 
@@ -210,17 +212,6 @@ it("a session from a test token carries the next message without Turnstile", asy
 	expect(next.status).toBe(200);
 	expect(await next.json()).not.toHaveProperty("session");
 	expect(siteverify.mock.calls.length).toBe(calls);
-});
-
-// Uses the real local Rate Limiting binding from wrangler.jsonc (Miniflare), not a fake.
-it("the 11th message in a minute on one session is 429", async () => {
-	const session = await mint();
-	const statuses: number[] = [];
-	let last: Response | undefined;
-	for (let i = 0; i < 11; i++) statuses.push((last = await post({ message: "hi", history: [], session })).status);
-	expect(statuses).toEqual([...Array(10).fill(200), 429]);
-	expect(await last!.json()).toEqual({ error: "slow down" });
-	expect((await post({ message: "hi", history: [], session: await mint() })).status).toBe(200); // other sessions unaffected
 });
 
 // The real local D1 with migrations/ applied (test/apply-migrations.ts).

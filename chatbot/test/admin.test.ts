@@ -21,16 +21,14 @@ it("the daily scheduled run deletes a 91-day-old chat and keeps an 89-day-old on
 
 // Cloudflare Access, faked: our own RSA key published at the team's certs URL, tokens signed with it.
 const TEAM = "https://test-team.cloudflareaccess.com";
-const keys = await crypto.subtle.generateKey(
-	{ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
-	true,
-	["sign", "verify"],
-);
-const other = await crypto.subtle.generateKey(
-	{ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
-	true,
-	["sign", "verify"],
-);
+const rsa = () =>
+	crypto.subtle.generateKey(
+		{ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
+		true,
+		["sign", "verify"],
+	);
+const keys = await rsa();
+const other = await rsa();
 const jwk = { ...(await crypto.subtle.exportKey("jwk", keys.publicKey)), kid: "k1", alg: "RS256", use: "sig" };
 const certs = vi.fn(async (url: RequestInfo | URL) => {
 	expect(String(url)).toBe(`${TEAM}/cdn-cgi/access/certs`);

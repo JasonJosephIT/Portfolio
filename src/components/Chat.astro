@@ -44,6 +44,7 @@ const contact = "/#about-heading";
           <div id="chat-turnstile" />
           <div class="window flex items-center gap-3 px-3 py-2.5">
             <label for="chat-q" class="sr-only">Question</label>
+            {/* maxlength 500: the chat Worker's CAP (chatbot/src/index.ts) */}
             <input id="chat-q" name="q" required maxlength="500" autocomplete="off" autofocus placeholder="What did Jason build on Cloudflare?" class="min-w-0 flex-1 bg-transparent text-sm placeholder:text-pencil" />
             <button type="submit" class="label hover:!text-tech">Send</button>
           </div>
@@ -163,6 +164,7 @@ const contact = "/#about-heading";
     };
 
     const ask = async (message: string) => {
+      // The chat Worker's MAX_TURNS (3) and CAP (500), chatbot/src/index.ts.
       const body: Record<string, unknown> = { message, history: turns.slice(-3).map((t) => ({ ...t, content: t.content.slice(0, 500) })) };
       if (session) body.session = session;
       else body.turnstileToken = await token();
