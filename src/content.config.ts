@@ -1,5 +1,6 @@
 import { defineCollection, z } from "astro:content";
 import { file, glob } from "astro/loaders";
+import { DOC_TITLE } from "./lib/bundle";
 import { BUNDLE_DIR } from "./lib/bundle-dir";
 import { validateBundle } from "../scripts/lib/validate-bundle.mjs";
 
@@ -47,13 +48,14 @@ const relations = defineCollection({
 const docs = defineCollection({
   loader: glob({ pattern: "*.md", base: `${BUNDLE_DIR}/docs` }),
   // ponytail: loose, YAML may turn an unquoted approved_at into a Date; the strict check is validateBundle's
-  schema: z.object({ parent: z.string(), kind: z.enum(["features", "decisions"]) }).passthrough(),
+  schema: z.object({ parent: z.string(), kind: z.enum(Object.keys(DOC_TITLE) as [keyof typeof DOC_TITLE]) }).passthrough(),
 });
 
 // In-repo, hand-written build notes: <slug>.md. The build page refuses a slug that is not a project.
 const BUILDS_DIR = process.env.BUILDS_DIR ?? "src/content/builds";
 const builds = defineCollection({
   loader: glob({ pattern: "*.md", base: BUILDS_DIR }),
+  // Any frontmatter, unchecked: a build note's only contract is its filename (the project slug).
   schema: z.object({}).passthrough(),
 });
 

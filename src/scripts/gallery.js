@@ -14,14 +14,12 @@
 
 const RETURN_KEY = 'portfolio:return';
 
-/** Only these sections may ever be used to build a return link. */
+/** Only these /art sections may ever be used to build a return link. */
 const SECTION_LABELS = {
-  art: {
-    'selected-works': 'Selected Works',
-    explore: 'Explore by Style',
-    about: 'About Me',
-    contact: 'Contact',
-  },
+  'selected-works': 'Selected Works',
+  explore: 'Explore by Style',
+  about: 'About Me',
+  contact: 'Contact',
 };
 
 const readStore = (key) => {
@@ -42,10 +40,7 @@ const writeStore = (key, value) => {
 };
 
 /** A stored section is usable only when it is one this site actually renders. */
-const sectionLabel = (page, section) =>
-  Object.hasOwn(SECTION_LABELS, page) && Object.hasOwn(SECTION_LABELS[page], section)
-    ? SECTION_LABELS[page][section]
-    : null;
+const sectionLabel = (section) => (Object.hasOwn(SECTION_LABELS, section) ? SECTION_LABELS[section] : null);
 
 /* ------------------------------------------------------------------ *
  * Failed images keep their frame, their size and their title
@@ -78,14 +73,14 @@ function wireColorToggle() {
  * Return context: an ordinary link, remembered
  * ------------------------------------------------------------------ */
 
-function wireListingReturn(page) {
+function wireListingReturn() {
   for (const link of document.querySelectorAll('[data-detail-link]')) {
     link.addEventListener('click', () => {
       const section = link.dataset.returnSection ?? '';
-      if (sectionLabel(page, section) === null) return;
+      if (sectionLabel(section) === null) return;
       // The target is recorded so a stale context from an earlier click cannot
       // relabel the Back link of a detail page reached some other way.
-      writeStore(RETURN_KEY, { page, section, target: link.pathname });
+      writeStore(RETURN_KEY, { section, target: link.pathname });
     });
   }
 }
@@ -99,11 +94,11 @@ function wireDetailReturn() {
   // A host may add a trailing slash to the piece path.
   const context = readStore(RETURN_KEY);
   const here = location.pathname.replace(/\/$/, '');
-  if (context === null || context.page !== 'art' || context.target.replace(/\/$/, '') !== here) return;
-  const label = sectionLabel(context.page, context.section);
+  if (context === null || context.target.replace(/\/$/, '') !== here) return;
+  const label = sectionLabel(context.section);
   if (label === null) return;
 
-  link.setAttribute('href', `/${context.page}#${context.section}`);
+  link.setAttribute('href', `/art#${context.section}`);
   link.textContent = `Back to ${label}`;
 }
 
@@ -114,5 +109,5 @@ function wireDetailReturn() {
 watchImages();
 wireColorToggle();
 
-if (document.body.dataset.returnPage) wireListingReturn('art');
+if (document.body.dataset.returnPage) wireListingReturn();
 else wireDetailReturn();

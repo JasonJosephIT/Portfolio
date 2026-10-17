@@ -21,7 +21,7 @@ One person, two disciplines, presented as a single identity rather than two site
 ## Operating Context
 
 - An Astro site, fully prerendered, served as static assets from a Cloudflare Worker.
-- Three public pages: `/` (home), `/art` (photography), `/tech` (software). Tech is fed by the public bundle Open Thoughts exports (pulled into `content/bundle/` by PR); Art is hand-managed in `src/data/art.json`.
+- Public pages: `/` (home), `/art` (photography) with a page per art piece, `/tech` (software) with a page per project and its doc and build pages. Tech is fed by the public bundle Open Thoughts exports (pulled into `content/bundle/` by PR); Art is hand-managed in `src/data/art.json`.
 
 ## Capabilities and Constraints
 
@@ -48,4 +48,4 @@ One person, two disciplines, presented as a single identity rather than two site
 1. The work leads and the interface recedes: on Art the photographs are the page; on Tech the projects are.
 2. Duality is structural, not decorative: every surface knows which half it belongs to, and the home page is the hinge between them.
 3. Honest placeholders: synthetic content is authored at full quality and labeled; factual claims are never fabricated.
-4. Progressive enhancement only: every page works with JavaScript off. No external services, images sized and lazy-loaded.
+4. Progressive enhancement only: every page works with JavaScript off. No external services, except Turnstile and the chat Worker behind the Tech chat widget; images sized and lazy-loaded.

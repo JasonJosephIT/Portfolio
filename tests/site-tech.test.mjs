@@ -1,11 +1,10 @@
 import { before, test } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
-import { buildSite, copyFixture, fixture, page } from "./helpers.mjs";
+import { buildSite, copyFixture, editJson, fixture, page } from "./helpers.mjs";
 
 const read = (p) => JSON.parse(readFileSync(p, "utf8"));
-const write = (p, v) => writeFileSync(p, JSON.stringify(v));
 const build = ({ edit, env } = {}) => buildSite(copyFixture(edit), env);
 const text = (html) => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
@@ -42,7 +41,7 @@ test("project page uses visitor labels and one plain Related projects list", () 
   for (const l of ["What it is", "Made with", "Related projects", "See it working"]) assert.ok(alpha.includes(`>${l}<`), l);
   const headings = [...alpha.matchAll(/<h[23][^>]*>([^<]*)</g)].map((m) => m[1].trim());
   for (const old of ["Overview", "Tags", "Docs", "Connected work", "Prototype video", "Used by", "Uses", "Built with", "Used to build", "Part of", "Includes"]) assert.ok(!headings.includes(old), old);
-  assert.ok(text(alpha).includes("Plate 01 · See it working") || /Plate \d\d · See it working/.test(text(alpha)));
+  assert.match(text(alpha), /Plate \d\d · See it working/);
   assert.doesNotMatch(text(alpha), /prototype/i);
   assert.match(alpha, /aria-label="Placeholder for a video of it working/);
   assert.doesNotMatch(alpha, /<h3/);
@@ -53,7 +52,7 @@ test("project page uses visitor labels and one plain Related projects list", () 
 
 test("a project related twice appears once", () => {
   const o = build({
-    edit: (d) => write(join(d, "relations.json"), [...read(join(d, "relations.json")), { from: "alpha-tool", to: "beta-site", type: "related-to", evidence: "x" }]),
+    edit: (d) => editJson(join(d, "relations.json"), (rel) => rel.push({ from: "alpha-tool", to: "beta-site", type: "related-to", evidence: "x" })),
   });
   assert.deepEqual(related(page(o, "tech/alpha-tool/index.html")).sort(), ["beta-site", "gamma-lib"]);
 });
@@ -76,11 +75,7 @@ test("About shows the profile headline and every skill", () => {
 test("a relation to a slug outside the bundle fails the build", () => {
   assert.throws(() =>
     build({
-      edit: (d) => {
-        const rel = read(join(d, "relations.json"));
-        rel.push({ from: "alpha-tool", to: "ghost", type: "uses", evidence: "x" });
-        write(join(d, "relations.json"), rel);
-      },
+      edit: (d) => editJson(join(d, "relations.json"), (rel) => rel.push({ from: "alpha-tool", to: "ghost", type: "uses", evidence: "x" })),
     }),
   );
 });
@@ -88,11 +83,9 @@ test("a relation to a slug outside the bundle fails the build", () => {
 test("removing a project leaves no page or card for it", () => {
   const o = build({
     edit: (d) => {
-      const b = read(join(d, "bundle.json"));
-      b.records.projects = b.records.projects.filter((s) => s !== "gamma-lib");
-      write(join(d, "bundle.json"), b);
+      editJson(join(d, "bundle.json"), (b) => (b.records.projects = b.records.projects.filter((s) => s !== "gamma-lib")));
       rmSync(join(d, "projects", "gamma-lib.json"));
-      write(join(d, "relations.json"), read(join(d, "relations.json")).filter((r) => r.to !== "gamma-lib"));
+      editJson(join(d, "relations.json"), (rel) => rel.splice(0, rel.length, ...rel.filter((r) => r.to !== "gamma-lib")));
     },
   });
   assert.equal(existsSync(join(o, "tech/gamma-lib")), false);
@@ -103,11 +96,7 @@ test("draft banner shows only in a PREVIEW build of a pending bundle", () => {
   assert.doesNotMatch(page(out, "tech/index.html"), /not yet approved/);
   const o = build({
     env: { PREVIEW: "1" },
-    edit: (d) => {
-      const b = read(join(d, "bundle.json"));
-      b.approval = "pending";
-      write(join(d, "bundle.json"), b);
-    },
+    edit: (d) => editJson(join(d, "bundle.json"), (b) => (b.approval = "pending")),
   });
   assert.match(page(o, "tech/index.html"), /not yet approved/);
 });

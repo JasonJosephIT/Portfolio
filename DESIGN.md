@@ -253,7 +253,7 @@ Square-cut throughout. Mats, windows, prints, cards, and the hinge are all right
 
 ## Components
 
-There are no buttons or form fields on the public pages; every call to action is a text link in the label register.
+There are no buttons or form fields on the public pages; every call to action is a text link in the label register. The one exception is the Tech chat widget: a popover, its question form and one progressive-enhancement script.
 
 ### Navigation
 - **Style:** 72px bar on the backing board with a hairline beneath; sticky on inner pages, absolute and transparent over the wall on the home page. Brand mark and wordmark left (the painted drummer `src/assets/bard-mark.png` at 36px, paper white on the board, 12px before the wordmark), three links right with a `clamp(18px, 3vw, 36px)` gap.
@@ -320,5 +320,5 @@ There are no buttons or form fields on the public pages; every call to action is
 - **Don't** round corners on public surfaces; mats, windows, and cards are square-cut.
 - **Don't** use hard-offset, colored, or glowing shadows; depth is the inset highlight, the cut edge, and the long soft cast.
 - **Don't** emboss, engrave, or outline display type; it is pale ink with one soft cast shadow.
-- **Don't** type plate numbers into markup or add label rows above titles; the counter and the `data-title` / `data-note` attributes are the only caption mechanism.
-- **Don't** add runtime JavaScript, icon fonts, or glyph characters to the public pages.
+- **Don't** type plate numbers into markup or add label rows above titles; the counter and the `data-title` / `data-note` attributes are the only caption mechanism. The exception is a number that crosses pages: a project page's `Plate NN of NN` and previous/next plates come from its place in the Tech index at build time, since a CSS counter cannot count across pages.
+- **Don't** add runtime JavaScript, icon fonts, or glyph characters to the public pages (the chat widget's one progressive-enhancement script excepted).

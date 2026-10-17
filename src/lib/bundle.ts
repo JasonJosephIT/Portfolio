@@ -39,8 +39,9 @@ export async function docsFor(slug: string) {
   return all.filter((d) => d.data.parent === slug).sort((a, b) => DOC_KINDS.indexOf(a.data.kind) - DOC_KINDS.indexOf(b.data.kind));
 }
 
-const DOC_KINDS = ["features", "decisions"];
+// Doc kinds in page order; the docs collection schema takes its enum from these keys.
 export const DOC_TITLE = { features: "What it does", decisions: "Why it's built this way" } as const;
+const DOC_KINDS: string[] = Object.keys(DOC_TITLE);
 
 /** Hand-written build notes, keyed by project slug (empty when the folder is missing). */
 export const builds = async () => getCollection("builds");
