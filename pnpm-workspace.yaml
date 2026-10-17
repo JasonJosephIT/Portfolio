@@ -1,3 +1,5 @@
+packages:
+  - chatbot
 minimumReleaseAgeExclude:
   - '@astrojs/internal-helpers@0.13.0'
   - '@astrojs/markdown-satteri@0.4.4'

@@ -1,5 +1,8 @@
 import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
+import { createServer } from "node:http";
+import { chromium } from "playwright";
 import { buildSite, page } from "./helpers.mjs";
 
 const NOTICE = "This is an AI assistant. It answers only from published work on this site. Chats are stored for 90 days. Don't share personal information.";
@@ -18,30 +21,8 @@ test("with PUBLIC_CHAT_URL the built Tech pages carry the notice", () => {
   for (const p of ["tech/index.html", "tech/alpha-tool/index.html"]) assert.ok(text(page(out, p)).includes(NOTICE), p);
 });
 
-// ---- Browser checks: Playwright (borrowed from another local project, not a dependency) against `astro preview`,
-// the chat Worker replaced by a local stub server and Turnstile by a fake window.turnstile.
-import { spawn } from "node:child_process";
-import { createServer } from "node:http";
-import { createRequire } from "node:module";
-import { readdirSync } from "node:fs";
-import { homedir } from "node:os";
-import { join } from "node:path";
-
-const PW_FROM = process.env.PLAYWRIGHT_FROM ?? "/Users/jsloth/Projects/Chazak Studio Management/package.json";
-let chromium;
-try {
-  ({ chromium } = createRequire(PW_FROM)("playwright"));
-} catch (e) {
-  if (process.env.PLAYWRIGHT_FROM) throw e; // asked for explicitly: fail loudly rather than skip
-  console.warn("site-chat: Playwright not found, browser checks SKIPPED (set PLAYWRIGHT_FROM to a package.json that has it)");
-}
-const browserTest = chromium ? test : test.skip;
-const newestShell = () => {
-  const cache = join(homedir(), "Library/Caches/ms-playwright");
-  const dir = readdirSync(cache).filter((d) => d.startsWith("chromium_headless_shell-")).sort().at(-1);
-  return join(cache, dir, "chrome-headless-shell-mac-arm64/chrome-headless-shell");
-};
-
+// ---- Browser checks: Playwright against `astro preview`, the chat Worker replaced by a local stub server and
+// Turnstile by a fake window.turnstile.
 const calls = []; // request bodies the stub received
 let reply = () => [200, { answer: "Alpha Tool sorts files.", citations: [{ title: "Alpha Tool", url: "/tech/alpha-tool" }], session: "abc123.1999999999999.ff" }];
 const stub = createServer((req, res) => {
@@ -64,7 +45,6 @@ const FAKE_TURNSTILE = `window.turnstile = { n: 0,
 
 let preview, browser, base, cfHits = 0;
 before(async () => {
-  if (!chromium) return;
   await new Promise((r) => stub.listen(0, "127.0.0.1", r));
   const out = buildSite(undefined, { PUBLIC_CHAT_URL: `http://127.0.0.1:${stub.address().port}/chat`, PUBLIC_TURNSTILE_SITEKEY: "test-key" });
   const port = 4400 + Math.floor(Math.random() * 500);
@@ -74,12 +54,7 @@ before(async () => {
     if (await fetch(base).then((r) => r.ok, () => false)) break;
     await new Promise((r) => setTimeout(r, 100));
   }
-  // ponytail: the borrowed Playwright may want a browser revision that is not cached; only then fall back to the
-  // newest cached macOS shell. Any other launch failure (and CI, where the right browser is installed) stays loud.
-  browser = await chromium.launch().catch((e) => {
-    if (!/Executable doesn't exist/.test(e.message)) throw e;
-    return chromium.launch({ executablePath: newestShell() });
-  });
+  browser = await chromium.launch();
 });
 after(async () => {
   await browser?.close();
@@ -99,7 +74,7 @@ const ask = async (page, q) => {
   await page.press("#chat-q", "Enter");
 };
 
-browserTest("a question gets an answer with a citation link; no chat request on load", async () => {
+test("a question gets an answer with a citation link; no chat request on load", async () => {
   calls.length = 0;
   const page = await open();
   await page.click("button[popovertarget=chat]");
@@ -125,7 +100,7 @@ browserTest("a question gets an answer with a citation link; no chat request on 
   await page.close();
 });
 
-browserTest("an answer is plain text, never HTML", async () => {
+test("an answer is plain text, never HTML", async () => {
   reply = () => [200, { answer: "<img src=x onerror=alert(1)>", citations: [{ title: "x", url: "javascript:alert(1)" }] }];
   const page = await open();
   await page.click("button[popovertarget=chat]");
@@ -137,7 +112,7 @@ browserTest("an answer is plain text, never HTML", async () => {
   await page.close();
 });
 
-browserTest("a 403 re-runs Turnstile once and retries", async () => {
+test("a 403 re-runs Turnstile once and retries", async () => {
   calls.length = 0;
   let n = 0;
   reply = () => (n++ ? [200, { answer: "ok", citations: [] }] : [403, { error: "verify" }]);
@@ -150,7 +125,7 @@ browserTest("a 403 re-runs Turnstile once and retries", async () => {
 });
 
 for (const [name, r] of [["503 off", () => [503, { off: true }]], ["network error", () => "drop"]]) {
-  browserTest(`${name}: the panel says unavailable with a contact link; navigation still works`, async () => {
+  test(`${name}: the panel says unavailable with a contact link; navigation still works`, async () => {
     reply = r;
     const page = await open();
     await page.click("button[popovertarget=chat]");
@@ -165,7 +140,7 @@ for (const [name, r] of [["503 off", () => [503, { off: true }]], ["network erro
   });
 }
 
-browserTest("429 asks to wait", async () => {
+test("429 asks to wait", async () => {
   reply = () => [429, { error: "slow down" }];
   const page = await open();
   await page.click("button[popovertarget=chat]");
@@ -174,7 +149,7 @@ browserTest("429 asks to wait", async () => {
   await page.close();
 });
 
-browserTest("the input refuses a 501st character", async () => {
+test("the input refuses a 501st character", async () => {
   const page = await open();
   await page.click("button[popovertarget=chat]");
   await page.fill("#chat-q", "a".repeat(500));
@@ -184,7 +159,7 @@ browserTest("the input refuses a 501st character", async () => {
   await page.close();
 });
 
-browserTest("keyboard only: open, type, send, read the answer, close", async () => {
+test("keyboard only: open, type, send, read the answer, close", async () => {
   reply = () => [200, { answer: "Keyboard answer.", citations: [{ title: "Alpha Tool", url: "/tech/alpha-tool" }] }];
   const page = await open();
   const focused = () => page.evaluate(() => document.activeElement?.getAttribute("popovertarget") ?? document.activeElement?.id);
@@ -206,7 +181,7 @@ for (const [name, fake] of [
   ["render throws", `window.turnstile = { render() { throw new Error("boom"); }, reset() {} };`],
   ["fires timeout-callback", `window.turnstile = { render(el, o) { setTimeout(() => o["timeout-callback"]()); return "w1"; }, reset() {} };`],
 ]) {
-  browserTest(`Turnstile ${name}: unavailable, and Send works again`, async () => {
+  test(`Turnstile ${name}: unavailable, and Send works again`, async () => {
     calls.length = 0;
     const page = await open("/tech", fake);
     await page.click("button[popovertarget=chat]");
@@ -218,7 +193,7 @@ for (const [name, fake] of [
   });
 }
 
-browserTest("a malformed citation is skipped; the answer and good citations still show", async () => {
+test("a malformed citation is skipped; the answer and good citations still show", async () => {
   reply = () => [200, { answer: "Still here.", citations: [null, { title: 5, url: "/x" }, { title: "bad", url: "http://[" }, { title: "obj", url: {} }, { title: "Good", url: "/tech/alpha-tool" }] }];
   const page = await open();
   await page.click("button[popovertarget=chat]");
