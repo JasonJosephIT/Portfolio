@@ -50,7 +50,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring;
   }
   html {
     color-scheme: dark;
@@ -66,7 +66,7 @@ body { font-variant-numeric: tabular-nums; }
 .display { font-weight: 800; letter-spacing: 0.05em; line-height: 0.9; font-variation-settings: "wdth" 125; color: var(--ink-display); text-shadow: 0 4px 14px rgba(0, 0, 0, 0.6); text-wrap: balance; }
 .title { font-weight: 700; letter-spacing: 0.01em; line-height: 1.1; font-variation-settings: "wdth" 118; text-wrap: balance; }
 .lede { font-size: 1.05rem; line-height: 1.55; color: var(--muted-text); text-wrap: pretty; }
-.label { font-weight: 500; font-size: 0.72rem; line-height: 1.4; letter-spacing: 0.16em; text-transform: uppercase; font-variation-settings: "wdth" 108; color: var(--pencil); }
+.label { font-weight: 500; font-size: 0.75rem; line-height: 1.4; letter-spacing: 0.16em; text-transform: uppercase; font-variation-settings: "wdth" 108; color: var(--pencil); }
 .label-section { font-weight: 600; font-size: 0.8rem; line-height: 1.4; letter-spacing: 0.2em; text-transform: uppercase; font-variation-settings: "wdth" 108; color: var(--muted-text); }
 /* Anything not yet real: sentence case is what separates a note from a label. */
 .note { font-weight: 500; font-size: 0.75rem; line-height: 1.45; letter-spacing: 0.04em; color: var(--pencil); }
@@ -120,7 +120,7 @@ body { font-variant-numeric: tabular-nums; }
 .ring-link:hover .arrow, .ring-link:focus-visible .arrow { color: var(--accent-tech); }
 @media (hover: hover) and (pointer: fine) { .ring-link:hover .arrow { transform: translate(3px, -3px); } }
 
-:focus-visible { outline: 1px solid var(--accent-tech); outline-offset: 4px; border-radius: 1px; }
+:focus-visible { outline: 2px solid var(--accent-tech); outline-offset: 4px; border-radius: 1px; }
 .lift:focus-visible { outline-offset: 2px; }
 
 /* Develop: where scroll timelines exist, each plate comes up out of the dark as it enters (CSS only). */
@@ -151,6 +151,8 @@ body { font-variant-numeric: tabular-nums; }
 .prose-board h2, .prose-board h3 { color: var(--text); font-weight: 700; font-variation-settings: "wdth" 115; margin-top: 1.6em; }
 
 /* Chat panel: native popover. */
+#chat-q:focus-visible { outline: none; }
+.window:has(#chat-q:focus-visible) { box-shadow: 0 0 0 1px var(--accent-tech); }
 .chat-panel { position: fixed; inset: auto 16px 76px auto; margin: 0; width: min(22rem, calc(100vw - 32px)); max-height: calc(100dvh - 92px); overflow-y: auto; overscroll-behavior: contain; border: 0; padding: 0; color: var(--text); }
 .chat-panel:popover-open { animation: chat-in 0.2s var(--ease-out); }
 @keyframes chat-in { from { opacity: 0; transform: translateY(6px); } }

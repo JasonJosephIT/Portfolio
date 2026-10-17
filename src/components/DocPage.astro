@@ -15,7 +15,7 @@ const { Content, headings } = await render(doc);
 const outline = headings.filter((h) => h.depth === 2 || h.depth === 3);
 ---
 
-<Tech title={`${p.name} · ${kind}`} {description}>
+<Tech title={`${p.name} · ${kind} · Jason`} {description}>
   <nav aria-label="Breadcrumb" class="pt-8">
     <a href={`/tech/${p.slug}`} class="label text-link nudge-left !text-muted-text hover:!text-foreground">
       <svg aria-hidden="true" viewBox="0 0 24 24" class="arrow size-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>

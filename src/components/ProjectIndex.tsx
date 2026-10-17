@@ -24,29 +24,33 @@ export default function ProjectIndex({ projects }: { projects: IndexProject[] })
   }, [projects]);
   const matches = (p: IndexProject) => !tag || p.tags.some((t) => tagKey(t) === tag);
   const shown = projects.filter(matches).length;
+  if (!projects.length) return <p className="note">No plates placed yet.</p>;
 
+  // A filter with nothing to choose (no tag shared by two projects) is left out.
   return (
-    <div className="grid gap-x-12 gap-y-8 md:grid-cols-[10rem_1fr]">
-      <div className="md:sticky md:top-[104px] md:self-start">
-        <h3 id="filter-label" className="label mb-3">Filter</h3>
-        <ul aria-labelledby="filter-label" className="flex flex-wrap gap-x-5 md:flex-col">
-          <li>
-            <FilterButton active={tag === null} count={projects.length} onClick={() => setTag(null)}>
-              All
-            </FilterButton>
-          </li>
-          {filters.map(([t, n]) => (
-            <li key={t}>
-              <FilterButton active={tag === t} count={n} onClick={() => setTag(tag === t ? null : t)}>
-                {t}
+    <div className={`grid gap-x-12 gap-y-8 ${filters.length ? "md:grid-cols-[10rem_1fr]" : ""}`}>
+      {filters.length > 0 && (
+        <div className="md:sticky md:top-[104px] md:self-start">
+          <h3 id="filter-label" className="label mb-3">Filter</h3>
+          <ul aria-labelledby="filter-label" className="flex flex-wrap gap-x-5 md:flex-col">
+            <li>
+              <FilterButton active={tag === null} count={projects.length} onClick={() => setTag(null)}>
+                All
               </FilterButton>
             </li>
-          ))}
-        </ul>
-        <p className="sr-only" aria-live="polite">
-          {tag ? `Showing ${shown} of ${projects.length} projects tagged ${tag}` : ""}
-        </p>
-      </div>
+            {filters.map(([t, n]) => (
+              <li key={t}>
+                <FilterButton active={tag === t} count={n} onClick={() => setTag(tag === t ? null : t)}>
+                  {t}
+                </FilterButton>
+              </li>
+            ))}
+          </ul>
+          <p className="sr-only" aria-live="polite">
+            {tag ? `Showing ${shown} of ${projects.length} projects tagged ${tag}` : ""}
+          </p>
+        </div>
+      )}
 
       <ol className="grid gap-[clamp(12px,1.4vw,16px)]">
         {projects.map((p, i) => (
@@ -94,7 +98,7 @@ function FilterButton({ active, count, onClick, children }: { active: boolean; c
     >
       <span aria-hidden="true" className={`h-px transition-[width,background-color] duration-200 ease-out ${active ? "w-4 bg-tech" : "w-2 bg-pencil/40"}`} />
       <span>{children}</span>
-      <sup className="text-[0.65rem] text-pencil tabular-nums">{count}</sup>
+      <span className="self-start text-[0.75rem] font-medium text-pencil tabular-nums">{count}</span>
     </button>
   );
 }

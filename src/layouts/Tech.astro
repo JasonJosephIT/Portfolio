@@ -25,14 +25,14 @@ const { title, description = "Software by Jason." } = Astro.props;
       )
     }
     <header class="sticky top-0 z-20 border-b border-hairline bg-background/90 backdrop-blur-sm">
-      <nav aria-label="Main" class="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between px-[clamp(16px,4vw,48px)]">
+      <nav aria-label="Main" class="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between gap-4 px-[clamp(16px,4vw,48px)]">
         <a href="/tech" class="wordmark flex items-center gap-3 text-foreground">
           <Image src={bard} alt="" width={36} height={36} class="size-9" />
           JASON
         </a>
-        <ul class="flex items-center gap-[clamp(18px,3vw,36px)]">
-          <li><a href="/" class="label">Home</a></li>
-          <li><a href="/art" class="label">Art</a></li>
+        <ul class="flex items-center gap-[clamp(10px,3vw,36px)]">
+          <li><a href="/" class="label inline-block pt-2 pb-1.5 transition-colors duration-[250ms] hover:!text-foreground">Home</a></li>
+          <li><a href="/art" class="label inline-block pt-2 pb-1.5 transition-colors duration-[250ms] hover:!text-foreground">Art</a></li>
           <li>
             <a href="/tech" aria-current="page" class="label inline-block border-b border-tech pt-2 pb-1.5 !text-foreground">Tech</a>
           </li>
@@ -50,7 +50,8 @@ const { title, description = "Software by Jason." } = Astro.props;
           <p class="title text-[clamp(1.35rem,2.6vw,1.9rem)] text-ink">Man is not truly one, but truly two.</p>
           <p class="label">JASON · Photography · Software</p>
         </div>
-        <p class="note sm:mb-20 sm:text-right">Contact address pending.</p>
+        <!-- TODO: replace the placeholder address with your real contact, then remove the note -->
+        <p class="sm:mb-20 sm:text-right"><a href="mailto:hello@example.com" class="label text-link">Get in touch</a> <span class="note">address pending</span></p>
       </div>
     </footer>
     <Chat />

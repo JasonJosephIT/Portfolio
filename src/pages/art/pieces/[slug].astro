@@ -8,7 +8,7 @@ export const getStaticPaths = () => pieces.map((piece) => ({ params: { slug: pie
 const { piece } = Astro.props;
 ---
 
-<Rail title={`${piece.title} — Art — Jason`} description={piece.image.alt}>
+<Rail title={`${piece.title} · Art · Jason`} description={piece.image.alt}>
   <nav class="site-nav" id="top" aria-label="Site">
     <div class="wrap">
       <a href="/" class="wordmark" aria-label="Jason — portfolio home"><Image class="brand-logo" src={bard} alt="" width={36} height={36} />JASON</a>

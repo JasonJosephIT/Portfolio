@@ -111,7 +111,7 @@
 .gallery-page .link-list a,
 .gallery-page .gallery-footer__top,
 .gallery-page .skip-link {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 500;
   font-stretch: 108%;
   letter-spacing: 0.16em;
@@ -164,7 +164,7 @@
 
 /* Note: sentence case, for anything pending or reported rather than labelled. */
 .gallery-page .image-fallback {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 500;
   font-stretch: 100%;
   letter-spacing: 0.04em;
@@ -451,7 +451,7 @@
 }
 
 .gallery-page .card__title {
-  font-size: 1.125rem;
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
 }
 
 /* The Plate Number Rule: never typed into markup, always soft pencil, always

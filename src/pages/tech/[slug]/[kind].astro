@@ -15,4 +15,4 @@ const { doc, project: p } = Astro.props;
 const kind = DOC_TITLE[doc.data.kind];
 ---
 
-<DocPage doc={doc} project={p} kind={kind} description={`${kind} of ${p.name}.`} />
+<DocPage doc={doc} project={p} kind={kind} description={`${p.name}: ${kind.toLowerCase()}.`} />

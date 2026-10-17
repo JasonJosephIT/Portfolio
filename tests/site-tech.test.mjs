@@ -100,3 +100,9 @@ test("draft banner shows only in a PREVIEW build of a pending bundle", () => {
   });
   assert.match(page(o, "tech/index.html"), /not yet approved/);
 });
+
+test("the filter shows only when two projects share a tag", () => {
+  assert.doesNotMatch(page(out, "tech/index.html"), />Filter</, "fixture tags are all unique: no one-option filter");
+  const o = build({ edit: (d) => editJson(join(d, "projects/beta-site.json"), (r) => r.tags.push("python")) });
+  assert.match(page(o, "tech/index.html"), />Filter</);
+});
