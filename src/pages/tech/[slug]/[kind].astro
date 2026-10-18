@@ -1,0 +1,18 @@
+---
+import { getCollection } from "astro:content";
+import DocPage from "@/components/DocPage.astro";
+import { DOC_TITLE, projects } from "@/lib/bundle";
+
+export async function getStaticPaths() {
+  const all = await projects();
+  return (await getCollection("docs")).map((doc) => ({
+    params: { slug: doc.data.parent, kind: doc.data.kind },
+    props: { doc, project: all.find((p) => p.slug === doc.data.parent)! },
+  }));
+}
+
+const { doc, project: p } = Astro.props;
+const kind = DOC_TITLE[doc.data.kind];
+---
+
+<DocPage doc={doc} project={p} kind={kind} description={`${p.name}: ${kind.toLowerCase()}.`} />

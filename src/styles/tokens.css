@@ -1,0 +1,28 @@
+/* The palette and shared measures, one copy for both stylesheets: global.css (Tech) and diptych.css (Home, Art, 404).
+   Each page sets --accent (amber on Art, bone on Home, cyan on Tech); everything accented reads var(--accent). */
+@font-face {
+  font-family: "Archivo";
+  src: url("/fonts/archivo-var.woff2") format("woff2-variations"), url("/fonts/archivo-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #08090b;            /* backing board */
+  --board: #101115;         /* mat face */
+  --board-raised: #17181d;  /* label plate */
+  --board-edge: #030304;    /* cut edge in shadow */
+  --text: #ece8de;          /* paper white */
+  --ink-display: #d9d4c8;   /* pale ink: display type */
+  --muted: #a5a197;         /* graphite */
+  --pencil: #8a8479;        /* soft pencil */
+  --hairline: rgba(236, 232, 222, 0.07);
+  --accent-art: #e98a3e;    /* amber core */
+  --accent-tech: #48c4dc;   /* ice-cyan core */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --mat: clamp(14px, 2.4vw, 32px);
+  --mat-sm: clamp(10px, 1.4vw, 16px);
+  --pad-x: clamp(16px, 4vw, 48px);
+}

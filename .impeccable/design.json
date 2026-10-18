@@ -410,7 +410,7 @@
       },
       {
         "name": "The Home Is Bone Rule",
-        "body": "On index.html the two hues appear only inside the two panels. Everything outside the diptych (nav, focus, selection, wall label, footer) uses the neutral bone accent.",
+        "body": "On the home page (/) the two hues appear only inside the two panels. Everything outside the diptych (nav, focus, selection, wall label, footer) uses the neutral bone accent.",
         "section": "colors"
       },
       {
@@ -445,8 +445,6 @@
       "Do give every work a counter-generated plate number in soft pencil, with an optional title after a spaced middle dot.",
       "Do set every label on a mat in the pencil register (0.72rem, 500, width 108%, tracking 0.16em, uppercase).",
       "Do use the 0.7s / 0.9s `cubic-bezier(0.16, 1, 0.3, 1)` ease-out for lifts, swings, and arrow nudges, and remove transforms entirely under `prefers-reduced-motion: reduce`.",
-      "Do keep the pipeline contracts intact: `.gallery > a > img`, `.projects .project-grid > .project-card` with `h3`, `p`, `.tech-tags`, `.project-link`, `.skills .skill-pills > .skill-pill`, and a `.page-title` on inner pages.",
-      "Do keep the token names `--bg --text --muted --accent-art --accent-tech --space --radius --nav-height`; the admin stylesheet reads them.",
       "Do draw arrows as inline 24-unit stroke SVG (1.5 stroke, round caps) or a `currentColor` mask, sized 16-22px."
     ],
     "donts": [

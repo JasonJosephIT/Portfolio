@@ -1,0 +1,807 @@
+/* ==========================================================================
+   Gallery styles — /art, its piece pages and the 404 page.
+
+   src/layouts/Rail.astro loads this file on those pages. It dresses them in
+   the Hinged Diptych (.impeccable/design.json), the same visual language
+   diptych.css gives Home, so Art is the same matted object as Home.
+
+   Everything is scoped under `.gallery-page` (plus the `--art` variant) so
+   Home keeps what it has. diptych.css is loaded first: it owns the reset, the
+   Archivo @font-face, the :root tokens, the board and its rag texture, the
+   shared top navigation and the focus ring. Nothing here redeclares any of it.
+
+   The language, in short: a near-black board; charcoal mat faces carrying each
+   work; a one-pixel bevel ring on the print taking its colour from the half of
+   the site it belongs to; depth from an inset highlight, a cut edge and a long
+   soft cast; every label on a mat in the pencil register; every work carrying a
+   counter-generated plate number; square-cut corners; accents only as 1px
+   rings, glyph tints and hover colour — never as a fill.
+
+   Where docs/portfolio-design-brief.md and .tastemaker/style-lock.md still
+   govern — CSS Grid rather than column masonry, the responsive column counts,
+   the grayscale→colour reveal, the 44px targets — they are kept as written.
+   ========================================================================== */
+
+.gallery-page {
+  /* Layout rhythm from the design brief; colour comes from the :root tokens
+     diptych.css already defines, so the two halves of the site cannot drift. */
+  --gallery-max-width: 1200px;
+  --gallery-gutter: 20px;
+  --gallery-grid-gap: 24px;
+  --gallery-section-gap: 64px;
+
+  /* The diptych's arrows: 24-unit stroke SVG, 1.5 stroke, round caps, drawn as
+     a currentColor mask so a link's arrow always matches its text. */
+  --arrow-forward: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E");
+  --arrow-back: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12H5M11 6l-6 6 6 6'/%3E%3C/svg%3E");
+  --arrow-up: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20V5M6 11l6-6 6 6'/%3E%3C/svg%3E");
+
+  color: var(--text);
+}
+
+/* The Accent Scope Rule: a surface declares which half of the site it belongs
+   to and `--bevel` recomputes from it. No rule below names an accent hex. */
+.gallery-page--art {
+  --accent: var(--accent-art);
+  --bevel: color-mix(in srgb, var(--accent) 58%, var(--board));
+  --gallery-max-width: 1400px;
+}
+
+@media (min-width: 700px) {
+  .gallery-page {
+    --gallery-gutter: 32px;
+    --gallery-grid-gap: 32px;
+    --gallery-section-gap: 80px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .gallery-page {
+    --gallery-gutter: 48px;
+    --gallery-grid-gap: 40px;
+    --gallery-section-gap: 112px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   The wave: the Art background Jason selected (docs/portfolio-design-brief.md,
+   "Selected brand assets"; treatment locked in .tastemaker/style-lock.md).
+
+   `patterned` is the marker Rail.astro stamps on its pages and nowhere else,
+   so pairing it with `.gallery-page` keeps the wave off Tech and Home while
+   staying inside this file's scope rule.
+
+   diptych.css has already spent `body::before` on the board's rag texture, so
+   the wave takes `::after`. Both are z-index -1 inside the stacking context
+   `body { isolation: isolate }` opens: the wave lies over the rag, and both
+   lie under every mat, plate and label. The near-black canvas stays beneath
+   them, the layer takes no pointer events, and no text ever inherits its
+   opacity — the 4% is spent on the artwork alone, never on a photograph.
+   -------------------------------------------------------------------------- */
+.gallery-page.patterned::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("../assets/art/wave-pattern.svg");
+  background-repeat: repeat;
+  /* The locked tile: the 1104x608 source hung at half scale. */
+  background-size: 552px 304px;
+  /* The supplied strokes are dark on transparent. brightness(0) then invert(1)
+     drives every stroke to pure white without touching alpha, so 4% reads as
+     silver drawn on the board rather than as a grey wash laid over it. */
+  filter: grayscale(1) brightness(0) invert(1);
+  opacity: 0.04;
+}
+
+/* ==========================================================================
+   The type registers, shared by every component below
+
+   The One Family Rule: Archivo only, hierarchy from the width axis
+   (100 / 108 / 115 / 118 / 125) and weight (400 / 500 / 600 / 700 / 800).
+   ========================================================================== */
+
+/* Pencil caption: every label on a mat that is not a title or prose. */
+.gallery-page .card__kind,
+.gallery-page .card__title::after,
+.gallery-page .control,
+.gallery-page .back-link,
+.gallery-page .rail a:not(.rail__brand),
+.gallery-page .link-list a,
+.gallery-page .gallery-footer__top {
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-stretch: 108%;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+/* Title: the name of a work. */
+.gallery-page .detail__title,
+.gallery-page .card__title {
+  font-weight: 700;
+  font-stretch: 118%;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* Section label: tracked caps with a hairline rule filling the rest of the row. */
+.gallery-page .section__title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 var(--gallery-grid-gap);
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-stretch: 108%;
+  letter-spacing: 0.2em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.gallery-page .section__title:not(.section__title--page)::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--hairline);
+}
+
+/* Display: page titles only. Pale ink on the board, one soft cast. */
+.gallery-page .section__title--page,
+.gallery-page .rail__brand {
+  font-weight: 800;
+  font-stretch: 125%;
+  color: var(--ink-display);
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+/* Note: sentence case, for anything pending or reported rather than labelled. */
+.gallery-page .image-fallback {
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-stretch: 100%;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--pencil);
+}
+
+/* Body prose: graphite on the board, one column, capped measure. */
+.gallery-page .detail__summary {
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.55;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================================================
+   Shared primitives
+   ========================================================================== */
+
+/* The progressive-enhancement controls ship with the `hidden` attribute and are
+   revealed by gallery.js. An author-origin `display` (`.control` is
+   inline-flex) always beats the UA stylesheet's
+   `[hidden] { display: none }` regardless of specificity, so without this
+   override a visitor without JavaScript would see inert controls. `!important`
+   is deliberate: `hidden` must win over every rule in this file. */
+.gallery-page [hidden] {
+  display: none !important;
+}
+
+/* The focus ring is diptych.css's `:focus-visible` — 2px of the accent in force,
+   offset 4px onto the backing board (amber 7.75:1, ice-cyan 9.68:1, bone
+   11.45:1). It is deliberately not overridden here: one indicator sitewide. */
+
+/* The piece-page nav carries the same bone mark Home does, under its own class
+   name. No colour filter: the file is already paper white on the board. */
+.gallery-page .brand-logo {
+  width: 36px;
+  height: 36px;
+  flex: none;
+}
+
+/* The shared nav is styled by diptych.css and must keep looking the way it does
+   on Home, so the 44px target is added as a hit area rather than as height. */
+.gallery-page .site-nav .wordmark {
+  min-height: 44px;
+}
+
+.gallery-page .site-nav .nav-links a {
+  position: relative;
+}
+
+.gallery-page .site-nav .nav-links a::after {
+  content: "";
+  position: absolute;
+  /* Links are ~30px tall and sit 18–36px apart, so growing the target
+     vertically alone can never make two of them overlap. */
+  inset: -7px 0;
+}
+
+/* A current page needs a cue beyond colour: diptych.css already gives it an
+   accent underline, and this makes it the heaviest label in the row. */
+.gallery-page .site-nav .nav-links a.current {
+  font-weight: 600;
+}
+
+.gallery-page .section,
+.gallery-page [id] {
+  scroll-margin-top: calc(var(--nav-height) + 16px);
+}
+
+/* A rail page has no sticky bar over its content — above 1100px the rail is a
+   column beside it, below that a block that scrolls away with the document — so
+   an anchor there needs only its own breathing room. The detail views still use
+   the shared sticky top navigation and keep the larger offset above. */
+.gallery-page .rail-content .section,
+.gallery-page .rail-content [id] {
+  scroll-margin-top: 24px;
+}
+
+.gallery-page .section + .section {
+  margin-top: var(--gallery-section-gap);
+}
+
+/* The page title, and the bevel rule the diptych cuts beneath it. */
+.gallery-page .section__title--page {
+  display: block;
+  /* The diptych's page title is clamp(3rem, 8vw, 6rem) for a one-word title.
+     "Selected Works" is two, and at 320px a 3rem floor overflows the column, so
+     the floor is lowered to the wall-name's 2.25rem. Every width from 600px up
+     is unchanged. */
+  font-size: clamp(2.25rem, 8vw, 6rem);
+  letter-spacing: 0.05em;
+  line-height: 0.9;
+  margin: 0 0 var(--gallery-grid-gap);
+  padding-bottom: clamp(16px, 2.4vh, 28px);
+  border-bottom: 1px solid var(--bevel);
+  text-transform: none;
+}
+
+.gallery-page .empty-state {
+  margin: 0;
+  max-width: 55ch;
+  color: var(--pencil);
+  letter-spacing: 0.02em;
+  line-height: 1.55;
+}
+
+/* --------------------------------------------------------------------------
+   Controls: a 44px target, a bevel ring for a boundary, and a marker that
+   carries the pressed state without relying on hue.
+   -------------------------------------------------------------------------- */
+
+.gallery-page .control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 18px;
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  /* The bevel ring is the boundary: against the backing board it measures
+     3.37:1 amber, 4.00:1 ice-cyan, 4.58:1 bone — clear of the 3:1 floor a
+     control's visible boundary has to hold. */
+  box-shadow: 0 0 0 1px var(--bevel);
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Unfilled at rest, filled when pressed: a luminance and shape change, so the
+   state survives without colour vision. */
+.gallery-page .control::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-inline-end: 10px;
+  box-shadow: inset 0 0 0 1px var(--pencil);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.gallery-page .control:hover {
+  color: var(--text);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.gallery-page .control[aria-pressed='true'] {
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.gallery-page .control[aria-pressed='true']::before {
+  background: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.gallery-page .color-toggle {
+  margin-top: var(--gallery-grid-gap);
+}
+
+.gallery-page .color-toggle {
+  margin-top: 0;
+  margin-bottom: var(--gallery-grid-gap);
+}
+
+/* ==========================================================================
+   Grids and mats
+
+   CSS Grid in DOM order throughout: the brief forbids column masonry because
+   it makes the visual and keyboard reading orders diverge.
+   ========================================================================== */
+
+.gallery-page .grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gallery-grid-gap);
+  /* The run each plate number is counted within, so the numbers always read
+     01..n down what is on the wall. */
+  counter-reset: plate;
+}
+
+/* Art uses two generous columns everywhere from 700px, one below. */
+@media (min-width: 700px) {
+  .gallery-page--art .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Each mat is cut to its own print, so a row of works with different
+   proportions hangs with its tops aligned and its mats ending where the work
+   does — rather than one short print sitting above a tall band of empty mat. */
+.gallery-page .card {
+  min-width: 0;
+  counter-increment: plate;
+}
+
+.gallery-page .card__link {
+  display: grid;
+  align-content: start;
+  gap: calc(var(--space) * 1.5);
+  padding: var(--mat-sm) var(--mat-sm) calc(var(--mat-sm) + 2px);
+  background: var(--board);
+  color: var(--text);
+  text-decoration: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    0 1px 0 var(--board-edge);
+  transition: transform 0.7s var(--ease-out), box-shadow 0.7s var(--ease-out);
+}
+
+/* The opening cut in the mat: the board behind the print, and the one-pixel
+   bevel that takes its colour from this half of the site. */
+.gallery-page .card__frame,
+.gallery-page .detail__frame {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  box-shadow: 0 0 0 1px var(--bevel);
+  transition: box-shadow 0.7s var(--ease-out);
+}
+
+.gallery-page .card__image,
+.gallery-page .detail__image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.gallery-page .image-fallback {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  text-align: center;
+}
+
+/* Set by gallery.js when an image fails: the frame keeps its reserved size. */
+.gallery-page .is-missing .image-fallback {
+  display: flex;
+}
+
+.gallery-page .is-missing .card__image,
+.gallery-page .is-missing .detail__image {
+  visibility: hidden;
+}
+
+.gallery-page .card__body {
+  display: grid;
+  gap: 4px;
+  max-width: 60ch;
+}
+
+.gallery-page .card__kind {
+  color: var(--muted);
+}
+
+.gallery-page .card__title {
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+}
+
+/* The Plate Number Rule: never typed into markup, always soft pencil, always
+   after the title it belongs to. It is decorative — the card's accessible name
+   is its `aria-label`, and every fact a visitor needs is in the markup — so
+   nothing is lost where generated content is not announced. */
+.gallery-page .card__title::after {
+  content: "Plate " counter(plate, decimal-leading-zero);
+  display: block;
+  margin-top: 8px;
+  color: var(--pencil);
+  letter-spacing: 0.12em;
+}
+
+/* The Lift Rule: a 4px rise, the long soft cast, and the bevel turning to full
+   accent. Hover is gated so a tap on a touch screen cannot leave a card stuck
+   in the lifted state; keyboard focus gets the same treatment everywhere. */
+.gallery-page .card__link:focus-visible {
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    0 1px 0 var(--board-edge),
+    0 26px 34px -22px rgba(0, 0, 0, 0.95);
+}
+
+.gallery-page .card__link:focus-visible .card__frame {
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gallery-page .card__link:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.035),
+      0 1px 0 var(--board-edge),
+      0 26px 34px -22px rgba(0, 0, 0, 0.95);
+  }
+
+  .gallery-page .card__link:hover .card__frame {
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  .gallery-page .card__link:hover .card__title {
+    color: var(--accent);
+  }
+}
+
+/* Hover colours a label; it never fills anything. */
+.gallery-page .card__link:focus-visible .card__title {
+  color: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   Monochrome Art previews, original colour on interaction.
+   Listing images only: never text, controls, the whole page, or a detail view.
+   This is the locked reveal mechanism, and it replaces the diptych's
+   scroll-driven "develop" animation, which is not ported.
+   -------------------------------------------------------------------------- */
+
+.gallery-page--art .card__image {
+  filter: grayscale(1);
+  transition: filter 240ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gallery-page--art .card__link:hover .card__image {
+    filter: grayscale(0);
+  }
+}
+
+.gallery-page--art .card__link:focus-visible .card__image {
+  filter: grayscale(0);
+}
+
+.gallery-page--art.show-color .card__image {
+  filter: grayscale(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-page--art .card__image {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   The identity rail and the column beside it
+
+   Shared by /art and the not-found page. Above 1100px it is a 100px
+   column; below that it collapses to the visible wrapping top bar the brief
+   requires — no drawer, no offscreen sidebar, no horizontal scrolling.
+   ========================================================================== */
+
+.gallery-page .rail-shell {
+  padding-inline: var(--gallery-gutter);
+}
+
+.gallery-page .rail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 28px;
+  padding-block: 20px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.gallery-page .rail__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  font-size: 0.9rem;
+  letter-spacing: 0.24em;
+  text-decoration: none;
+  text-shadow: none;
+}
+
+.gallery-page .rail__nav ul,
+.gallery-page .rail__switch ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gallery-page .rail a:not(.rail__brand) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+.gallery-page .rail a:not(.rail__brand):hover {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.gallery-page .rail-content {
+  min-width: 0;
+  padding-block: 24px 0;
+}
+
+/* Inside the rail the column owns the measure and the gutter, so the blocks
+   that centre themselves on a rail-less page — the footer everywhere, the
+   not-found article — stand down rather than inset themselves twice. */
+.gallery-page .rail-content > .gallery-footer,
+.gallery-page .rail-content > .detail {
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: 0;
+}
+
+@media (min-width: 1100px) {
+  .gallery-page .rail-shell {
+    display: grid;
+    /* 100px, narrowed from the brief's 200px at Jason's request, 2026-09-10.
+       The pencil register is not shrunk to make it fit: the widest link,
+       "About Me", measures 82px and holds one line with 9px either side. A
+       label wider than the column — "Starred Projects" — wraps onto a second
+       line inside the same 44px target rather than being abbreviated away
+       from the heading it points at. */
+    grid-template-columns: 100px minmax(0, 1fr);
+    column-gap: 48px;
+    align-items: start;
+    max-width: var(--gallery-max-width);
+    margin-inline: auto;
+  }
+
+  .gallery-page .rail {
+    display: block;
+    padding-block: 48px 0;
+    border-bottom: 0;
+  }
+
+  /* The lockup is 131px laid out in a row — 36px mark, 12px gap, 83px
+     wordmark — so it cannot stand across a 100px column. Stacking the mark
+     over the name keeps both elements at their locked sizes; the wordmark's
+     83px is the piece that has to fit, and it does. */
+  .gallery-page .rail__brand {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .gallery-page .rail__nav {
+    margin-top: 32px;
+  }
+
+  .gallery-page .rail__switch {
+    margin-top: 24px;
+  }
+
+  .gallery-page .rail__nav ul,
+  .gallery-page .rail__switch ul {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .gallery-page .rail a:not(.rail__brand) {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .gallery-page .rail-content {
+    padding-block: 48px 0;
+  }
+}
+
+/* Stick the rail only when the viewport is tall enough to show every link;
+   otherwise it scrolls with the document rather than clipping. */
+@media (min-width: 1100px) and (min-height: 640px) {
+  .gallery-page .rail {
+    position: sticky;
+    top: 48px;
+  }
+}
+
+.gallery-page .gallery-footer {
+  max-width: var(--gallery-max-width);
+  margin-inline: auto;
+  padding-inline: var(--gallery-gutter);
+}
+
+/* ==========================================================================
+   Detail views
+   ========================================================================== */
+
+.gallery-page .detail {
+  max-width: var(--gallery-max-width);
+  margin-inline: auto;
+  padding: 24px var(--gallery-gutter) 0;
+}
+
+.gallery-page .detail__body {
+  max-width: 1000px;
+  margin-top: 24px;
+}
+
+.gallery-page .detail__title {
+  margin: 0 0 12px;
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  color: var(--text);
+}
+
+.gallery-page .detail__summary {
+  margin: 0 0 32px;
+  max-width: 65ch;
+}
+
+/* A work hung straight under its own title still needs room to breathe. */
+.gallery-page .detail__title + .detail__frame {
+  margin-top: 24px;
+}
+
+/* A detail print is matted in the board's own mat face, with the bevel ring cut
+   just inside it, and lifted off the board on the long soft cast. */
+.gallery-page .detail--piece > .detail__frame {
+  border: var(--mat-sm) solid var(--board);
+  box-shadow:
+    inset 0 0 0 1px var(--bevel),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    0 1px 0 var(--board-edge),
+    0 40px 60px -40px rgba(0, 0, 0, 0.9);
+}
+
+.gallery-page .detail__frame {
+  margin-bottom: 24px;
+}
+
+/* Links in the pencil register, each with the diptych's arrow nudging forward. */
+.gallery-page .link-list a,
+.gallery-page .back-link,
+.gallery-page .gallery-footer__top {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  overflow-wrap: anywhere;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+.gallery-page .back-link,
+.gallery-page .gallery-footer__top {
+  color: var(--muted);
+}
+
+.gallery-page .link-list a::after,
+.gallery-page .back-link::before,
+.gallery-page .gallery-footer__top::before {
+  content: "";
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--arrow-forward) center / contain no-repeat;
+  mask: var(--arrow-forward) center / contain no-repeat;
+  transition: transform 0.6s var(--ease-out);
+}
+
+.gallery-page .back-link::before {
+  -webkit-mask-image: var(--arrow-back);
+  mask-image: var(--arrow-back);
+}
+
+.gallery-page .gallery-footer__top::before {
+  -webkit-mask-image: var(--arrow-up);
+  mask-image: var(--arrow-up);
+}
+
+.gallery-page .link-list a:hover,
+.gallery-page .back-link:hover,
+.gallery-page .gallery-footer__top:hover {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.gallery-page .link-list a:hover::after {
+  transform: translateX(4px);
+}
+
+.gallery-page .back-link:hover::before {
+  transform: translateX(-4px);
+}
+
+.gallery-page .gallery-footer__top:hover::before {
+  transform: translateY(-3px);
+}
+
+.gallery-page .link-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gallery-page .link-list {
+  margin-top: 24px;
+}
+
+/* ==========================================================================
+   The back of the frame
+   ========================================================================== */
+
+.gallery-page .gallery-footer {
+  margin-top: clamp(48px, 8vh, 96px);
+  padding-block: clamp(32px, 5vh, 56px) clamp(24px, 4vh, 40px);
+  border-top: 1px solid var(--hairline);
+}
+
+/* ==========================================================================
+   Reduced motion: the object stops moving, the states stay legible.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-page .card__link,
+  .gallery-page .card__link:hover,
+  .gallery-page .card__link:focus-visible {
+    transform: none;
+  }
+
+  .gallery-page .link-list a:hover::after,
+  .gallery-page .back-link:hover::before,
+  .gallery-page .gallery-footer__top:hover::before {
+    transform: none;
+  }
+}

@@ -1,0 +1,81 @@
+---
+import { marked } from "marked";
+import { Image } from "astro:assets";
+import Tech from "@/layouts/Tech.astro";
+import ProjectIndex from "@/components/ProjectIndex";
+import { profile, projects } from "@/lib/bundle";
+import hero from "@/assets/hero.jpg";
+
+const list = await projects();
+const bio = await marked.parse(profile.bio);
+---
+
+<Tech title="Tech · Jason" description={profile.headline}>
+  <!-- Page title: title and lede left, the cool half of the split portrait matted right (Panel II). -->
+  <section class="grid grid-cols-[minmax(0,1fr)_auto] gap-x-[clamp(16px,4vw,64px)] gap-y-6 border-b border-bevel pt-[clamp(40px,8vh,96px)] pb-[clamp(32px,6vh,64px)] [grid-template-areas:'label_label''title_title''lede_win'] md:[grid-template-areas:'label_win''title_win''lede_win']">
+    <p class="label [grid-area:label] self-end">Tech</p>
+    <h1 class="display uppercase text-[clamp(2rem,11vw,7rem)] md:text-[clamp(3rem,8vw,6rem)] [grid-area:title]">Software</h1>
+    <div class="grid content-start gap-6 [grid-area:lede]">
+      <p class="lede max-w-[44ch] text-[clamp(1.05rem,1.6vw,1.25rem)]">{profile.headline}.</p>
+      <p class="flex flex-wrap gap-x-8 gap-y-1">
+        <a href="#work" class="label text-link !text-foreground">
+          Selected work
+          <svg aria-hidden="true" viewBox="0 0 24 24" class="arrow size-4 text-tech" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
+        </a>
+        <a href="#about" class="label text-link !text-foreground">
+          About
+          <svg aria-hidden="true" viewBox="0 0 24 24" class="arrow size-4 text-pencil" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
+        </a>
+      </p>
+    </div>
+    <figure class="mat cast grid w-[clamp(104px,17vw,232px)] gap-2 self-end p-[var(--mat-sm)] [grid-area:win]">
+      <div class="window aspect-[7/10] overflow-hidden">
+        <Image
+          src={hero}
+          alt="Portrait of Jason lit in cool blue from the right, the Tech half of the split-lit image"
+          widths={[480, 960]}
+          sizes="(min-width: 768px) 464px, 208px"
+          class="h-full w-[200%] max-w-none -translate-x-1/2 object-cover"
+          loading="eager"
+        />
+      </div>
+      <figcaption class="label hidden text-right md:block">Panel II</figcaption>
+    </figure>
+  </section>
+
+  <section id="work" aria-labelledby="work-title" class="grid scroll-mt-24 gap-8 pt-[clamp(40px,7vh,80px)]">
+    <div class="rule-head">
+      <h2 id="work-title" class="label-section">Selected work</h2>
+      <p class="label order-last">{list.length} {list.length === 1 ? "plate" : "plates"}</p>
+    </div>
+    <ProjectIndex client:idle projects={list.map(({ slug, name, summary, tags }) => ({ slug, name, summary, tags }))} />
+  </section>
+
+  <section id="about" aria-labelledby="about-title" class="grid scroll-mt-24 gap-8 pt-[clamp(64px,11vh,128px)]">
+    <div class="rule-head">
+      <h2 id="about-title" class="label-section">About</h2>
+    </div>
+    <div class="mat-cast grid gap-x-[clamp(24px,5vw,72px)] gap-y-10 p-[clamp(24px,3.4vw,44px)] lg:grid-cols-[1fr_20rem]">
+      {/* Unsanitised markdown: safe only because the bundle is reviewed and merged by PR. */}
+      <div class="prose-board max-w-[62ch]" set:html={bio} />
+      <div class="grid content-start gap-8">
+        <div class="grid gap-3">
+          <h3 class="label">Skills</h3>
+          <ul class="grid border-t border-hairline text-[0.95rem] text-muted-text">
+            {profile.skills.map((s) => <li class="border-b border-hairline py-2">{s}</li>)}
+          </ul>
+        </div>
+        {
+          profile.interests.length > 0 && (
+            <div class="grid gap-3">
+              <h3 class="label">Interests</h3>
+              <ul class="grid gap-1.5 text-[0.95rem] text-muted-text">
+                {profile.interests.map((s) => <li>{s}</li>)}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </section>
+</Tech>

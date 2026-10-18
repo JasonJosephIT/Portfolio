@@ -1,10 +1,15 @@
 .DS_Store
 .superpowers/
 .claude/*
-!.claude/commands/
 .env
+content/bundle-preview/
 node_modules/
 .impeccable/review/
 .impeccable/questions/
 .impeccable/build/
 .impeccable/mocks/
+
+# Astro
+dist/
+.astro/
+.vscode/

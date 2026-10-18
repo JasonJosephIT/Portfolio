@@ -1,0 +1,23 @@
+---
+// Art and 404 pages: the shared Head, gallery.css, gallery.js and the body data Art needs.
+import "@/styles/diptych.css";
+import "@/styles/gallery.css";
+import Head from "@/layouts/Head.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  returnPage?: string;
+}
+const { title, description, returnPage } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<Head title={title} description={description} />
+<body class="gallery-page gallery-page--art art patterned" data-return-page={returnPage}>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <slot />
+  <script src="../scripts/gallery.js"></script>
+</body>
+</html>

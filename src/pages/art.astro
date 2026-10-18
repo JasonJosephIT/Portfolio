@@ -1,0 +1,60 @@
+---
+import { Image } from "astro:assets";
+import Rail from "@/layouts/Rail.astro";
+import { pieces, selected } from "@/lib/art";
+import bard from "@/assets/bard-mark.png";
+
+const grids = [
+  { id: "selected-works", pieces: selected, kind: true },
+  { id: "explore", pieces, kind: false },
+];
+---
+
+<Rail title="Art · Jason" description="Jason’s photography: selected works and pieces to explore by style." returnPage="art">
+  <div class="rail-shell">
+    <header class="rail" id="top">
+      <a href="/" class="wordmark rail__brand" aria-label="Jason — portfolio home"><Image class="brand-logo" src={bard} alt="" width={36} height={36} />JASON</a>
+      <nav class="rail__nav" aria-label="Art sections">
+        <ul>
+          <li><a href="#selected-works">Selected works</a></li>
+          <li><a href="#explore">Styles</a></li>
+          <li><a href="#about">About Me</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <nav class="rail__switch" aria-label="Other portfolios">
+        <ul>
+          <li><a href="/tech">Tech</a></li>
+        </ul>
+      </nav>
+    </header>
+    <div class="rail-content">
+      <main id="main">
+        {grids.map(({ id, pieces, kind }) => (
+          <section class="section" id={id} aria-labelledby={`${id}-title`}>
+            {kind
+              ? <h1 class="section__title section__title--page" id={`${id}-title`}>Selected Works</h1>
+              : <h2 class="section__title" id={`${id}-title`}>Explore by Style</h2>}
+            {kind && <button type="button" class="control color-toggle" data-color-toggle aria-pressed="false" hidden>Show original colors</button>}
+            <div class={`grid grid--${kind ? "selected" : "explore"}`} id={`${id}-grid`}>
+              {pieces.length === 0 && <p class="empty-state">No plates placed yet.</p>}
+              {pieces.map((p, i) => (
+                <article class="card card--piece"><a class="card__link" href={`/art/pieces/${p.slug}`} aria-label={`${p.title} — art piece`} data-detail-link data-return-section={id}><span class="card__frame" style={`aspect-ratio: ${p.img.width} / ${p.img.height}`}><Image class="card__image" src={p.img} alt={p.image.alt} width={p.img.width} height={p.img.height} loading={kind && i === 0 ? "eager" : "lazy"} decoding="async" /><span class="image-fallback" aria-hidden="true">Image unavailable</span></span><span class="card__body">{kind && <span class="card__kind">Piece</span>}<span class="card__title">{p.title}</span></span></a></article>
+              ))}
+            </div>
+          </section>
+        ))}
+        <section class="section" id="about" aria-labelledby="about-title">
+          <h2 class="section__title" id="about-title">About Me</h2>
+          <p class="empty-state">A short biography will appear here soon.</p>
+        </section>
+        <section class="section" id="contact" aria-labelledby="contact-title">
+          <h2 class="section__title" id="contact-title">Contact</h2>
+          <!-- TODO: replace the placeholder address with your real contact, then remove the note -->
+          <ul class="link-list"><li><a href="mailto:hello@example.com">Get in touch</a> <span class="note">address pending</span></li></ul>
+        </section>
+      </main>
+      <footer class="gallery-footer"><a class="gallery-footer__top" href="#top">Back to top</a></footer>
+    </div>
+  </div>
+</Rail>

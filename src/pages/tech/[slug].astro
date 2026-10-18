@@ -1,0 +1,136 @@
+---
+import { marked } from "marked";
+import Tech from "@/layouts/Tech.astro";
+import { builds, DOC_TITLE, docsFor, projects, relationsFor } from "@/lib/bundle";
+
+export async function getStaticPaths() {
+  const all = await projects();
+  return all.map((p, i) => ({ params: { slug: p.slug }, props: { project: p, index: i, all } }));
+}
+
+const { project: p, index, all } = Astro.props;
+const html = await marked.parse(p.description);
+const name = (slug: string) => all.find((x) => x.slug === slug)?.name ?? slug;
+const related = await relationsFor(p.slug);
+const hasBuild = (await builds()).some((b) => b.id === p.slug);
+const docs = await docsFor(p.slug);
+const plate = (i: number) => String(i + 1).padStart(2, "0");
+const prev = all[(index - 1 + all.length) % all.length];
+const next = all[(index + 1) % all.length];
+---
+
+<Tech title={`${p.name} · Jason`} description={p.summary}>
+  <nav aria-label="Breadcrumb" class="flex items-center justify-between gap-4 pt-8">
+    <a href="/tech#work" class="label text-link nudge-left !text-muted-text hover:!text-foreground">
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="arrow size-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+      All work
+    </a>
+    <p class="label">Plate {plate(index)} of {plate(all.length - 1)}</p>
+  </nav>
+
+  <header class="grid gap-5 border-b border-bevel pt-[clamp(32px,6vh,64px)] pb-[clamp(28px,5vh,48px)] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-end lg:gap-x-16">
+    <h1 class="display text-[clamp(2.25rem,6vw,4.75rem)]">{p.name}</h1>
+    <p class="lede max-w-[44ch] text-[clamp(1.05rem,1.6vw,1.2rem)] lg:pb-1">{p.summary}</p>
+  </header>
+
+  <div class="grid gap-x-[clamp(32px,5vw,72px)] gap-y-12 pt-[clamp(32px,6vh,64px)] lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <div class="grid min-w-0 content-start gap-[clamp(40px,7vh,72px)]">
+      <figure class="mat grid gap-3 p-[var(--mat-sm)]">
+        <div class="window grid aspect-video place-items-center overflow-hidden" role="img" aria-label="Placeholder for a video of it working, not recorded yet">
+          <!-- Placeholder only: no prototype is built or hosted yet (prototype-hosting ticket, deferred). -->
+          <div class="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(135deg,transparent_0_14px,rgba(236,232,222,0.025)_14px_15px)]" aria-hidden="true"></div>
+          <div class="relative grid justify-items-center gap-4 px-6 text-center">
+            <span class="grid size-14 place-items-center shadow-[0_0_0_1px_var(--bevel)]" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="size-5 translate-x-px text-tech" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M8 5.5v13L18.5 12z" /></svg>
+            </span>
+            <p class="label">See it working</p>
+            <p class="note -mt-2">Placeholder. Not recorded yet.</p>
+          </div>
+        </div>
+        <figcaption class="label flex justify-between gap-4 px-1">
+          <span>Plate {plate(index)} · See it working</span>
+          <span class="note normal-case tracking-[0.04em]">Coming later</span>
+        </figcaption>
+      </figure>
+
+      <article aria-label="About the project" class="grid gap-5">
+        <h2 class="rule-head label-section">What it is</h2>
+        {/* Unsanitised markdown: safe only because the bundle is reviewed and merged by PR. */}
+        <div class="prose-board max-w-[62ch] text-[1.03rem]" set:html={html} />
+      </article>
+    </div>
+
+    <aside aria-label="Project details" class="lg:sticky lg:top-[104px] lg:self-start">
+      <div class="mat-cast grid gap-8 p-[clamp(20px,2.4vw,28px)]">
+        <section aria-labelledby="made-with" class="grid gap-3">
+          <h2 id="made-with" class="label">Made with</h2>
+          <ul class="grid border-t border-hairline">
+            {p.tags.map((t) => <li class="border-b border-hairline py-2 text-[0.95rem] text-foreground/90 first-letter:uppercase">{t}</li>)}
+          </ul>
+        </section>
+        {
+          docs.length > 0 && (
+            <section aria-labelledby="read-more" class="grid gap-3">
+              <h2 id="read-more" class="label">Read more</h2>
+              <ul class="grid gap-2">
+                {docs.map((d) => (
+                  <li>
+                    <a href={`/tech/${p.slug}/${d.data.kind}`} class="window ring-link flex items-center justify-between gap-3 px-4 py-3 text-foreground">
+                      {DOC_TITLE[d.data.kind]}
+                      <svg aria-hidden="true" viewBox="0 0 24 24" class="arrow size-4 shrink-0 text-pencil" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+        {
+          hasBuild && (
+            <section aria-labelledby="build" class="grid gap-3">
+              <h2 id="build" class="label">Build</h2>
+              <a href={`/tech/${p.slug}/build`} class="window ring-link flex items-center justify-between gap-3 px-4 py-3 text-foreground">
+                How it was built
+                <svg aria-hidden="true" viewBox="0 0 24 24" class="arrow size-4 shrink-0 text-pencil" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </a>
+            </section>
+          )
+        }
+        {
+          related.length > 0 && (
+            <section aria-labelledby="related" class="grid gap-3">
+              <h2 id="related" class="label">Related projects</h2>
+              <ul class="grid gap-2">
+                {related.map((slug) => (
+                  <li>
+                    <a href={`/tech/${slug}`} class="window ring-link flex items-center justify-between gap-3 px-4 py-3 text-foreground">
+                      {name(slug)}
+                      <svg aria-hidden="true" viewBox="0 0 24 24" class="arrow size-4 shrink-0 text-pencil" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8" /></svg>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+      </div>
+    </aside>
+  </div>
+
+  <nav aria-label="More work" class="grid gap-[clamp(16px,2vw,24px)] pt-[clamp(56px,10vh,112px)] sm:grid-cols-2">
+    <a href={`/tech/${prev.slug}`} class="mat lift group grid gap-2 p-[clamp(18px,2.4vw,28px)]">
+      <span class="label flex items-center gap-2">
+        <svg aria-hidden="true" viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+        Previous · Plate {plate(all.indexOf(prev))}
+      </span>
+      <span class="title text-[clamp(1.15rem,1.8vw,1.4rem)] text-foreground">{prev.name}</span>
+    </a>
+    <a href={`/tech/${next.slug}`} class="mat lift group grid gap-2 p-[clamp(18px,2.4vw,28px)] sm:text-right">
+      <span class="label flex items-center gap-2 sm:justify-end">
+        Next · Plate {plate(all.indexOf(next))}
+        <svg aria-hidden="true" viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </span>
+      <span class="title text-[clamp(1.15rem,1.8vw,1.4rem)] text-foreground">{next.name}</span>
+    </a>
+  </nav>
+</Tech>

@@ -6,7 +6,7 @@ Design Jason’s Art and Tech portfolios as calm, image-led galleries: museum-li
 
 This brief supersedes the Art and Tech layout, placeholder-content, and freeform-placement guidance in older documents, including `docs/prd.md` and comments in the current page shells. Preserve existing Home navigation, Jason’s name, chosen hero, and quotation unless a later task explicitly changes them. Do not restore previously removed personal photos or invent public projects, skills, testimonials, or outcomes.
 
-This document specifies future implementation; creating it does not authorize deployment or a platform migration. Inspect current code and applicable repository instructions before implementation. The repository now includes admin/editing functionality beyond the original static MVP: preserve those integrations and adapt them deliberately. Use the existing stack where practical; structured layouts do not require a framework migration.
+This document specifies future implementation; creating it does not authorize deployment or a platform migration. Inspect current code and applicable repository instructions before implementation. Use the existing stack where practical; structured layouts do not require a framework migration.
 
 Interpret “no longer freeform” as a structured content system: fixed section types, reusable cards, curated ordering, and predictable detail templates. No absolute-positioned canvas or arbitrary visitor-facing layout controls.
 
@@ -154,7 +154,7 @@ Start with the existing dark palette to connect these pages to Home. Let the art
 | `--gallery-section-gap` | `64px / 80px / 112px` | Space between sections |
 | `--gallery-radius` | `8px` | Image corners; avoid pill-shaped cards |
 
-Alias existing tokens where possible rather than creating conflicting global definitions. Scope new page styling so it does not regress Home or admin pages.
+Alias existing tokens where possible rather than creating conflicting global definitions. Scope new page styling so it does not regress Home.
 
 Use the system sans-serif stack. Page title: `clamp(2.5rem, 5vw, 4.5rem)`, weight 600, line-height 1.08. Section title: `clamp(1.75rem, 3vw, 2.5rem)`, weight 500–600. Card title: 18–20px. Body: 16–18px, line-height 1.5–1.65. Metadata: at least 14px. Avoid long all-caps passages and ultra-light type. Reading text should stay near 65 characters per line.
 
@@ -230,17 +230,17 @@ Suggested editorial lengths: titles 2–8 words, summaries 15–30 words. These 
 - Keep visual order aligned with DOM order. Never require hover, drag, swipe, or precise pointer movement to browse.
 - Test text zoom and reflow, including 200% zoom and a 320px-wide viewport. Content must remain reachable without horizontal page scrolling.
 - Use responsive image sources, explicit width/height or aspect ratio, efficient formats with fallbacks as needed, and native lazy loading below the fold. Do not lazy-load the primary visible image.
-- Public browsing must not depend on admin authentication or editor scripts. Avoid shipping full-resolution originals as every thumbnail.
+- Public browsing must not depend on editor scripts. Avoid shipping full-resolution originals as every thumbnail.
 - Prefer ordinary links and server/static-rendered content so essential browsing survives JavaScript failure.
 
 ## Subagent work plan and ownership
 
-1. **Inspect and map:** Read this brief, current pages/styles, and existing content/admin contracts. Report a concise mapping of records, routes, and any conflicts. Do not treat the old PRD’s removed photos/placeholders as source content.
+1. **Inspect and map:** Read this brief, current pages/styles, and existing content contracts. Report a concise mapping of records, routes, and any conflicts. Do not treat the old PRD’s removed photos/placeholders as source content.
 2. **Shared foundation:** One owner implements tokens, shell, anchor navigation, accessible card primitives, and breakpoints. Establish these contracts before parallel page work.
 3. **Art implementation:** Build the rail, Selected Works (Favorites), Projects, Explore by Style, About Me, Contact, monochrome preview interactions, and detail templates using shared components and canonical records. Leave tapestry research deferred.
 4. **Tech implementation:** Build Starred Projects, Projects, and the simpler detail template using the same visual language.
 5. **Content integration:** Connect curation and publication rules to existing owner workflows. Coordinate changes to shared files; do not create competing data stores.
-6. **Review:** A separate reviewer checks the actual implementation against this document, including content integrity, keyboard paths, mobile browsing, and Home/admin regressions.
+6. **Review:** A separate reviewer checks the actual implementation against this document, including content integrity, keyboard paths, mobile browsing, and Home regressions.
 
 Page agents can work in parallel after shared contracts exist. Assign a single owner to shared styles and content schemas to avoid conflicting edits. Each agent reports files changed, decisions, checks actually performed, and remaining issues. Do not invent verification evidence or expand into deployment as part of design work.
 
@@ -262,5 +262,5 @@ Page agents can work in parallel after shared contracts exist. Assign a single o
 - [ ] Layouts are reviewed at 320, 375, 768, 1024, and 1440px, plus zoom and reduced motion.
 - [ ] Keyboard users can reach/open every card and operate any expansion, filtering, or dialog controls.
 - [ ] Contrast, focus visibility, meaningful alt text, image failure, and long content are checked.
-- [ ] Existing Home and admin/editing behavior remains functional.
+- [ ] Existing Home behavior remains functional.
 - [ ] Review captures desktop/mobile screenshots and reports real remaining limitations.

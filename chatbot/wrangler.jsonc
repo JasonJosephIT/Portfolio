@@ -1,0 +1,70 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "jason-portfolio-chat",
+	"main": "src/index.ts",
+	// Deploy: a Workers Builds connection of its own (the site Worker deploys from the repo root), production branch
+	// main, non-production builds off. Settings > Build:
+	//   Root directory: chatbot
+	//   Build command:  pnpm install --frozen-lockfile   (the one pnpm workspace: root ajv for the bundle check,
+	//                   chatbot's github-slugger; the lockfile sits at the repo root)
+	//   Deploy command: pnpm wrangler deploy && node scripts/build-index.mjs
+	//   Build variables and secrets: CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN, KV_NAMESPACE_ID
+	// Roll back the search index (from chatbot/): node scripts/rollback-index.mjs <b-namespace>
+	"compatibility_date": "2026-10-13",
+	"vars": {
+		// Kill switch: anything but "true" answers 503 { off: true }. Ships off.
+		"CHAT_ENABLED": "false",
+		// Comma-separated site origins allowed by CORS.
+		// TODO(Jason): append ",https://jason-portfolio.<account>.workers.dev" (and the custom domain).
+		"ALLOWED_ORIGINS": "http://localhost:4321",
+		// Chat model, called through AI Gateway. Moving to Claude is a change here (e.g. "anthropic/<model>").
+		"CHAT_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+		// Must match the model build-index.mjs embedded with.
+		"EMBED_MODEL": "@cf/baai/bge-base-en-v1.5",
+		// TODO(Jason): create the gateway in the dashboard (AI > AI Gateway) with this name, or change it.
+		"AI_GATEWAY_ID": "portfolio-chat",
+		// Best match below this cosine score answers "I don't know" without calling the chat model.
+		// 0.6: bge-base-en-v1.5 scores unrelated text around 0.4-0.55 and on-topic text 0.7+; the test fixture
+		// (test/fake-index.json) puts on-topic questions at 0.7-1.0 and off-topic ones at 0-0.5, either side of it.
+		// ponytail: a guess until real traffic; retune from AI Gateway logs once the index is live.
+		"MIN_SCORE": "0.6",
+		// Cloudflare Access for /admin/chats. Empty refuses every admin call. TODO(Jason): see the checklist below.
+		"ACCESS_AUD": "",
+		"ACCESS_TEAM_DOMAIN": ""
+	},
+	// Daily at 03:00 UTC: the scheduled handler deletes chats older than 90 days.
+	"triggers": { "crons": ["0 3 * * *"] },
+	"ai": { "binding": "AI" },
+	"vectorize": [{ "binding": "VECTORIZE", "index_name": "portfolio-chat" }],
+	// TODO(Jason): the KV namespace build-index.mjs writes ACTIVE_NS to (same id as the KV_NAMESPACE_ID secret).
+	"kv_namespaces": [{ "binding": "INDEX_KV", "id": "00000000000000000000000000000000" }],
+	// Set with `pnpm wrangler secret put <NAME>`, never here. TURNSTILE_SECRET: the widget's secret key.
+	// SESSION_SECRET: any long random string (e.g. `openssl rand -hex 32`); rotating it ends every session.
+	"secrets": { "required": ["TURNSTILE_SECRET", "SESSION_SECRET"] },
+	// 10 messages a minute per session (keyed by session id). Counters are per Cloudflare location and eventually
+	// consistent, so a burst can slip a message or two over. namespace_id: any integer unique in the account.
+	"ratelimits": [{ "name": "CHAT_LIMIT", "namespace_id": "1001", "simple": { "limit": 10, "period": 60 } }],
+	// The only store of chat text: emails and phones scrubbed before insert.
+	// TODO(Jason): `pnpm wrangler d1 create portfolio-chats`, paste its id here, then
+	// `pnpm wrangler d1 migrations apply portfolio-chats --remote`.
+	"d1_databases": [
+		{ "binding": "CHATS", "database_name": "portfolio-chats", "database_id": "00000000-0000-0000-0000-000000000000" }
+	]
+	// Dashboard settings code cannot hold (TODO(Jason), listed in the PR):
+	// - AI Gateway "portfolio-chat" (AI > AI Gateway > Settings): Logs off. The Worker also sends collectLog: false
+	//   on every call, so chat text stays out of gateway logs even if the setting is flipped.
+	// - Same gateway, Settings > Spend limits: one rule, no dimensions, $1 per day (fixed window). Over budget the
+	//   gateway answers 429, which the Worker turns into 502 { error: "unavailable" }. Kill switch stays CHAT_ENABLED.
+	// - Turnstile widget (Turnstile > Add widget) for the site's hostnames; site key goes in the chat widget,
+	//   secret key via `wrangler secret put TURNSTILE_SECRET`.
+	// - Cloudflare Access for /admin/* (Zero Trust > Access > Applications > Add > Self-hosted): one application
+	//   covering the chat Worker's hostname with path admin/* (or, on workers.dev, Worker > Settings > Domains &
+	//   Routes > Enable Cloudflare Access, then Manage Cloudflare Access). One Allow policy: Include > Emails >
+	//   Jason's email only. Copy the application's Application Audience (AUD) tag into ACCESS_AUD and
+	//   "https://<team-name>.cloudflareaccess.com" (Settings > Team name) into ACCESS_TEAM_DOMAIN, then deploy.
+	//   Check: open https://<worker-host>/admin/chats in a browser, log in, see { chats: [...] }; a private window
+	//   without login never reaches the Worker, and a direct call without the Access header gets 403.
+	//   Delete on request: curl -X DELETE through Access (or the browser console) to /admin/chats?session=<id>.
+	// - Workers Logs: the Worker never calls console, and invocation logs carry no request bodies; leave
+	//   head-sampling as is.
+}

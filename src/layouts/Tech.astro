@@ -1,0 +1,59 @@
+---
+import "@/styles/global.css";
+import Head from "@/layouts/Head.astro";
+import { Image } from "astro:assets";
+import { isDraft, manifest } from "@/lib/bundle";
+import Chat from "@/components/Chat.astro";
+import bard from "@/assets/bard-mark.png";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = "Software by Jason." } = Astro.props;
+---
+
+<html lang="en">
+  <Head title={title} description={description} />
+  <body class="min-h-dvh">
+    <a href="#main" class="label sr-only z-50 bg-board px-4 py-3 !text-foreground focus:not-sr-only focus:fixed focus:top-2 focus:left-2">Skip to content</a>
+    {
+      isDraft && (
+        <p class="note border-b border-hairline px-4 py-2 text-center">
+          Preview: drafts from Open Thoughts, not yet approved ({manifest.generated_at.slice(0, 10)}).
+        </p>
+      )
+    }
+    <header class="sticky top-0 z-20 border-b border-hairline bg-background/90 backdrop-blur-sm">
+      <nav aria-label="Main" class="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between gap-4 px-[clamp(16px,4vw,48px)]">
+        <a href="/tech" class="wordmark flex items-center gap-3 text-foreground">
+          <Image src={bard} alt="" width={36} height={36} class="size-9" />
+          JASON
+        </a>
+        <ul class="flex items-center gap-[clamp(10px,3vw,36px)]">
+          <li><a href="/" class="label inline-block pt-2 pb-1.5 transition-colors duration-[250ms] hover:!text-foreground">Home</a></li>
+          <li><a href="/art" class="label inline-block pt-2 pb-1.5 transition-colors duration-[250ms] hover:!text-foreground">Art</a></li>
+          <li>
+            <a href="/tech" aria-current="page" class="label inline-block border-b border-tech pt-2 pb-1.5 !text-foreground">Tech</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main" class="mx-auto max-w-[1240px] px-[clamp(16px,4vw,48px)] pb-[clamp(64px,10vh,120px)]">
+      <slot />
+    </main>
+
+    <footer class="border-t border-hairline">
+      <div class="mx-auto grid max-w-[1240px] gap-x-8 gap-y-6 px-[clamp(16px,4vw,48px)] pt-12 pb-28 sm:grid-cols-[1fr_auto] sm:items-end">
+        <div class="grid gap-3">
+          <p class="title text-[clamp(1.35rem,2.6vw,1.9rem)] text-ink">Man is not truly one, but truly two.</p>
+          <p class="label">JASON · Photography · Software</p>
+        </div>
+        <!-- TODO: replace the placeholder address with your real contact, then remove the note -->
+        <p class="sm:mb-20 sm:text-right"><a href="mailto:hello@example.com" class="label text-link">Get in touch</a> <span class="note">address pending</span></p>
+      </div>
+    </footer>
+    <Chat />
+  </body>
+</html>

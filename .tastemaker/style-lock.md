@@ -7,7 +7,7 @@ Thesis: quiet, image-led rooms with precise alignment and captions. First viewpo
 Reference board: .tastemaker/reference-board.md (brief-described inspiration, no screenshot/live site available or viewed). Mode Experience; variance3, motion1, density3, art direction7. No global taste profile found or promoted.
 
 ## Palette and contrast
-Art canvas #000000; Tech #0a0a0b preserved; surface #141416; text #f2f2f0; muted #a5a5a0; Art accent #ff7a4d; Tech accent #4dc3ff. All new tokens scoped under gallery page classes; do not modify Home/admin through globals.
+Art canvas #000000; Tech #0a0a0b preserved; surface #141416; text #f2f2f0; muted #a5a5a0; Art accent #ff7a4d; Tech accent #4dc3ff. All new tokens scoped under gallery page classes; do not modify Home through globals.
 Measured using tastemaker check_contrast.py: text/black18.73, text/surface16.41, muted/black8.49, muted/surface7.44, Art accent/black8.14, accent/surface7.13, Tech accent/black10.57, accent/surface9.26. All clear4.5 text floor. Neutral outlined controls; white focus outline on dark backdrops. Light text on accent fills is forbidden (2.30 Art,1.77 Tech); use black on any accent fill. Hairlines decorative only. Full matrix in .superpowers/sdd/contrast.txt. Dark single mode; no theme switch.
 
 ## Typography
@@ -19,7 +19,7 @@ Tech: compact global nav, Tech intro, Starred Projects/Projects anchors, curated
 No card fill/border/shadow by default; image-only surface; square Art,8px Tech. Control minimum44px with distinct borders/zone. Card captions beneath image. Selected curation up to4 with enhancement expansion, all entries readable without JS.
 
 ## Assets and motion
-Preserve assets/wave-pattern.svg. Bard mark is assets/bard-mark.png at 36x36 beside JASON with empty alt, intrinsic attributes matching the rendered size (updated 2026-09-10: this replaced assets/bard.svg, which Jason removed — it cost 1,000,965 bytes per page to draw a 36px figure; recoverable from git history). Wave552x304 repeating behind Art only, white at4%, no overlay onto media. Tile joins checked 2026-09-10: the supplied artwork is NOT seamless (faint horizontal seams and specks visible when boosted to 50%), but invisible at the locked 4% on near-black — do not tune the opacity to compensate. No cultural provenance claims. Home hero untouched. No external photographs or illustrations.
+Preserve src/assets/wave-pattern.svg. Bard mark is src/assets/bard-mark.png at 36x36 beside JASON with empty alt, intrinsic attributes matching the rendered size (updated 2026-09-10: this replaced assets/bard.svg, which Jason removed — it cost 1,000,965 bytes per page to draw a 36px figure; recoverable from git history). Wave552x304 repeating behind Art only, white at4%, no overlay onto media. Tile joins checked 2026-09-10: the supplied artwork is NOT seamless (faint horizontal seams and specks visible when boosted to 50%), but invisible at the locked 4% on near-black — do not tune the opacity to compensate. No cultural provenance claims. Home hero untouched. No external photographs or illustrations.
 Art preview image filter grayscale(1), hover-capable card hover and keyboard focus restore grayscale(0), 240ms ease. Show original colors button toggles aria-pressed. Touch first tap navigates; details always source color. Reduced motion immediate. No lifting, scaling, parallax, scroll snapping or reveal delays.
 
 ## Memory
