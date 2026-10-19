@@ -26,7 +26,7 @@ function setup({ committed = false, inRepo = false } = {}) {
   writeFileSync(join(repo, "README"), "x");
   if (committed) cpSync(fixture, join(repo, "content", "bundle"), { recursive: true });
   if (inRepo) {
-    for (const d of ["scripts", "schemas"]) cpSync(resolve(d), join(repo, d), { recursive: true });
+    for (const d of ["scripts", "schemas", "standards"]) cpSync(resolve(d), join(repo, d), { recursive: true });
     symlinkSync(resolve("node_modules"), join(repo, "node_modules"));
     writeFileSync(join(repo, ".gitignore"), "node_modules\n");
   }

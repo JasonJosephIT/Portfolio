@@ -3,7 +3,7 @@
 .claude/*
 .env
 content/bundle-preview/
-node_modules/
+node_modules
 .impeccable/review/
 .impeccable/questions/
 .impeccable/build/
