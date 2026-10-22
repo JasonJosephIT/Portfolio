@@ -11,8 +11,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "test": "node --test --test-concurrency=1 \"tests/site*.test.mjs\"",
-    "pull": "node scripts/pull-bundle.mjs",
-    "pull:preview": "node scripts/pull-bundle.mjs --preview",
+    "pull": "node scripts/pull-public-enrichment.mjs",
+    "pull:bundle": "node scripts/pull-bundle.mjs",
     "deploy": "astro build && wrangler deploy"
   },
   "dependencies": {

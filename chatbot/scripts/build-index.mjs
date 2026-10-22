@@ -64,7 +64,7 @@ export async function buildIndex({ dir, env, fetch = globalThis.fetch, batch = 1
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const dir = process.env.BUNDLE_DIR || fileURLToPath(new URL("../../content/bundle", import.meta.url));
+  const dir = process.env.BUNDLE_DIR || fileURLToPath(new URL("../../content/bundle-public", import.meta.url));
   buildIndex({ dir, env: process.env })
     .then((ns) => console.log(`ACTIVE_NS = ${ns}`))
     .catch((e) => { console.error(`build-index: ${e.message}`); process.exit(1); });

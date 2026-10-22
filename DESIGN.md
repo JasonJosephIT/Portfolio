@@ -13,6 +13,8 @@ colors:
   accent-art: "#e98a3e"
   accent-tech: "#48c4dc"
   accent-home: "#c9c4b8"
+  accent-navy: "#173a5f"
+  accent-coral: "#ff7668"
   bevel: "color-mix(in srgb, var(--accent) 58%, var(--board))"
 typography:
   display:
@@ -147,7 +149,7 @@ components:
 
 **Creative North Star: "The Hinged Diptych"**
 
-The whole site is one matted object. A near-black museum board is the ground; charcoal mat faces sit on it, each cut with a one-pixel bevel that takes its color from the half of the work it frames, amber for Art and ice-cyan for Tech. Titles are a wide grotesque set as pale ink directly on the board with a single soft cast shadow. Everything else that is written on a mat is written in pencil: small, tracked, uppercase captions in graphite. Color never fills a surface; it lives on the bevels and in the light inside the prints.
+The whole site is one matted object suspended over moving aerial water. A near-black museum board is the ground; charcoal mat faces sit on it, each cut with a one-pixel bevel that takes its color from the half of the work it frames, amber for Art and ice-cyan for Tech. Behind the object, Jason's supplied pixelated ocean photographs form branching silver foam and broad dark pools. Smooth eddies and downward flow animate the water at 25% opacity, with navy shadows and sparse coral highlights. Titles are a wide grotesque set as pale ink directly on the board with a single soft cast shadow. Everything else that is written on a mat is written in pencil: small, tracked, uppercase captions in graphite.
 
 The home page is the hinge between the two disciplines: a split-lit portrait cut into two panels that meet edge to edge down the center of the face, with no line between them, the name riding across both mats above it. Art and Tech pages are the same board with their works matted and plate-numbered in a run. Density is museum-quiet: one column of prose at 44-62ch, generous mats, hairline dividers, and no chrome beyond the nav and the back of the frame.
 
@@ -155,20 +157,23 @@ Confirmed rejections: no name-over-hero-plus-grids arrangement; no accent fills,
 
 **Key Characteristics:**
 - One near-black board, charcoal mats, one-pixel colored bevels
+- Pixelated aerial ocean: branching silver foam, navy shadows, sparse coral, and continuous eddy motion at 25% opacity
 - One variable family (Archivo) doing all hierarchy through width and weight
 - Pencil caption register for every label on a mat
 - Every work carries a counter-generated plate number
 - Physical depth: an inset highlight line, a cut edge, and a long soft cast
-- Motion is the object moving: panels swing on their hinge, mats lift, prints develop into view
+- Motion is physical: the current descends, panels swing on their hinge, mats lift, prints develop into view
 
 ## Colors
 
-A monochrome board-and-paper palette with two saturated hues confined to hairlines and the light inside the photographs.
+A monochrome board-and-paper palette with saturated color confined to hairlines, photographic light, and the atmospheric current behind the mats.
 
 ### Primary
 - **Amber Core** (`accent-art`): the Art accent. Appears as the bevel hairline around Art prints, the label color on Art hover, the arrow glyph in the Art caption, the current-page underline on /art, focus rings, and text selection on Art surfaces. Never a fill.
 - **Ice-Cyan Core** (`accent-tech`): the Tech accent, same roles on Tech surfaces: project-card window bevels, Tech panel label hover, arrow glyph, current-page underline on /tech.
 - **Bone** (`accent-home`): the home page's resting accent, a neutral warm grey. Drives the focus ring, current-nav underline, and selection on the home page (/) so the home surface carries no hue outside the two panels.
+- **Atlantic Navy** (`accent-navy`): the dark outer lines and scattered pixels around the moving wave. It may tint the empty board but never a mat or text surface.
+- **Current Coral** (`accent-coral`): the broken warm seam and rare foam pixels in the wave. It is an atmospheric counterpoint, never a control color or filled surface.
 
 ### Neutral
 - **Backing Board** (`bg`): page background, nav background, and the "window" plate behind each project title. Also the `theme-color`.
@@ -184,11 +189,11 @@ A monochrome board-and-paper palette with two saturated hues confined to hairlin
 - **Bevel** (`bevel`): the resting hairline around every gallery print, project window, and page-title rule, computed as 58% of the in-force accent mixed into the mat face. The home diptych windows carry no bevel. It is re-declared on `body`, `.panel`, and `.project-card` so it recomputes wherever `--accent` is re-scoped.
 
 ### Named Rules
-**The Bevel Rule.** Color lives only on bevels and in the light on the prints. An accent may draw a 1px line, tint a glyph, or color a hovered label; it never fills a surface, a button, or a block of text.
+**The Bevel Rule.** Interface color lives only on bevels and in the light on the prints. An accent may draw a 1px line, tint a glyph, or color a hovered label; it never fills a mat, button, or block of text. The atmospheric wave is the sole exception: navy, metallic silver, and coral may draw pixel-quantized lines and isolated foam pixels behind content.
 
 **The Accent Scope Rule.** `--accent` is set once per scope (`body.home` bone, `body.tech` cyan, `.panel-art` / `.panel-tech` / `.project-card` per half) and `--bevel` is recomputed inside that scope. New surfaces inherit their hue by declaring which half they belong to, never by hard-coding a hex.
 
-**The Home Is Bone Rule.** On the home page (/) the two hues appear only inside the two panels. Everything outside the diptych (nav, focus, selection, wall label, footer) uses the neutral bone accent.
+**The Home Is Bone Rule.** On the home page (/) interactive accents outside the diptych (nav, focus, selection, wall label, footer) use neutral bone. Navy and coral belong only to the noninteractive current field.
 
 ## Typography
 

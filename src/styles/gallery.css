@@ -63,37 +63,8 @@
   }
 }
 
-/* --------------------------------------------------------------------------
-   The wave: the Art background Jason selected (docs/portfolio-design-brief.md,
-   "Selected brand assets"; treatment locked in .tastemaker/style-lock.md).
-
-   `patterned` is the marker Rail.astro stamps on its pages and nowhere else,
-   so pairing it with `.gallery-page` keeps the wave off Tech and Home while
-   staying inside this file's scope rule.
-
-   diptych.css has already spent `body::before` on the board's rag texture, so
-   the wave takes `::after`. Both are z-index -1 inside the stacking context
-   `body { isolation: isolate }` opens: the wave lies over the rag, and both
-   lie under every mat, plate and label. The near-black canvas stays beneath
-   them, the layer takes no pointer events, and no text ever inherits its
-   opacity — the 4% is spent on the artwork alone, never on a photograph.
-   -------------------------------------------------------------------------- */
-.gallery-page.patterned::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: url("../assets/art/wave-pattern.svg");
-  background-repeat: repeat;
-  /* The locked tile: the 1104x608 source hung at half scale. */
-  background-size: 552px 304px;
-  /* The supplied strokes are dark on transparent. brightness(0) then invert(1)
-     drives every stroke to pure white without touching alpha, so 4% reads as
-     silver drawn on the board rather than as a grey wash laid over it. */
-  filter: grayscale(1) brightness(0) invert(1);
-  opacity: 0.04;
-}
+/* The shared CurrentField component now supplies the site's moving water
+   ground. Art keeps its quiet treatment through the layout's `quiet` prop. */
 
 /* ==========================================================================
    The type registers, shared by every component below
@@ -392,7 +363,7 @@
   align-content: start;
   gap: calc(var(--space) * 1.5);
   padding: var(--mat-sm) var(--mat-sm) calc(var(--mat-sm) + 2px);
-  background: var(--board);
+  background: var(--surface-board);
   color: var(--text);
   text-decoration: none;
   box-shadow:
@@ -408,7 +379,7 @@
   display: block;
   position: relative;
   overflow: hidden;
-  background: var(--bg);
+  background: var(--surface-bg);
   box-shadow: 0 0 0 1px var(--bevel);
   transition: box-shadow 0.7s var(--ease-out);
 }

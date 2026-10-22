@@ -18,6 +18,8 @@
 :root {
   --bg: #08090b;            /* backing board */
   --board: #101115;         /* mat face */
+  --surface-board: color-mix(in srgb, var(--board) 75%, transparent);
+  --surface-bg: color-mix(in srgb, var(--bg) 75%, transparent);
   --board-raised: #17181d;  /* label plate */
   --board-edge: #030304;    /* cut edge in shadow */
   --text: #ece8de;          /* paper white */
@@ -26,6 +28,8 @@
   --hairline: rgba(236, 232, 222, 0.07);
   --accent-art: #e98a3e;    /* amber core */
   --accent-tech: #48c4dc;   /* ice-cyan core */
+  --accent-navy: #173a5f;   /* Atlantic depth */
+  --accent-coral: #ff7668;  /* warm current highlight */
   --accent: var(--accent-art);
   --bevel: color-mix(in srgb, var(--accent) 58%, var(--board));
   --name-h: clamp(2.25rem, 6vw, 5rem);
@@ -268,7 +272,7 @@ body.home { position: relative; }
   display: flex;
   flex-direction: column;
   padding: calc(var(--mat) + var(--name-h) * 1.15) 0 var(--mat);
-  background: var(--board);
+  background: var(--surface-board);
   color: var(--text);
   text-decoration: none;
   box-shadow:
@@ -384,7 +388,7 @@ body.home { position: relative; }
   max-width: 62ch;
   margin: 0 auto;
   padding: clamp(24px, 3vw, 36px) clamp(24px, 3.4vw, 44px) clamp(22px, 3vw, 32px);
-  background: var(--board);
+  background: var(--surface-board);
   box-shadow:
     0 0 0 1px var(--bevel),
     inset 0 1px 0 rgba(255, 255, 255, 0.035),

@@ -1,0 +1,81 @@
+{
+  "standard_version": "1.0.0",
+  "pipeline_position": "after_initial_project_enrichment",
+  "interactive_demo_sections": [
+    "problem_audience",
+    "approach_decisions",
+    "challenges_solutions",
+    "outcome_evidence"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "fields": {
+        "name": "Project name",
+        "description": "One-sentence description",
+        "demo_or_image": "Screenshot or working demo URL"
+      }
+    },
+    {
+      "key": "problem_audience",
+      "title": "Problem and audience",
+      "fields": {
+        "audience": "Intended audience",
+        "problem": "Problem",
+        "goal": "Goal"
+      }
+    },
+    {
+      "key": "role_scope",
+      "title": "Your role and scope",
+      "fields": {
+        "ownership": "Personal ownership",
+        "team": "Team context",
+        "timeline": "Timeline"
+      }
+    },
+    {
+      "key": "approach_decisions",
+      "title": "Approach and key decisions",
+      "fields": {
+        "approach": "Approach",
+        "tools": "Tools and methods",
+        "decisions": "Decisions and reasons"
+      }
+    },
+    {
+      "key": "challenges_solutions",
+      "title": "Challenges and solutions",
+      "fields": {
+        "challenge": "Obstacle or constraint",
+        "solution": "Response",
+        "tradeoff": "Tradeoff"
+      }
+    },
+    {
+      "key": "outcome_evidence",
+      "title": "Outcome and evidence",
+      "fields": {
+        "result": "Finished result",
+        "evidence": "Supporting evidence or validation",
+        "limitations": "Limits of the evidence"
+      }
+    },
+    {
+      "key": "reflection",
+      "title": "Reflection",
+      "fields": {
+        "learned": "Lessons learned",
+        "next_steps": "What to improve next"
+      }
+    },
+    {
+      "key": "links",
+      "title": "Links",
+      "fields": {
+        "resources": "Relevant public URLs (one per line)"
+      }
+    }
+  ]
+}

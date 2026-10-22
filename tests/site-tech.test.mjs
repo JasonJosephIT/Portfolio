@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { buildSite, copyFixture, fixture, page } from "./helpers.mjs";
+import { standard, legacyPortfolio } from "../standards/portfolio.mjs";
+import { validateBundle } from "../scripts/lib/validate-bundle.mjs";
 
 const read = (p) => JSON.parse(readFileSync(p, "utf8"));
 const write = (p, v) => writeFileSync(p, JSON.stringify(v));
@@ -14,10 +16,9 @@ before(() => {
   out = buildSite();
 });
 
-test("each card holds name, summary and tags, and nothing else", () => {
+test("each project panel introduces its bundle record without status, dates, or repo links", () => {
   const html = page(out, "tech/index.html");
-  const list = html.slice(0, html.indexOf("</ol>", html.indexOf('class="plate-item"'))); // stop at the end of the card list
-  const cards = list.split('class="plate-item"').slice(1); // tag <li>s nest inside, so split rather than match
+  const cards = html.split('data-panel').slice(1).map(p => p.slice(0, p.indexOf('</article>')));
   assert.equal(cards.length, 3);
   for (const slug of ["alpha-tool", "beta-site", "gamma-lib"]) {
     const rec = read(join(fixture, "projects", `${slug}.json`));
@@ -27,6 +28,49 @@ test("each card holds name, summary and tags, and nothing else", () => {
     assert.doesNotMatch(card, /<time|github\.com|href="https?:/i);
     assert.doesNotMatch(text(card), /\d{4}-\d{2}-\d{2}|\b(draft|archived|active|shipped|status)\b/i);
   }
+});
+
+test("every project renders exactly the eight canonical sections, including missing sections", () => {
+  const html = page(out, "tech/index.html");
+  for (const slug of ['alpha-tool', 'beta-site', 'gamma-lib']) {
+    const panel = html.split(`data-slug="${slug}"`)[1].split('</article>')[0];
+    assert.deepEqual([...panel.matchAll(/data-section="([^"]+)"/g)].map(m=>m[1]),standard.sections.map(s=>s.key));
+    assert.equal([...panel.matchAll(/data-demo-topic="true"/g)].length,4);
+    assert.match(panel,/hasn’t been documented yet/);
+    assert.doesNotMatch(panel,/source_refs|needs_input|missing_fields/);
+  }
+  const alpha = html.split('data-slug="alpha-tool"')[1].split('</article>')[0];
+  assert.match(alpha, /href="\/tech\/alpha-tool\/features"/);
+  assert.doesNotMatch(html,/Sideways for projects|Downward for the details|#d6e4d9|#e0e4f0/);
+});
+
+test("structured enrichment fields render verbatim and local metadata stays hidden", () => {
+  const o = build({edit: d => {
+    const file=join(d,'projects/alpha-tool.json'); const record=read(file);
+    record.portfolio=legacyPortfolio(record);
+    const section=record.portfolio.sections.problem_audience;
+    section.fields.problem='Files accumulate in one unsorted folder.';
+    section.missing_fields=section.missing_fields.filter(k=>k!=='problem');
+    section.source_refs=['author:alpha-tool'];
+    write(file,record);
+  }});
+  const html=page(o,'tech/index.html');
+  assert.match(html,/Files accumulate in one unsorted folder\./);
+  assert.doesNotMatch(html,/author:alpha-tool|source_refs/);
+});
+
+test("malformed eight-section records are rejected without weakening the pending-publication gate",()=>{
+  const d=copyFixture(dir=>{const f=join(dir,'projects/alpha-tool.json');const r=read(f);r.portfolio=legacyPortfolio(r);delete r.portfolio.sections.reflection;write(f,r);});
+  assert.throws(()=>validateBundle(d),/reflection|eight sections/);
+});
+
+test("unavailable media is omitted; a configured media origin renders the image and lightbox control", () => {
+  assert.doesNotMatch(page(out, "tech/index.html"), /data-expand-image/);
+  const mediaOut = build({ env: { PUBLIC_PROJECT_MEDIA_BASE: "https://media.example.test/" } });
+  const html = page(mediaOut, "tech/index.html");
+  assert.match(html, /src="https:\/\/media.example.test\/alpha-tool\/shot.png"/);
+  assert.match(html, /data-expand-image/);
+  assert.match(html, /data-section="overview"/);
 });
 
 // The slugs linked inside the "Related projects" section.
@@ -67,7 +111,7 @@ test("breadcrumb counts plates as N of total", () => {
 test("About shows the profile headline and every skill", () => {
   const html = page(out, "tech/index.html");
   const profile = read(join(fixture, "profile.json"));
-  const about = html.slice(html.indexOf('id="about"'));
+  const about = html.slice(html.indexOf('data-about-dialog'));
   assert.ok(text(about).includes(profile.bio));
   assert.ok(text(html).includes(profile.headline));
   for (const s of [...profile.skills, ...profile.interests]) assert.ok(text(about).includes(s), s);
