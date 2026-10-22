@@ -1,0 +1,120 @@
+{
+  "approved_at": null,
+  "source": "Open Thoughts/daydream/map/jason-joseph-source-of-truth.md (v1.1-rebuilt, 2026-10-14), sections 2 and 4",
+  "name": "Jason Joseph",
+  "summary": "IT operations and solo consulting, with work in workflow improvement, client-engagement systems, and custom Zoho solutions for small and mid-sized businesses.",
+  "project_excerpts": {
+    "civic-awareness-project-know-your-vote": [
+      "District lookup works from the full address rather than a ZIP code. It started on Google geocoding and moved to a self-hosted Pelias instance.",
+      "It builds a corpus from Firecrawl and publisher sitemaps, streams stories to candidate pages, and characterizes coverage with a model. A confidence threshold and outlet-lean review sit on top of that step."
+    ],
+    "chazak-studio-management": [
+      "Research agents search for open calls and grants. SQL filters check each artist's eligibility.",
+      "A person approves each opportunity before it reaches anyone. Every artist then gets a feed of opportunities they can apply to."
+    ],
+    "output-engine": [
+      "It runs 15 LLM stages from intake to delivery. Each stage writes a versioned record that has to be approved before the next one runs.",
+      "Image models would not hold a room steady, so a Blender previs layer was added: shots are planned in Blender and animated with Kling, and a mannequin carries a seven-joint anatomy check.",
+      "The engine has been used for real work, including brand art for Know Your Vote that was placed into that site, and multi-angle product shots."
+    ]
+  },
+  "experience": [
+    {
+      "organization": "Chazak Solutions LLC",
+      "role": "Solutions Consultant / Owner",
+      "dates": "Feb 2024 - Present",
+      "context": "Solo consulting practice · Orlando, FL",
+      "bullets": [
+        "Build custom Zoho workflows and client-engagement systems for small and mid-sized businesses."
+      ],
+      "tags": [
+        "Zoho",
+        "Workflow improvement"
+      ]
+    },
+    {
+      "organization": "SSA Group",
+      "role": "IT Analyst",
+      "dates": "Jan 2023 - Jun 2026",
+      "context": "IT operations · Orlando, FL",
+      "bullets": [
+        "Resolved 3,000+ technical issues over tenure and maintained 95%+ SLA compliance using Jira ITSM.",
+        "Implemented and troubleshot POS terminals, including hardware diagnostics, software configuration, and payment-processing integrations.",
+        "Supported multiple sites across the country, with hands-on work in Azure deployments and process documentation."
+      ],
+      "tags": [
+        "Jira ITSM",
+        "POS",
+        "Azure"
+      ]
+    },
+    {
+      "organization": "Lockheed Martin",
+      "role": "Desktop Support Specialist",
+      "dates": "Jan 2022 - Jan 2023",
+      "context": "Desktop support · Orlando, FL",
+      "bullets": [
+        "Closed and documented 100+ tickets in ServiceNow.",
+        "Troubleshot Microsoft Office and business applications, installed applications, and supported peripheral devices and hardware."
+      ],
+      "tags": [
+        "ServiceNow",
+        "Desktop support"
+      ]
+    },
+    {
+      "organization": "Love All Tennis LLC",
+      "role": "Business Owner",
+      "dates": "Jan 2020 - Apr 2025",
+      "context": "Private coaching business · Windermere / Orlando, FL",
+      "bullets": [
+        "Ran client acquisition and retention, scheduling, financial management, and service delivery for a private tennis coaching business.",
+        "Grew the business through client referrals from families in the greater Windermere area."
+      ],
+      "tags": [
+        "Business operations",
+        "Coaching"
+      ]
+    }
+  ],
+  "education": "Western Governors University · B.S. Information Technology (in progress)",
+  "credentials": [
+    "CompTIA A+",
+    "CompTIA Network+",
+    "CompTIA Project+",
+    "AWS Cloud Technical Essentials",
+    "AI Business Strategy · Johns Hopkins University",
+    "Future of AI · BlueDot Impact",
+    "Negotiation Professional Certificate · American Negotiation Institute"
+  ],
+  "in_progress": [
+    "AWS Certified Solutions Architect - Associate",
+    "Claude Certified Architect - Professional"
+  ],
+  "contact_links": [
+    {
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/jason-joseph-dev"
+    },
+    {
+      "label": "Portfolio",
+      "url": "/tech"
+    }
+  ],
+  "community": [
+    {
+      "title": "Youth ministry leadership",
+      "bullets": [
+        "Progressed through youth community involvement, mentorship, and program strategy roles.",
+        "Established an ongoing partnership between a church youth group and the Parramore Community Center through direct outreach.",
+        "Delivered service programming through the partnership, including a Valentine’s Day gala hosted and served by the youth group."
+      ]
+    },
+    {
+      "title": "Volunteer adaptive tennis instruction",
+      "bullets": [
+        "Supported instructors teaching tennis to children with behavioral challenges."
+      ]
+    }
+  ]
+}

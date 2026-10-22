@@ -1,4 +1,5 @@
 Daily `pnpm pull` (09:00) in a dedicated clone, not your working checkouts.
+`pnpm pull` now only refreshes the approved public API snapshot locally. It does not open a PR or publish a site. Rebuild/deploy separately. The legacy PR importer is `pnpm pull:bundle`.
 1. Clone: mkdir -p ~/Library/"Application Support"/portfolio-pull && git clone <portfolio-remote-url> ~/Library/"Application Support"/portfolio-pull/Portfolio
 2. Check `gh auth status` works from a plain shell (no prompts).
 3. Install: sed "s#__HOME__#$HOME#g" scripts/launchd/com.jason.portfolio-pull.plist > ~/Library/LaunchAgents/com.jason.portfolio-pull.plist

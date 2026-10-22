@@ -3,7 +3,13 @@
 .claude/*
 .env
 content/bundle-preview/
-node_modules
+content/bundle-preview-staging-*/
+content/bundle-preview-previous-*/
+content/.public-pull-*/
+content/.public-previous-*/
+content/bundle-public/
+content/bundle/
+node_modules/
 .impeccable/review/
 .impeccable/questions/
 .impeccable/build/

@@ -1,0 +1,147 @@
+---
+import { marked } from "marked";
+import Resume from "@/layouts/Resume.astro";
+import { profile, projects } from "@/lib/bundle";
+import resume from "@/data/resume.json";
+
+// Career copy has its own review state. Never promote it merely because a bundle is approved.
+const careerVisible = Boolean(resume.approved_at) || import.meta.env.PREVIEW === "1";
+const careerDraft = !resume.approved_at;
+const all = await projects();
+const work = all; // The website carries the full record; application templates select a smaller subset.
+const projectRows = work.map((project) => {
+  if (!project) throw new Error("Missing resume project");
+  const list = marked.lexer(project.description).find((token) => token.type === "list");
+  // Excerpts must still occur verbatim in the current bundle; stale or invented copy cannot render.
+  const suggestions = (resume.project_excerpts as Record<string, string[]>)[project.slug] ?? [];
+  const excerpts = suggestions.filter((text) => project.description.includes(text));
+  const details = excerpts.length ? excerpts.map((text) => marked.parse(text)) : list?.type === "list" ? list.items.slice(0, 3).map((item) => marked.parser(item.tokens)) : [];
+  return { ...project, details };
+});
+---
+
+<Resume title="Resume · Jason Joseph" description={profile.headline} showCareer={careerVisible}>
+  <div class="resume-page">
+    <header class="resume-intro">
+
+      <div class="resume-title-row">
+        <h1 class="title">{careerVisible ? resume.name : "Jason"}</h1>
+        {careerVisible && <div class="resume-contact">{resume.contact_links.map((link) => <a href={link.url}>{link.label}</a>)}</div>}
+      </div>
+      <p class="resume-direction"><span class="resume-direction-label">Career direction</span>{profile.headline}</p>
+      {careerVisible && <p class="resume-summary">{resume.summary}</p>}
+      {careerVisible && careerDraft && <p class="resume-draft" role="note">Career details are a draft for review. Project descriptions follow the portfolio’s content review status.</p>}
+    </header>
+
+    <div class="resume-body">
+      {careerVisible && <section id="experience" class="resume-section" aria-labelledby="experience-title">
+        <h2 id="experience-title" class="label-section">Experience</h2>
+        <div class="resume-entries">
+          {resume.experience.map((entry) => <article class="resume-entry">
+            <div class="resume-entry-heading">
+              <h3><span class="resume-organization">{entry.organization}</span> <span aria-hidden="true">—</span> {entry.role}</h3>
+              <p class="resume-dates">{entry.dates}</p>
+            </div>
+            <p class="resume-context">{entry.context}</p>
+            <ul class="resume-bullets">{entry.bullets.map((bullet) => <li>{bullet}</li>)}</ul>
+            <ul class="resume-tags" aria-label="Tools and areas">{entry.tags.map((tag) => <li>{tag}</li>)}</ul>
+          </article>)}
+        </div>
+      </section>}
+
+      <section id="selected-projects" class="resume-section" aria-labelledby="projects-title">
+        <h2 id="projects-title" class="label-section">Selected projects</h2>
+        <div class="resume-entries">
+          {projectRows.map((project) => <article class="resume-entry resume-project">
+            <div class="resume-entry-heading"><h3><a href={`/tech/${project.slug}`}>{project.name}<span class="resume-project-arrow" aria-hidden="true"> ↗</span></a></h3></div>
+            <p class="resume-purpose">{project.summary}</p>
+            {project.details.length > 0 && <ul class="resume-bullets">{project.details.map((detail) => <li set:html={detail} />)}</ul>}
+            {project.tags.length > 0 && <ul class="resume-tags" aria-label="Technologies">{project.tags.map((tag) => <li>{tag}</li>)}</ul>}
+          </article>)}
+          {projectRows.length === 0 && <p class="resume-summary">Project details will appear as work is added to the portfolio.</p>}
+        </div>
+      </section>
+
+      {careerVisible && <section id="community" class="resume-section" aria-labelledby="community-title">
+        <h2 id="community-title" class="label-section">Community leadership</h2>
+        <div class="resume-entries">{resume.community.map((entry) => <article class="resume-entry"><h3>{entry.title}</h3><ul class="resume-bullets">{entry.bullets.map((bullet) => <li>{bullet}</li>)}</ul></article>)}</div>
+      </section>}
+
+      <section id="skills" class="resume-section" aria-labelledby="skills-title">
+        <h2 id="skills-title" class="label-section">Skills</h2>
+        <ul class="resume-skills">{profile.skills.map((skill) => <li>{skill}</li>)}</ul>
+      </section>
+
+      {careerVisible && <section id="education" class="resume-section" aria-labelledby="education-title">
+        <h2 id="education-title" class="label-section">Education &amp; credentials</h2>
+        <div class="resume-entries resume-education">
+          <p>{resume.education}</p>
+          <div><h3>Credentials held</h3><ul class="resume-credentials">{resume.credentials.map((credential) => <li>{credential}</li>)}</ul></div>
+          <div><h3>In progress</h3><ul class="resume-credentials">{resume.in_progress.map((credential) => <li>{credential}</li>)}</ul></div>
+        </div>
+      </section>}
+    </div>
+    <a class="resume-back text-link" href="/tech">Explore the full portfolio <span aria-hidden="true">↗</span></a>
+  </div>
+</Resume>
+
+<script>
+  document.getElementById("print-resume")?.addEventListener("click", () => window.print());
+</script>
+
+<style>
+  .resume-intro { padding:32px 40px; background:var(--resume-card); border:1px solid var(--resume-border); border-radius:14px; }
+  .resume-title-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+  h1 { font-size:34px; line-height:1.2; letter-spacing:-.04em; }
+  .resume-contact { display:grid; text-align:right; color:var(--resume-muted); font-size:14px; }
+  .resume-direction { margin-top:10px; color:var(--resume-muted); line-height:1.6; }
+  .resume-direction-label { display:block; font-size:12px; margin-bottom:3px; }
+  .resume-summary { margin-top:16px; color:var(--resume-muted); line-height:1.65; }
+  .resume-draft { margin-top:16px; padding-top:12px; border-top:1px solid var(--resume-border); color:var(--resume-muted); font-size:12px; }
+  .resume-section { margin-top:30px; scroll-margin-top:120px; }
+  .resume-section > h2 { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; padding-bottom:6px; border-bottom:1px solid var(--resume-border); margin-bottom:16px; color:var(--resume-accent); }
+  .resume-entries { display:grid; gap:20px; }
+  .resume-entry { padding:20px 24px; border:1px solid var(--resume-border); border-radius:10px; background:var(--resume-card); }
+  .resume-entry-heading { display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px 16px; }
+  h3 { font-size:16px; font-weight:700; line-height:1.5; }
+  .resume-organization { color:var(--resume-accent); }
+  .resume-dates { flex-shrink:0; font-size:12px; color:var(--resume-muted); border:1px solid var(--resume-border); background:var(--resume-bg); border-radius:5px; padding:2px 9px; }
+  .resume-context { margin-top:7px; color:var(--resume-muted); font-size:13px; }
+  .resume-bullets { margin-top:12px; padding-left:16px; color:var(--resume-muted); font-size:14px; line-height:1.65; list-style:disc; }
+  .resume-bullets li + li { margin-top:6px; }
+  .resume-bullets li::marker { color:var(--resume-accent); }
+  .resume-bullets :global(p) { display:inline; }
+  .resume-bullets :global(strong) { color:var(--resume-text); font-weight:600; }
+  .resume-purpose { color:var(--resume-muted); font-size:14px; line-height:1.65; margin-top:8px; }
+  .resume-tags { display:flex; flex-wrap:wrap; gap:5px; list-style:none; padding:0; margin-top:14px; }
+  .resume-tags li { border:1px solid var(--resume-border); border-radius:20px; background:var(--resume-bg); color:var(--resume-muted); padding:0 8px; font-size:12px; line-height:1.65; }
+  .resume-project-arrow { color:var(--resume-accent); }
+  .resume-skills { display:flex; flex-wrap:wrap; gap:8px; list-style:none; padding:20px 24px; background:var(--resume-card); border:1px solid var(--resume-border); border-radius:10px; }
+  .resume-skills li { color:var(--resume-muted); font-size:14px; padding-right:12px; }
+  .resume-education { padding:20px 24px; border:1px solid var(--resume-border); border-radius:10px; background:var(--resume-card); gap:20px; }
+  .resume-credentials { padding-left:18px; color:var(--resume-muted); font-size:14px; margin-top:8px; }
+  .resume-back { display:inline-block; margin-top:24px; color:var(--resume-muted); font-size:14px; }
+  @media(max-width:600px) { .resume-intro { padding:24px; } h1 { font-size:28px; } .resume-contact { text-align:left; display:flex; gap:16px; } .resume-entry { padding:18px; } .resume-section { scroll-margin-top:160px; } }
+  @media print {
+    .resume-intro,.resume-entry,.resume-skills,.resume-education { background:white; border:0; border-radius:0; padding:0; }
+    h1 { font-size:24pt; }
+    .resume-direction,.resume-summary,.resume-purpose,.resume-bullets { font-size:10pt; line-height:1.35; }
+    .resume-contact,.resume-back,.resume-context { display:none; }
+    .resume-draft { margin-top:8px; padding-top:0; border:0; font-size:9pt; }
+    .resume-section { margin-top:18px; }
+    .resume-section > h2 { font-size:10pt; border-color:#999; margin-bottom:10px; break-after:avoid; }
+    .resume-entry { break-inside:avoid; }
+    .resume-entries { gap:14px; }
+    h3 { font-size:11pt; }
+    .resume-dates { font-size:10pt; padding:0; border:0; background:white; }
+    .resume-bullets { margin-top:5px; }
+    .resume-bullets li + li { margin-top:3px; }
+    .resume-tags { margin-top:6px; gap:0; }
+    .resume-tags li { font-size:9pt; background:white; border:0; padding:0; }
+    .resume-tags li:not(:last-child)::after { content:" · "; white-space:pre; }
+    .resume-skills { display:block; }
+    .resume-skills li { display:inline; padding:0; font-size:10pt; }
+    .resume-skills li:not(:last-child)::after { content:"; "; }
+    .resume-credentials { font-size:10pt; }
+  }
+</style>
