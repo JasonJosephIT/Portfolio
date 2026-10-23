@@ -4,6 +4,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, join } from "node:path";
 import Ajv2020 from "ajv/dist/2020.js";
+import { portfolioError } from "../../standards/portfolio.mjs";
 
 export const SUPPORTED_SCHEMA_VERSION = 1;
 const SCHEMA = JSON.parse(readFileSync(new URL("../../schemas/bundle.schema.json", import.meta.url), "utf8"));
@@ -42,6 +43,10 @@ export function validateBundle(dir, { allowPending = false } = {}) {
   const records = Object.fromEntries(files.map((f) => [f, load(`projects/${f}.json`)]).filter(([, r]) => r));
   for (const [f, r] of Object.entries(records)) {
     problems.push(...shape("project", r, `projects/${f}.json`));
+    if (r.portfolio) {
+      const error = portfolioError(r.portfolio, { allowDraft: allowPending && manifest.approval === "pending" });
+      if (error) problems.push(`projects/${f}.json: ${error}`);
+    }
     if (r.slug !== f) problems.push(`projects/${f}.json: slug ${JSON.stringify(r.slug)} != filename stem`);
   }
   const profile = load("profile.json");

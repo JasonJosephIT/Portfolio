@@ -1,0 +1,130 @@
+{
+  "slug": "ledger",
+  "name": "Ledger",
+  "summary": "A plain-text budgeting tool that turns bank exports into a monthly picture in one command.",
+  "tags": [
+    "rust",
+    "cli",
+    "finance"
+  ],
+  "description": "A plain-text budgeting tool that turns bank exports into a monthly picture in one command. This is placeholder copy for layout review.",
+  "media": [
+    {
+      "key": "sample-media/ledger/main.svg",
+      "kind": "image",
+      "checksum": "sha256-sample",
+      "poster_key": null,
+      "caption": "Ledger: main view"
+    },
+    {
+      "key": "sample-media/ledger/detail.svg",
+      "kind": "image",
+      "checksum": "sha256-sample",
+      "poster_key": null,
+      "caption": "Ledger: detail view"
+    }
+  ],
+  "part_of": null,
+  "approved_at": "2026-10-22T00:00:00Z",
+  "source_hash": "5a5a5a5a5a5a5a5a",
+  "portfolio": {
+    "schema_version": "1.0.0",
+    "sections": {
+      "overview": {
+        "fields": {
+          "name": "Ledger",
+          "description": "A plain-text budgeting tool that turns bank exports into a monthly picture in one command.",
+          "demo_or_image": ""
+        },
+        "status": "needs_input",
+        "source_refs": [
+          "approved:ledger"
+        ],
+        "missing_fields": [
+          "demo_or_image"
+        ]
+      },
+      "problem_audience": {
+        "fields": {
+          "audience": "Anyone who keeps a budget in a spreadsheet and dreads the monthly paste",
+          "problem": "Every bank exports a different CSV, so reconciling takes an evening.",
+          "goal": "One command that normalises any export and prints a clean monthly summary."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:ledger"
+        ],
+        "missing_fields": []
+      },
+      "role_scope": {
+        "fields": {
+          "ownership": "Built the parser, the rules engine and the report.",
+          "team": "Solo project",
+          "timeline": "Six weeks"
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:ledger"
+        ],
+        "missing_fields": []
+      },
+      "approach_decisions": {
+        "fields": {
+          "approach": "Describe each bank once in a small config file, then pipe any export through it.",
+          "tools": "Rust, a hand-written CSV adapter layer, golden-file tests.",
+          "decisions": "Plain-text files over a database, so the data outlives the tool.\nRules are ordered and readable, not learned."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:ledger"
+        ],
+        "missing_fields": []
+      },
+      "challenges_solutions": {
+        "fields": {
+          "challenge": "Banks change their export format without warning.",
+          "solution": "Fail loudly with the exact line and column, and ship a fixture test per bank.",
+          "tradeoff": "More upfront config per bank, but no silent miscategorisation."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:ledger"
+        ],
+        "missing_fields": []
+      },
+      "outcome_evidence": {
+        "fields": {
+          "result": "Twelve months of exports from four banks reconcile to the cent.",
+          "evidence": "Golden tests for every adapter, plus a manual check against statement totals.",
+          "limitations": "Only tested on checking and credit card exports."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:ledger"
+        ],
+        "missing_fields": []
+      },
+      "reflection": {
+        "fields": {
+          "learned": "Golden-file tests made every refactor safe.",
+          "next_steps": "A forecast view and recurring-payment detection."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:ledger"
+        ],
+        "missing_fields": []
+      },
+      "links": {
+        "fields": {
+          "resources": ""
+        },
+        "status": "needs_input",
+        "source_refs": [],
+        "missing_fields": [
+          "resources"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,64 @@
+---
+import { marked } from "marked";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
+import { profile, projects, docsFor, builds, DOC_TITLE } from "@/lib/bundle";
+import "@/styles/project-explorer.css";
+import { standard, legacyPortfolio, publicUrl } from "../../standards/portfolio.mjs";
+
+const all = await projects();
+const notes = await builds();
+const colors = ["var(--accent-tech)", "var(--accent-sky)", "var(--accent-art)", "var(--accent-coral)"];
+const mediaBase = import.meta.env.PUBLIC_PROJECT_MEDIA_BASE;
+const mediaUrl = (key: string) => {
+  if (key.startsWith("//") || key.split("/").some((segment) => segment === "..") || /[?#\\]/.test(key)) return null;
+  if (key.startsWith("/") && !key.startsWith("//")) return existsSync(resolve("public", `.${key}`)) ? key : null;
+  if (/^[a-z]+:/i.test(key)) return null;
+  if (existsSync(resolve("public", key))) return `/${key}`;
+  return mediaBase?.startsWith("https://") ? new URL(key, `${mediaBase.replace(/\/$/, "")}/`).href : null;
+};
+const panels = await Promise.all(all.map(async (p, index) => {
+  const docs = await docsFor(p.slug);
+  const portfolio = p.portfolio ?? legacyPortfolio(p);
+  const sections = standard.sections.map((definition) => ({ id: definition.key, label: definition.title, fields: Object.entries(definition.fields).map(([key, label]) => ({ key, label, value: portfolio.sections[definition.key].fields[key] ?? "", isLink: definition.key === "links" || key === "demo_or_image" })) }));
+  const media = p.media.flatMap((m) => { const url = mediaUrl(m.key); return url ? [{ ...m, url, poster: m.poster_key ? mediaUrl(m.poster_key) : null }] : []; });
+  return { ...p, narrative: await marked.parse(p.description), color: colors[index % colors.length], sections, media, portfolio, docs, hasBuild: notes.some((n) => n.id === p.slug) };
+}));
+---
+
+<div class="project-explorer" data-project-explorer>
+  <div class="pe-toolbar">
+    <div><h1>Software</h1></div>
+    <div class="pe-actions"><button data-prev aria-label="Previous project">←</button><span data-position aria-live="polite"></span><button data-next aria-label="Next project">→</button>{profile.approved_at && <button data-about>About</button>}</div>
+  </div>
+  <nav aria-label="Choose a project" class="pe-picker">{panels.map((p, i) => <button data-select={i}>{p.name}</button>)}</nav>
+  <div class="pe-track" id="work" data-track aria-label="Projects">
+    {panels.map((p, i) => <article class="pe-panel" data-panel data-slug={p.slug} style={`--pe-accent:${p.color}`} aria-label={p.name}>
+      <header class="pe-panel-header"><h2>{p.name}</h2><span data-current-section>Overview</span></header>
+      <div class="pe-scroll" data-scroll tabindex="0" aria-label={`${p.name} sections`}>
+        {p.sections.map((section, n) => <section class:list={["pe-section", { "pe-intro": section.id === "overview" }]} data-section={section.id} data-label={section.label} data-demo-topic={standard.interactive_demo_sections.includes(section.id) ? "true" : undefined}>
+          {section.id === "overview" ? <><div class="pe-intro-copy"><p class="pe-caption">Software by Jason</p><h3>{p.portfolio.sections.overview.fields.name || p.name}</h3><p class="pe-summary">{p.portfolio.sections.overview.fields.description || p.summary}</p><ul class="pe-tags" aria-label="Tags">{p.tags.map((t) => <li>{t}</li>)}</ul><a href={`/tech/${p.slug}`}>Open project page ↗</a>{publicUrl(p.portfolio.sections.overview.fields.demo_or_image) && <a class="pe-demo-link" href={p.portfolio.sections.overview.fields.demo_or_image} target="_blank" rel="noopener noreferrer">See it working ↗</a>}</div>{p.media[0]?.kind === "image" ? <div class="pe-cover"><button data-expand-image data-src={p.media[0].url} data-caption={p.media[0].caption ?? p.name} aria-label={`Enlarge ${p.media[0].caption ?? p.name}`}><img src={p.media[0].url} alt={p.media[0].caption ?? p.name} loading="eager" /></button></div> : <div class="pe-cover" aria-hidden="true"><div class="pe-cover-frame"><span>{p.name}</span><div class="pe-cover-lines"></div></div></div>}
+            {(p.media[0]?.kind === "image" ? p.media.slice(1) : p.media).length > 0 && <div class="pe-media">{(p.media[0]?.kind === "image" ? p.media.slice(1) : p.media).map(m => <figure>{m.kind === "image" ? <button data-expand-image data-src={m.url} data-caption={m.caption ?? p.name} aria-label={`Enlarge ${m.caption ?? p.name}`}><img src={m.url} alt={m.caption ?? p.name} loading="lazy" /></button> : <video controls preload="none" poster={m.poster ?? undefined} aria-label={m.caption ?? p.name}><source src={m.url} /></video>}<figcaption>{m.caption}</figcaption></figure>)}</div>}
+            {p.description.trim() !== p.summary.trim() && <div class="pe-prose pe-narrative" set:html={p.narrative} />}
+          </> : <>
+            <p class="pe-caption"><span class="pe-num">{String(n + 1).padStart(2, "0")} / {String(p.sections.length).padStart(2, "0")}</span>{p.name}</p><h3>{section.label}</h3>
+            <dl class="pe-fields">{section.fields.filter(f => f.value.trim()).map(field => <div><dt>{field.label}</dt><dd>{field.isLink ? field.value.split("\n").map(v=>v.trim()).filter(publicUrl).map(url => <a href={url} target="_blank" rel="noopener noreferrer">{url}</a>) : field.value}</dd></div>)}</dl>
+            {!section.fields.some(f => f.value.trim()) && <p class="pe-undocumented">This part of the project hasn’t been documented yet.</p>}
+            {section.id === "approach_decisions" && <>{p.docs.map(doc => <a class="pe-detail-link" href={`/tech/${p.slug}/${doc.data.kind}`}>{DOC_TITLE[doc.data.kind]} ↗</a>)}{p.hasBuild && <a class="pe-detail-link" href={`/tech/${p.slug}/build`}>How it was built ↗</a>}</>}
+          </>}
+        </section>)}
+        <div class="pe-end"><a href={`/tech/${p.slug}`}>Open {p.name}</a>{panels.length > 1 && <button data-select={(i + 1) % panels.length}>Next: {panels[(i + 1) % panels.length].name} →</button>}</div>
+      </div>
+    </article>)}
+    {!panels.length && <div class="pe-empty"><h2>Public projects are on their way.</h2><p>There are no public project stories to explore yet.</p></div>}
+  </div>
+  <div class="pe-bottom"><span data-project-name></span><nav data-section-nav aria-label="Project sections"></nav></div>
+</div>
+
+<dialog class="pe-dialog" data-about-dialog aria-labelledby="pe-about-title"><button data-close>Close ×</button><h2 id="pe-about-title">About Jason</h2><p>{profile.headline}</p><div class="pe-prose" set:html={await marked.parse(profile.bio)} /><h3>Skills</h3><ul>{profile.skills.map(s => <li>{s}</li>)}</ul>{profile.interests.length > 0 && <><h3>Interests</h3><ul>{profile.interests.map(s => <li>{s}</li>)}</ul></>}</dialog>
+<dialog class="pe-dialog pe-lightbox" data-media-dialog aria-label="Project image"><button data-close>Close ×</button><img alt="" /><p></p></dialog>
+
+<script>
+  import { initProjectExplorer } from "@/scripts/project-explorer";
+  document.querySelectorAll<HTMLElement>("[data-project-explorer]").forEach(initProjectExplorer);
+</script>

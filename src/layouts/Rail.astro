@@ -3,6 +3,7 @@
 import "@/styles/diptych.css";
 import "@/styles/gallery.css";
 import Head from "@/layouts/Head.astro";
+import CurrentField from "@/components/CurrentField.astro";
 
 interface Props {
   title: string;
@@ -15,8 +16,9 @@ const { title, description, returnPage } = Astro.props;
 <!DOCTYPE html>
 <html lang="en">
 <Head title={title} description={description} />
-<body class="gallery-page gallery-page--art art patterned" data-return-page={returnPage}>
+<body class="gallery-page gallery-page--art art" data-return-page={returnPage}>
   <a class="skip-link" href="#main">Skip to content</a>
+  <CurrentField quiet tone="coral" />
   <slot />
   <script src="../scripts/gallery.js"></script>
 </body>

@@ -2,13 +2,16 @@
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "jason-portfolio",
 	"compatibility_date": "2026-10-13",
+	"workers_dev": true,
+	"routes": [
+		{ "pattern": "jasonjoseph.info", "custom_domain": true }
+	],
 	// Fully prerendered: static assets only, no Worker script, no adapter.
 	"assets": {
 		"directory": "./dist",
 		"not_found_handling": "404-page"
 	}
-	// Workers Builds: production (main) build command `pnpm build`, deploy `pnpm wrangler deploy`.
-	// Non-production (PR preview) build command
-	// `[ -f content/bundle/bundle.json ] || export BUNDLE_DIR=tests/fixtures/bundle; PREVIEW=1 pnpm build`,
-	// deploy `pnpm wrangler versions upload`: a pull PR previews its pulled bundle; branches without one use the fixture.
+	// Workers Builds: pull the approved public snapshot before building: `pnpm pull && pnpm build`.
+	// Deploy production with `pnpm wrangler deploy`, or a preview with `pnpm wrangler versions upload`.
+	// An empty public snapshot renders an empty project list; never substitute drafts or fixtures for it.
 }

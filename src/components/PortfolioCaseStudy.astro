@@ -1,0 +1,31 @@
+---
+import { standard, legacyPortfolio, publicUrl } from "../../standards/portfolio.mjs";
+const { record } = Astro.props;
+const portfolio = record.portfolio ?? legacyPortfolio(record);
+const cloud = import.meta.env.PUBLIC_ENRICHMENT_API_URL ?? "https://open-thoughts-enrichment.slothdev-joseph.workers.dev";
+---
+<div class="portfolio-case-study grid gap-[clamp(32px,6vh,56px)]" data-portfolio data-project-slug={record.slug} data-cloud-base={cloud}>
+  {standard.sections.map((definition, index) => {
+    const section = portfolio.sections[definition.key];
+    return <section id={definition.key} data-section-key={definition.key} data-demo-topic={standard.interactive_demo_sections.includes(definition.key) ? "true" : undefined} class="grid gap-5">
+      <h2 class="rule-head label-section">{index + 1}. {definition.title}</h2>
+      <dl class="grid gap-5" data-section-fields>
+        {Object.entries(definition.fields).map(([key, label]) => {
+          const value = section.fields[key] ?? "";
+          const isLink = (definition.key === "links" && key === "resources") || (definition.key === "overview" && key === "demo_or_image");
+          return <div class="grid gap-2" data-field-key={key}>
+            <dt class="label">{label}</dt>
+            <dd class="text-[1.03rem] leading-relaxed whitespace-pre-line">
+              {isLink ? value.split("\n").filter((url) => publicUrl(url.trim())).map((url) => <a class="text-link block break-all" href={url.trim()} target="_blank" rel="noopener noreferrer">{url.trim()}</a>) : value || <span class="text-muted-text">Not yet documented.</span>}
+              {isLink && !value.trim() && <span class="text-muted-text">Not yet documented.</span>}
+            </dd>
+          </div>;
+        })}
+      </dl>
+    </section>;
+  })}
+</div>
+<script>
+  import { connectPortfolio } from "../scripts/enrichment-live";
+  document.querySelectorAll<HTMLElement>("[data-portfolio]").forEach(connectPortfolio);
+</script>

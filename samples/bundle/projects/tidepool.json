@@ -1,0 +1,128 @@
+{
+  "slug": "tidepool",
+  "name": "Tidepool",
+  "summary": "An interactive map of coastal water-quality readings, readable by anyone, not just analysts.",
+  "tags": [
+    "react",
+    "data-viz",
+    "maps"
+  ],
+  "description": "An interactive map of coastal water-quality readings, readable by anyone, not just analysts. This is placeholder copy for layout review.",
+  "media": [
+    {
+      "key": "sample-media/tidepool/main.svg",
+      "kind": "image",
+      "checksum": "sha256-sample",
+      "poster_key": null,
+      "caption": "Tidepool: main view"
+    },
+    {
+      "key": "sample-media/tidepool/detail.svg",
+      "kind": "image",
+      "checksum": "sha256-sample",
+      "poster_key": null,
+      "caption": "Tidepool: detail view"
+    }
+  ],
+  "part_of": null,
+  "approved_at": "2026-10-22T00:00:00Z",
+  "source_hash": "5a5a5a5a5a5a5a5a",
+  "portfolio": {
+    "schema_version": "1.0.0",
+    "sections": {
+      "overview": {
+        "fields": {
+          "name": "Tidepool",
+          "description": "An interactive map of coastal water-quality readings, readable by anyone, not just analysts.",
+          "demo_or_image": "https://example.com/tidepool"
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "approved:tidepool"
+        ],
+        "missing_fields": []
+      },
+      "problem_audience": {
+        "fields": {
+          "audience": "Beachgoers and local volunteers checking whether a beach is safe",
+          "problem": "The official data is a spreadsheet of station codes and units.",
+          "goal": "Answer “is it safe today?” in one glance, then let people dig deeper."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:tidepool"
+        ],
+        "missing_fields": []
+      },
+      "role_scope": {
+        "fields": {
+          "ownership": "Designed the map, the colour scale and the front end.",
+          "team": "Small team of three: me on design and front end",
+          "timeline": "Three months"
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:tidepool"
+        ],
+        "missing_fields": []
+      },
+      "approach_decisions": {
+        "fields": {
+          "approach": "One colour and one word per beach, with the raw readings a tap away.",
+          "tools": "React, MapLibre, a nightly data job, a colour-blind-safe scale.",
+          "decisions": "A three-step scale instead of a gradient, because people act on categories.\nOpen data in, open data out."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:tidepool"
+        ],
+        "missing_fields": []
+      },
+      "challenges_solutions": {
+        "fields": {
+          "challenge": "Stations report on different schedules, so the map showed stale and fresh readings side by side.",
+          "solution": "Show the reading's age on every pin and fade old ones.",
+          "tradeoff": "A quieter map on slow days, but never a misleading one."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:tidepool"
+        ],
+        "missing_fields": []
+      },
+      "outcome_evidence": {
+        "fields": {
+          "result": "Used by a volunteer group for a full summer season.",
+          "evidence": "Feedback from eleven volunteers; every one found their beach in under ten seconds.",
+          "limitations": "No formal usability study, and no comparison against the official site."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:tidepool"
+        ],
+        "missing_fields": []
+      },
+      "reflection": {
+        "fields": {
+          "learned": "Honest uncertainty is a design feature.",
+          "next_steps": "Alerts for a saved beach, and a year-over-year view."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:tidepool"
+        ],
+        "missing_fields": []
+      },
+      "links": {
+        "fields": {
+          "resources": "https://example.com/tidepool"
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:tidepool"
+        ],
+        "missing_fields": []
+      }
+    }
+  }
+}

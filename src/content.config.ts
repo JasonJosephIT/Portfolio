@@ -16,6 +16,15 @@ const projects = defineCollection({
     summary: z.string(),
     tags: z.array(z.string()),
     description: z.string(),
+    portfolio: z.object({
+      schema_version: z.literal("1.0.0"),
+      sections: z.record(z.string(), z.object({
+        fields: z.record(z.string(), z.string()),
+        status: z.enum(["needs_input", "draft", "reviewed"]),
+        source_refs: z.array(z.string()),
+        missing_fields: z.array(z.string()),
+      })),
+    }).optional(),
     media: z.array(
       z.strictObject({
         key: z.string(),

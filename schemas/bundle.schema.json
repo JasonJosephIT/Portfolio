@@ -4,25 +4,65 @@
   "title": "Open Thoughts bundle: the root is the manifest (bundle.json); $defs describe the other files",
   "$ref": "#/$defs/manifest",
   "$defs": {
-    "hash": {"type": "string", "pattern": "^[0-9a-f]+$"},
-    "timestamp_or_null": {"type": ["string", "null"]},
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$"
+    },
+    "timestamp_or_null": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "manifest": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["schema_version", "generated_at", "approval", "content_hash", "records"],
+      "required": [
+        "schema_version",
+        "generated_at",
+        "approval",
+        "content_hash",
+        "records"
+      ],
       "properties": {
-        "schema_version": {"type": "integer", "minimum": 1},
-        "generated_at": {"type": "string"},
-        "approval": {"enum": ["approved", "pending"]},
-        "content_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "schema_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "generated_at": {
+          "type": "string"
+        },
+        "approval": {
+          "enum": [
+            "approved",
+            "pending"
+          ]
+        },
+        "content_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
         "records": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["projects", "profile", "relations"],
+          "required": [
+            "projects",
+            "profile",
+            "relations"
+          ],
           "properties": {
-            "projects": {"type": "array", "items": {"type": "string"}},
-            "profile": {"type": "string"},
-            "relations": {"type": "string"}
+            "projects": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "profile": {
+              "type": "string"
+            },
+            "relations": {
+              "type": "string"
+            }
           }
         }
       }
@@ -30,65 +70,677 @@
     "media": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["key", "kind", "checksum"],
+      "required": [
+        "key",
+        "kind",
+        "checksum"
+      ],
       "properties": {
-        "key": {"type": "string"},
-        "kind": {"enum": ["image", "video"]},
-        "checksum": {"type": "string"},
-        "poster_key": {"type": ["string", "null"]},
-        "caption": {"type": "string"}
+        "key": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "image",
+            "video"
+          ]
+        },
+        "checksum": {
+          "type": "string"
+        },
+        "poster_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "caption": {
+          "type": "string"
+        }
       }
     },
     "project": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["slug", "name", "summary", "tags", "description", "media", "part_of", "approved_at", "source_hash"],
+      "required": [
+        "slug",
+        "name",
+        "summary",
+        "tags",
+        "description",
+        "media",
+        "part_of",
+        "approved_at",
+        "source_hash"
+      ],
       "properties": {
-        "slug": {"type": "string"},
-        "name": {"type": "string"},
-        "summary": {"type": "string"},
-        "tags": {"type": "array", "items": {"type": "string"}},
-        "description": {"type": "string"},
-        "media": {"type": "array", "items": {"$ref": "#/$defs/media"}},
-        "part_of": {"type": ["string", "null"]},
-        "approved_at": {"$ref": "#/$defs/timestamp_or_null"},
-        "source_hash": {"$ref": "#/$defs/hash"}
+        "slug": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "media": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/media"
+          }
+        },
+        "part_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "approved_at": {
+          "$ref": "#/$defs/timestamp_or_null"
+        },
+        "source_hash": {
+          "$ref": "#/$defs/hash"
+        },
+        "portfolio": {
+          "$ref": "#/$defs/portfolio"
+        }
       }
     },
     "profile": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["headline", "bio", "skills", "interests", "approved_at", "source_hash"],
+      "required": [
+        "headline",
+        "bio",
+        "skills",
+        "interests",
+        "approved_at",
+        "source_hash"
+      ],
       "properties": {
-        "headline": {"type": "string"},
-        "bio": {"type": "string"},
-        "skills": {"type": "array", "items": {"type": "string"}},
-        "interests": {"type": "array", "items": {"type": "string"}},
-        "approved_at": {"$ref": "#/$defs/timestamp_or_null"},
-        "source_hash": {"$ref": "#/$defs/hash"}
+        "headline": {
+          "type": "string"
+        },
+        "bio": {
+          "type": "string"
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "interests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "approved_at": {
+          "$ref": "#/$defs/timestamp_or_null"
+        },
+        "source_hash": {
+          "$ref": "#/$defs/hash"
+        }
       }
     },
     "relation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["from", "to", "type"],
+      "required": [
+        "from",
+        "to",
+        "type"
+      ],
       "properties": {
-        "from": {"type": "string"},
-        "to": {"type": "string"},
-        "type": {"enum": ["uses", "part-of", "built-with", "related-to"]},
-        "evidence": {"type": "string"}
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "uses",
+            "part-of",
+            "built-with",
+            "related-to"
+          ]
+        },
+        "evidence": {
+          "type": "string"
+        }
       }
     },
     "doc_frontmatter": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["slug", "parent", "kind", "approved_at", "source_hash"],
+      "required": [
+        "slug",
+        "parent",
+        "kind",
+        "approved_at",
+        "source_hash"
+      ],
       "properties": {
-        "slug": {"type": "string"},
-        "parent": {"type": "string"},
-        "kind": {"enum": ["features", "decisions"]},
-        "approved_at": {"$ref": "#/$defs/timestamp_or_null"},
-        "source_hash": {"$ref": "#/$defs/hash"}
+        "slug": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "features",
+            "decisions"
+          ]
+        },
+        "approved_at": {
+          "$ref": "#/$defs/timestamp_or_null"
+        },
+        "source_hash": {
+          "$ref": "#/$defs/hash"
+        }
+      }
+    },
+    "portfolio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "sections"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0"
+        },
+        "sections": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "overview",
+            "problem_audience",
+            "role_scope",
+            "approach_decisions",
+            "challenges_solutions",
+            "outcome_evidence",
+            "reflection",
+            "links"
+          ],
+          "properties": {
+            "overview": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fields",
+                "status",
+                "source_refs",
+                "missing_fields"
+              ],
+              "properties": {
+                "fields": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "description",
+                    "demo_or_image"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "maxLength": 12000
+                    },
+                    "description": {
+                      "type": "string",
+                      "maxLength": 12000
+                    },
+                    "demo_or_image": {
+                      "type": "string",
+                      "maxLength": 12000
+                    }
+                  }
+                },
+                "status": {
+                  "enum": [
+                    "needs_input",
+                    "draft",
+                    "reviewed"
+                  ]
+                },
+                "source_refs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^(note|author|approved):[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  }
+                },
+                "missing_fields": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "name",
+                      "description",
+                      "demo_or_image"
+                    ]
+                  }
+                }
+              }
+            },
+            "problem_audience": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fields",
+                "status",
+                "source_refs",
+                "missing_fields"
+              ],
+              "properties": {
+                "fields": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "audience",
+                    "problem",
+                    "goal"
+                  ],
+                  "properties": {
+                    "audience": {
+                      "type": "string",
+                      "maxLength": 12000
+                    },
+                    "problem": {
+                      "type": "string",
+                      "maxLength": 12000
+                    },
+                    "goal": {
+                      "type": "string",
+                      "maxLength": 12000
+                    }
+                  }
+                },
+                "status": {
+                  "enum": [
+                    "needs_input",
+                    "draft",
+                    "reviewed"
+                  ]
+                },
+                "source_refs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^(note|author|approved):[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  }
+                },
+                "missing_fields": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "audience",
+                      "problem",
+                      "goal"
+                    ]
+                  }
+                }
+              }
+            },
+            "role_scope": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fields",
+                "status",
+                "source_refs",
+                "missing_fields"
+              ],
+              "properties": {
+                "fields": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "ownership",
+                    "team",
+                    "timeline"
+                  ],
+                  "properties": {
+                    "ownership": {
+                      "type": "string",
+                      "maxLength": 12000
+                    },
+                    "team": {
+                      "type": "string",
+                      "maxLength": 12000
+                    },
+                    "timeline": {
+                      "type": "string",
+                      "maxLength": 12000
+                    }
+                  }
+                },
+                "status": {
+                  "enum": [
+                    "needs_input",
+                    "draft",
+                    "reviewed"
+                  ]
+                },
+                "source_refs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^(note|author|approved):[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  }
+                },
+                "missing_fields": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "ownership",
+                      "team",
+                      "timeline"
+                    ]
+                  }
+                }
+              }
+            },
+            "approach_decisions": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fields",
+                "status",
+                "source_refs",
+                "missing_fields"
+              ],
+              "properties": {
+                "fields": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "approach",
+                    "tools",
+                    "decisions"
+                  ],
+                  "properties": {
+                    "approach": {
+                      "type": "string",
+                      "maxLength": 12000
+                    },
+                    "tools": {
+                      "type": "string",
+                      "maxLength": 12000
+                    },
+                    "decisions": {
+                      "type": "string",
+                      "maxLength": 12000
+                    }
+                  }
+                },
+                "status": {
+                  "enum": [
+                    "needs_input",
+                    "draft",
+                    "reviewed"
+                  ]
+                },
+                "source_refs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^(note|author|approved):[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  }
+                },
+                "missing_fields": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "approach",
+                      "tools",
+                      "decisions"
+                    ]
+                  }
+                }
+              }
+            },
+            "challenges_solutions": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fields",
+                "status",
+                "source_refs",
+                "missing_fields"
+              ],
+              "properties": {
+                "fields": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "challenge",
+                    "solution",
+                    "tradeoff"
+                  ],
+                  "properties": {
+                    "challenge": {
+                      "type": "string",
+                      "maxLength": 12000
+                    },
+                    "solution": {
+                      "type": "string",
+                      "maxLength": 12000
+                    },
+                    "tradeoff": {
+                      "type": "string",
+                      "maxLength": 12000
+                    }
+                  }
+                },
+                "status": {
+                  "enum": [
+                    "needs_input",
+                    "draft",
+                    "reviewed"
+                  ]
+                },
+                "source_refs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^(note|author|approved):[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  }
+                },
+                "missing_fields": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "challenge",
+                      "solution",
+                      "tradeoff"
+                    ]
+                  }
+                }
+              }
+            },
+            "outcome_evidence": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fields",
+                "status",
+                "source_refs",
+                "missing_fields"
+              ],
+              "properties": {
+                "fields": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "result",
+                    "evidence",
+                    "limitations"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "maxLength": 12000
+                    },
+                    "evidence": {
+                      "type": "string",
+                      "maxLength": 12000
+                    },
+                    "limitations": {
+                      "type": "string",
+                      "maxLength": 12000
+                    }
+                  }
+                },
+                "status": {
+                  "enum": [
+                    "needs_input",
+                    "draft",
+                    "reviewed"
+                  ]
+                },
+                "source_refs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^(note|author|approved):[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  }
+                },
+                "missing_fields": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "result",
+                      "evidence",
+                      "limitations"
+                    ]
+                  }
+                }
+              }
+            },
+            "reflection": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fields",
+                "status",
+                "source_refs",
+                "missing_fields"
+              ],
+              "properties": {
+                "fields": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "learned",
+                    "next_steps"
+                  ],
+                  "properties": {
+                    "learned": {
+                      "type": "string",
+                      "maxLength": 12000
+                    },
+                    "next_steps": {
+                      "type": "string",
+                      "maxLength": 12000
+                    }
+                  }
+                },
+                "status": {
+                  "enum": [
+                    "needs_input",
+                    "draft",
+                    "reviewed"
+                  ]
+                },
+                "source_refs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^(note|author|approved):[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  }
+                },
+                "missing_fields": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "learned",
+                      "next_steps"
+                    ]
+                  }
+                }
+              }
+            },
+            "links": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fields",
+                "status",
+                "source_refs",
+                "missing_fields"
+              ],
+              "properties": {
+                "fields": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "resources"
+                  ],
+                  "properties": {
+                    "resources": {
+                      "type": "string",
+                      "maxLength": 12000
+                    }
+                  }
+                },
+                "status": {
+                  "enum": [
+                    "needs_input",
+                    "draft",
+                    "reviewed"
+                  ]
+                },
+                "source_refs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^(note|author|approved):[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  }
+                },
+                "missing_fields": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "resources"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

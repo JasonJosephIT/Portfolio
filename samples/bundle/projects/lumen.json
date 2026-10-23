@@ -1,0 +1,130 @@
+{
+  "slug": "lumen",
+  "name": "Lumen",
+  "summary": "A photo catalogue that reads exposure data and sorts a shoot into keepers, maybes and rejects.",
+  "tags": [
+    "python",
+    "image-processing",
+    "cli"
+  ],
+  "description": "A photo catalogue that reads exposure data and sorts a shoot into keepers, maybes and rejects. This is placeholder copy for layout review.",
+  "media": [
+    {
+      "key": "sample-media/lumen/main.svg",
+      "kind": "image",
+      "checksum": "sha256-sample",
+      "poster_key": null,
+      "caption": "Lumen: main view"
+    },
+    {
+      "key": "sample-media/lumen/detail.svg",
+      "kind": "image",
+      "checksum": "sha256-sample",
+      "poster_key": null,
+      "caption": "Lumen: detail view"
+    }
+  ],
+  "part_of": null,
+  "approved_at": "2026-10-22T00:00:00Z",
+  "source_hash": "5a5a5a5a5a5a5a5a",
+  "portfolio": {
+    "schema_version": "1.0.0",
+    "sections": {
+      "overview": {
+        "fields": {
+          "name": "Lumen",
+          "description": "A photo catalogue that reads exposure data and sorts a shoot into keepers, maybes and rejects.",
+          "demo_or_image": ""
+        },
+        "status": "needs_input",
+        "source_refs": [
+          "approved:lumen"
+        ],
+        "missing_fields": [
+          "demo_or_image"
+        ]
+      },
+      "problem_audience": {
+        "fields": {
+          "audience": "Photographers returning from a shoot with a thousand frames",
+          "problem": "Culling by eye takes longer than the shoot did, and tired eyes get inconsistent.",
+          "goal": "Cut the first pass of a cull from hours to minutes without hiding good frames."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:lumen"
+        ],
+        "missing_fields": []
+      },
+      "role_scope": {
+        "fields": {
+          "ownership": "Wrote the scoring, the catalogue format and the viewer.",
+          "team": "Solo project",
+          "timeline": "Ongoing since spring"
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:lumen"
+        ],
+        "missing_fields": []
+      },
+      "approach_decisions": {
+        "fields": {
+          "approach": "Score every frame for sharpness, blink, exposure and duplicates, then show a ranked contact sheet.",
+          "tools": "Python, OpenCV, SQLite, a small web viewer.",
+          "decisions": "Never delete. Lumen only proposes, so a wrong call costs a click, not a photograph.\nA sidecar file per image keeps the catalogue portable."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:lumen"
+        ],
+        "missing_fields": []
+      },
+      "challenges_solutions": {
+        "fields": {
+          "challenge": "Sharpness scores fooled by intentional motion blur and shallow focus.",
+          "solution": "Score the subject region, found by face and saliency, instead of the whole frame.",
+          "tradeoff": "Slower per image, but far fewer wrongly rejected keepers."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:lumen"
+        ],
+        "missing_fields": []
+      },
+      "outcome_evidence": {
+        "fields": {
+          "result": "A 1,200-frame wedding shoot sorted in under four minutes on a laptop.",
+          "evidence": "Compared against a manual cull of the same shoot: 94% of manual keepers landed in the top group.",
+          "limitations": "One photographer, one genre. Sports and low light are untested."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:lumen"
+        ],
+        "missing_fields": []
+      },
+      "reflection": {
+        "fields": {
+          "learned": "Showing why a frame scored low is worth more than the score.",
+          "next_steps": "Learn from my own keep and reject choices."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:lumen"
+        ],
+        "missing_fields": []
+      },
+      "links": {
+        "fields": {
+          "resources": ""
+        },
+        "status": "needs_input",
+        "source_refs": [],
+        "missing_fields": [
+          "resources"
+        ]
+      }
+    }
+  }
+}
