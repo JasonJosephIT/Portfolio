@@ -4,6 +4,7 @@ import Head from "@/layouts/Head.astro";
 import { Image } from "astro:assets";
 import { isDraft, manifest } from "@/lib/bundle";
 import Chat from "@/components/Chat.astro";
+import Backdrop from "@/components/Backdrop.astro";
 import bard from "@/assets/bard-mark.png";
 
 interface Props {
@@ -16,6 +17,7 @@ const { title, description = "Software by Jason." } = Astro.props;
 <html lang="en">
   <Head title={title} description={description} />
   <body class="min-h-dvh">
+    <Backdrop pos={1} />
     <a href="#main" class="label sr-only z-50 bg-board px-4 py-3 !text-foreground focus:not-sr-only focus:fixed focus:top-2 focus:left-2">Skip to content</a>
     {
       isDraft && (
@@ -55,5 +57,6 @@ const { title, description = "Software by Jason." } = Astro.props;
       </div>
     </footer>
     <Chat />
+    <script>import "../scripts/backdrop-rest.js";</script>
   </body>
 </html>

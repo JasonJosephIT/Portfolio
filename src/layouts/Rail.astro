@@ -3,6 +3,7 @@
 import "@/styles/diptych.css";
 import "@/styles/gallery.css";
 import Head from "@/layouts/Head.astro";
+import Backdrop from "@/components/Backdrop.astro";
 
 interface Props {
   title: string;
@@ -17,7 +18,9 @@ const { title, description, returnPage } = Astro.props;
 <Head title={title} description={description} />
 <body class="gallery-page gallery-page--art art patterned" data-return-page={returnPage}>
   <a class="skip-link" href="#main">Skip to content</a>
+  <Backdrop pos={-1} />
   <slot />
   <script src="../scripts/gallery.js"></script>
+  <script>import "../scripts/backdrop-rest.js";</script>
 </body>
 </html>

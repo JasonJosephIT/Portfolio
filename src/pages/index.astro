@@ -1,13 +1,12 @@
 ---
 import { Image } from "astro:assets";
 import Diptych from "@/layouts/Diptych.astro";
+import Backdrop from "@/components/Backdrop.astro";
 import bard from "@/assets/bard-mark.png";
 ---
 
 <Diptych title="Jason · Man is not truly one, but truly two." description="Jason's portfolio home, linking to the Art and Tech sections." bodyClass="home">
-  <div class="backdrop" aria-hidden="true">
-    <video class="pan" muted playsinline preload="auto" poster="/media/bay-pan-poster.webp" src="/media/bay-pan.mp4"></video>
-  </div>
+  <Backdrop pos={0} />
 
   <nav class="site-nav">
     <div class="wrap">

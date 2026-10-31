@@ -3,6 +3,7 @@
    ========================================================================== */
 
 @import "./tokens.css";
+@import "./backdrop.css";
 
 /* ==========================================================================
    Tokens
@@ -276,39 +277,6 @@ body.home { position: relative; }
 }
 
 .panel-tech { --accent: var(--accent-tech); }
-
-/* The bay scene is the page background: fixed behind everything, graded into the board palette.
-   home-scene.js sizes and places the three views and draws the surf on the canvas. */
-.backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-  pointer-events: none;
-  background: var(--bg);
-}
-
-/* One clip, scrubbed by home-scene.js: its start is the left coast, its middle the open sea looking
-   straight out, its end the right coast. The figure sits at the foot of the frame. */
-.backdrop .pan {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 100%;
-  image-rendering: pixelated;
-}
-
-/* Board-black wash: the scene stays visible at the edges and sinks behind the content */
-.backdrop::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 50% 45%, rgba(8, 9, 11, 0) 0%, rgba(8, 9, 11, 0.3) 85%),
-    linear-gradient(to bottom, rgba(8, 9, 11, 0.15), rgba(8, 9, 11, 0.5));
-}
 
 /* Captions leave fast (the system is responding) and return slowly on a cancelled turn */
 [data-scene].is-turning .caption { opacity: 0; transition: opacity 0.2s cubic-bezier(0.23, 1, 0.32, 1); }

@@ -1,0 +1,14 @@
+---
+// The bay background, one clip scrubbed by a script. `pos` is where the camera rests along it:
+// -1 the left coast (Art), 0 the open sea looking straight out (Home), 1 the right coast (Tech).
+// The poster is the matching still frame, so the page paints right while the clip loads.
+interface Props {
+  pos: -1 | 0 | 1;
+}
+const { pos } = Astro.props;
+const poster = { "-1": "left", "0": "mid", "1": "right" }[String(pos) as "-1" | "0" | "1"];
+---
+
+<div class="backdrop" data-pos={pos} aria-hidden="true">
+  <video class="pan" muted playsinline preload="auto" poster={`/media/bay-pan-poster-${poster}.webp`} src="/media/bay-pan.mp4"></video>
+</div>

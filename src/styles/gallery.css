@@ -78,22 +78,7 @@
    them, the layer takes no pointer events, and no text ever inherits its
    opacity — the 4% is spent on the artwork alone, never on a photograph.
    -------------------------------------------------------------------------- */
-.gallery-page.patterned::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: url("../assets/art/wave-pattern.svg");
-  background-repeat: repeat;
-  /* The locked tile: the 1104x608 source hung at half scale. */
-  background-size: 552px 304px;
-  /* The supplied strokes are dark on transparent. brightness(0) then invert(1)
-     drives every stroke to pure white without touching alpha, so 4% reads as
-     silver drawn on the board rather than as a grey wash laid over it. */
-  filter: grayscale(1) brightness(0) invert(1);
-  opacity: 0.04;
-}
+/* the wave pattern is retired: the bay backdrop replaces it */
 
 /* ==========================================================================
    The type registers, shared by every component below

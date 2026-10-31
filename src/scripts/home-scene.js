@@ -37,12 +37,12 @@ if (root && video) {
     prev = now;
     // Critically damped spring: no overshoot. Hover is quick, the committed pan deliberate, the
     // intro sweep slow.
-    const k = leaving ? 31 : sweeping ? 8 : 62; // stiffness scales with speed squared: 0.75x speed
+    const k = leaving ? 14 : sweeping ? 3.5 : 28; // stiffness scales with speed squared: 0.5x speed
     const c = 2 * Math.sqrt(k) * 0.95;
     vel += ((target - pos) * k - vel * c) * dt;
     pos += vel * dt;
     t += dt;
-    drift = reduced || leaving || sweeping ? drift * 0.9 : Math.sin(t * 0.375) * 0.035;
+    drift = reduced || leaving || sweeping ? drift * 0.9 : Math.sin(t * 0.25) * 0.035;
     render();
     requestAnimationFrame(frame);
   };
@@ -69,9 +69,9 @@ if (root && video) {
     pos = -1;
     target = -1;
     const at = (ms, fn) => sweepTimers.push(setTimeout(() => sweeping && fn(), ms));
-    at(1200, () => { target = 1; });
-    at(5200, () => { target = 0; });
-    at(8300, () => { sweeping = false; });
+    at(1800, () => { target = 1; });
+    at(7800, () => { target = 0; });
+    at(12400, () => { sweeping = false; });
   };
 
   panels.forEach((panel, i) => {
@@ -91,7 +91,7 @@ if (root && video) {
       leaving = true;
       target = side;
       root.classList.add("is-turning");
-      setTimeout(() => { location.href = panel.href; }, 1070);
+      setTimeout(() => { location.href = panel.href; }, 1600);
     });
   });
 
