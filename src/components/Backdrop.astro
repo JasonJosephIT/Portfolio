@@ -11,4 +11,5 @@ const poster = { "-1": "left", "0": "mid", "1": "right" }[String(pos) as "-1" | 
 
 <div class="backdrop" data-pos={pos} aria-hidden="true">
   <video class="pan" muted playsinline preload="auto" poster={`/media/bay-pan-poster-${poster}.webp`} src="/media/bay-pan.mp4"></video>
+  <canvas class="foam"></canvas>
 </div>

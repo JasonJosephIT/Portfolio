@@ -21,6 +21,15 @@
   image-rendering: pixelated;
 }
 
+/* Foamy waves drawn over the water by backdrop-foam.js */
+.backdrop .foam {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
 /* Board-black wash: the scene stays visible at the edges and sinks behind the content */
 .backdrop::after {
   content: "";

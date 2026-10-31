@@ -1,3 +1,4 @@
+import "./backdrop-foam.js";
 // Art and Tech: the camera rests at one end of the clip (Art left, Tech right) with the same slow
 // sway as Home, so arriving from Home's pan carries on from where it stopped.
 const el = document.querySelector(".backdrop[data-pos]");

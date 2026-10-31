@@ -1,3 +1,4 @@
+import "./backdrop-foam.js";
 // Home background: one clip of the camera panning around the figure, scrubbed rather than played.
 // Its start is the left coast (head turned left), its middle the open sea looking straight out, and
 // its end the right coast (head turned right). `pos` runs -1 .. 0 .. 1 along it, so the camera angle
