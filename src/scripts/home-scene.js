@@ -1,21 +1,27 @@
-// Home: three views of one bay across the two panels. The middle view is the open bay; the left
-// and right views are the coast on that side, with open ocean beyond. `pos` runs -1 (left coast)
-// .. 0 (bay) .. 1 (right coast). Hover leans toward a side; a click turns the camera all the way
-// there while the surf runs out toward the other side, then follows the link.
+// Home background: three views of one bay fill the viewport behind the page. The middle view is
+// the open bay; the left and right views are the coast on that side, with open ocean beyond.
+// `pos` runs -1 (left coast) .. 0 (bay) .. 1 (right coast). Hovering a panel leans toward its
+// side; a click turns the camera all the way there while the surf runs out toward the other
+// side, then follows the link.
 const root = document.querySelector("[data-scene]");
-if (root) {
+const backdrop = document.querySelector(".backdrop");
+if (root && backdrop) {
   const panels = [...root.querySelectorAll(".panel")];
-  const canvases = [...root.querySelectorAll("canvas.surf")];
-  const wins = canvases.map((c) => c.parentElement);
+  const canvases = [backdrop.querySelector("canvas.surf")];
+  const wins = [backdrop];
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const ZOOM = 2.4; // each image is ZOOM windows wide, leaving room to turn
-  const TURN = (ZOOM - 2) / 2; // fraction of a window the layers slide between views
-  const CELL = 6; // css px per surf pixel
+  const ZOOM = 1.2; // each image is ZOOM viewports wide, leaving room to turn
+  const TURN = (ZOOM - 1) / 2; // fraction of the viewport the layers slide between views
+  const CELL = 8; // css px per surf pixel
   const ASPECT = 1018 / 2400;
   const MASK_W = 396;
   const MASK_H = 168;
   const LAYERS = [-1, 0, 1];
+  // Sea palette: two colors, graphite water and bone-white crests
+  const GRAY = "#6d6c68";
+  const WHITE = "#ece8de";
+
 
   // imgs[w][k]: image for layer LAYERS[k] in window w
   const imgs = wins.map((w) => LAYERS.map((l) => w.querySelector(`img[data-layer="${l}"]`)));
@@ -33,15 +39,15 @@ if (root) {
   let leaving = false;
 
   const layout = () => {
-    const r = wins[0].getBoundingClientRect();
-    const W = r.width;
-    const H = r.height;
-    const imgW = W * ZOOM;
-    const imgH = Math.max(imgW * ASPECT, H);
-    return { W, H, imgW, imgH, slack: (imgW - 2 * W) / 2 };
+    const W = innerWidth;
+    const H = innerHeight;
+    // cover the viewport: wide enough to turn, tall enough to fill
+    const imgW = Math.max(W * ZOOM, H / ASPECT);
+    const imgH = imgW * ASPECT;
+    return { W, H, imgW, imgH, slack: (imgW - W) / 2 };
   };
 
-  // Where surf may draw: wherever a view is cyan, which is the sea.
+  // Where surf may draw: the sea.
   const buildMask = (img, k) => {
     const c = document.createElement("canvas");
     c.width = MASK_W;
@@ -49,12 +55,22 @@ if (root) {
     const x = c.getContext("2d", { willReadFrequently: true });
     x.drawImage(img, 0, 0, MASK_W, MASK_H);
     const d = x.getImageData(0, 0, MASK_W, MASK_H).data;
-    const m = new Uint8Array(MASK_W * MASK_H);
-    for (let i = 0; i < m.length; i++) {
+    // Water is the one big flat patch of graphite gray (#6d6c68). Rock is also gray but textured,
+    // so a cell only counts if almost its whole 5x5 neighbourhood is that gray.
+    const gray = new Uint8Array(MASK_W * MASK_H);
+    for (let i = 0; i < gray.length; i++) {
       const r = d[i * 4];
       const g = d[i * 4 + 1];
       const b = d[i * 4 + 2];
-      m[i] = b > 150 && g > 110 && b > r + 50 ? 1 : 0;
+      gray[i] = Math.abs(r - 108) < 16 && Math.abs(g - 108) < 16 && Math.abs(b - 104) < 16 ? 1 : 0;
+    }
+    const m = new Uint8Array(MASK_W * MASK_H);
+    for (let y = 2; y < MASK_H - 2; y++) {
+      for (let x2 = 2; x2 < MASK_W - 2; x2++) {
+        let n = 0;
+        for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) n += gray[(y + dy) * MASK_W + x2 + dx];
+        m[y * MASK_W + x2] = n >= 23 ? 1 : 0;
+      }
     }
     // Shoreline: sea cells with land to the left, right or below (not above, so the horizon stays calm).
     const e = new Uint8Array(m.length);
@@ -122,21 +138,19 @@ if (root) {
             const mx = Math.min(MASK_W - 1, (u * MASK_W) | 0);
             const mi = my * MASK_W + mx;
             if (!mask[mi]) continue;
+            x.globalAlpha = alpha;
             if (shore[mi]) {
-              // foam lapping the sand: each stretch of shore breathes on its own phase
+              // white foam lapping the sand: each stretch of shore breathes on its own phase
               const lap = 0.5 + 0.5 * Math.sin(t * 0.9 + u * 55 + v * 30);
-              x.fillStyle = `rgba(236,232,222,${(0.25 + 0.5 * lap) * alpha})`;
+              x.globalAlpha = (0.35 + 0.65 * lap) * alpha;
+              x.fillStyle = WHITE;
               x.fillRect(cx, cy, 1, 1);
               continue;
             }
-            const s =Math.sin(u * 70 - dir * t * 1.6 + Math.sin(v * 22 + u * 9) * 1.4 + v * 40 * depth);
-            if (s > 0.92) {
-              x.fillStyle = `rgba(236,232,222,${0.7 * alpha})`;
-              x.fillRect(cx, cy, 1, 1);
-            } else if (s > 0.8 && ((cx + cy) & 1) === 0) {
-              x.fillStyle = `rgba(236,232,222,${0.28 * alpha})`;
-              x.fillRect(cx, cy, 1, 1);
-            }
+            // The sea is two colors: gray water with white crests.
+            const s = Math.sin(u * 70 - dir * t * 1.6 + Math.sin(v * 22 + u * 9) * 1.4 + v * 40 * depth);
+            x.fillStyle = s > 0.84 ? WHITE : GRAY;
+            x.fillRect(cx, cy, 1, 1);
           }
         }
       });
