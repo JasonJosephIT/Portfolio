@@ -19,11 +19,7 @@
   --gutter: clamp(16px, 2vw, 28px);
 }
 
-body.home {
-  --accent: #c9c4b8;
-  /* the hero card is a small plate at the top so the figure in the background shows below it */
-  --name-h: clamp(1.5rem, 3.2vw, 2.5rem);
-}
+body.home { --accent: #c9c4b8; }
 
 /* The bevel takes its color from whichever accent is in force where it is cut */
 body,
@@ -267,53 +263,19 @@ body.home { position: relative; }
   justify-content: center;
   align-items: stretch;
   align-self: center;
-  perspective: 1800px;
+  gap: clamp(60px, 11vw, 170px); /* the wordmark sits between Art and Tech */
 }
 
 .panel {
   --accent: var(--accent-art);
   display: flex;
   flex-direction: column;
-  padding: calc(var(--mat) + var(--name-h) * 1.15) 0 var(--mat);
-  background: var(--board);
+  padding: calc(var(--mat) + var(--name-h) * 1.15) var(--mat) var(--mat);
   color: var(--text);
   text-decoration: none;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.035),
-    0 1px 0 var(--board-edge),
-    0 40px 60px -40px rgba(0, 0, 0, 0.9);
-  transform-origin: 100% 50%;
-  transition: transform 0.9s var(--ease-out), box-shadow 0.9s var(--ease-out);
-  will-change: transform;
 }
 
-.panel-tech {
-  --accent: var(--accent-tech);
-  transform-origin: 0% 50%;
-}
-
-.window {
-  position: relative;
-  overflow: hidden;
-  width: clamp(110px, 12vw, 190px);
-  aspect-ratio: 7 / 10;
-  background: #000;
-}
-
-.window img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 200%;
-  height: 100%;
-  max-width: none;
-  object-fit: cover;
-  object-position: 50% 38%;
-  filter: brightness(1) saturate(1);
-  transition: filter 0.9s var(--ease-out);
-}
-
-.panel-tech .window img { left: -100%; }
+.panel-tech { --accent: var(--accent-tech); }
 
 /* The bay scene is the page background: fixed behind everything, graded into the board palette.
    home-scene.js sizes and places the three views and draws the surf on the canvas. */
@@ -326,20 +288,16 @@ body.home { position: relative; }
   background: var(--bg);
 }
 
-.backdrop .scene {
-  position: absolute;
-  max-width: none;
-  image-rendering: pixelated;
-  filter: none;
-}
-
-.backdrop .surf {
+/* One clip, scrubbed by home-scene.js: its start is the left coast, its middle the open sea looking
+   straight out, its end the right coast. The figure sits at the foot of the frame. */
+.backdrop .pan {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  object-position: 50% 100%;
   image-rendering: pixelated;
-  z-index: 5; /* above the three view layers (z 1 to 3) */
 }
 
 /* Board-black wash: the scene stays visible at the edges and sinks behind the content */
@@ -347,7 +305,6 @@ body.home { position: relative; }
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 6;
   background:
     radial-gradient(ellipse at 50% 45%, rgba(8, 9, 11, 0) 0%, rgba(8, 9, 11, 0.3) 85%),
     linear-gradient(to bottom, rgba(8, 9, 11, 0.15), rgba(8, 9, 11, 0.5));
@@ -356,19 +313,6 @@ body.home { position: relative; }
 /* Captions leave fast (the system is responding) and return slowly on a cancelled turn */
 [data-scene].is-turning .caption { opacity: 0; transition: opacity 0.2s cubic-bezier(0.23, 1, 0.32, 1); }
 .caption { transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
-
-/* The light on the hovered half comes up */
-.panel:hover .window img,
-.panel:focus-visible .window img { filter: brightness(1.7) saturate(1.25); }
-
-/* The mat casts a shadow onto the print along the top of the opening */
-.window::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  box-shadow: inset 0 10px 18px -12px rgba(0, 0, 0, 0.95);
-}
 
 /* The hinge is the seam itself: the two halves meet, and the amber and cyan
    bevel hairlines are the only line between them. */
@@ -410,12 +354,6 @@ body.home { position: relative; }
 }
 
 .panel-tech .caption { align-items: flex-end; text-align: right; }
-
-.panel:hover,
-.panel:focus-visible { transform: rotateY(-7deg) translateZ(6px); }
-
-.panel-tech:hover,
-.panel-tech:focus-visible { transform: rotateY(7deg) translateZ(6px); }
 
 .panel:hover .label,
 .panel:focus-visible .label { color: var(--accent); }
@@ -558,7 +496,6 @@ body.home { position: relative; }
   .panel { padding: calc(var(--mat-sm) + var(--name-h) * 1.15) 0 var(--mat-sm); }
   .wall-name { top: calc(var(--mat-sm) + 0.1em); }
   .caption { padding: 0 var(--mat-sm); }
-  .window { width: calc((100vw - var(--mat-sm) * 2) / 2); }
   .label { font-size: 1.15rem; gap: 6px; }
   .label svg { width: 18px; height: 18px; }
   .frame-back-inner { grid-template-columns: 1fr; }
@@ -572,8 +509,4 @@ body.home { position: relative; }
     transition-duration: 0.01ms !important;
     animation: none !important;
   }
-  .panel:hover,
-  .panel:focus-visible,
-  .panel-tech:hover,
-  .panel-tech:focus-visible { transform: none; }
 }

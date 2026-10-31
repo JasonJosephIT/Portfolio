@@ -2,18 +2,11 @@
 import { Image } from "astro:assets";
 import Diptych from "@/layouts/Diptych.astro";
 import bard from "@/assets/bard-mark.png";
-import hero from "@/assets/hero.jpg";
-import pano from "@/assets/waves/panorama-bay.png";
-import coastLeft from "@/assets/waves/coast-left.png";
-import coastRight from "@/assets/waves/coast-right.png";
 ---
 
 <Diptych title="Jason · Man is not truly one, but truly two." description="Jason's portfolio home, linking to the Art and Tech sections." bodyClass="home">
   <div class="backdrop" aria-hidden="true">
-    <Image class="scene" data-layer="-1" src={coastLeft} alt="" width={2400} height={1018} loading="eager" />
-    <Image class="scene" data-layer="0" src={pano} alt="" width={2400} height={1018} loading="eager" fetchpriority="high" />
-    <Image class="scene" data-layer="1" src={coastRight} alt="" width={2400} height={1018} loading="eager" />
-    <canvas class="surf"></canvas>
+    <video class="pan" muted playsinline preload="auto" poster="/media/bay-pan-poster.webp" src="/media/bay-pan.mp4"></video>
   </div>
 
   <nav class="site-nav">
@@ -31,7 +24,6 @@ import coastRight from "@/assets/waves/coast-right.png";
     <div class="diptych" data-scene>
       <h1 class="wall-name">JASON</h1>
       <a class="panel panel-art" href="/art">
-        <span class="window"><Image src={hero} alt="" width={1194} height={1600} loading="eager" fetchpriority="high" /></span>
         <span class="caption">
           <span class="label">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -44,7 +36,6 @@ import coastRight from "@/assets/waves/coast-right.png";
       <span class="hinge" aria-hidden="true"></span>
 
       <a class="panel panel-tech" href="/tech">
-        <span class="window"><Image src={hero} alt="" width={1194} height={1600} loading="eager" /></span>
         <span class="caption">
           <span class="label">
             Tech
