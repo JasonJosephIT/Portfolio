@@ -20,12 +20,16 @@ if (root) {
   // imgs[w][k]: image for layer LAYERS[k] in window w
   const imgs = wins.map((w) => LAYERS.map((l) => w.querySelector(`img[data-layer="${l}"]`)));
   const masks = [null, null, null];
+  const shores = [null, null, null];
 
   let pos = 0;
+  let vel = 0; // spring velocity: a half-finished lean keeps its momentum if the pointer moves again
+  let drift = 0; // slow idle sway so the camera is never dead still
   let target = 0;
   let dir = 1; // surf travel: 1 = toward Tech (right), -1 = toward Art (left)
-  let speed = 0.35;
-  let speedTarget = 0.35;
+  const IDLE = reduced ? 0 : 0.35; // reduced motion: the sea holds still
+  let speed = IDLE;
+  let speedTarget = IDLE;
   let leaving = false;
 
   const layout = () => {
@@ -52,20 +56,34 @@ if (root) {
       const b = d[i * 4 + 2];
       m[i] = b > 150 && g > 110 && b > r + 50 ? 1 : 0;
     }
+    // Shoreline: sea cells with land to the left, right or below (not above, so the horizon stays calm).
+    const e = new Uint8Array(m.length);
+    for (let y = 0; y < MASK_H - 1; y++) {
+      for (let x2 = 1; x2 < MASK_W - 1; x2++) {
+        const i = y * MASK_W + x2;
+        if (m[i] && (!m[i - 1] || !m[i + 1] || !m[i + MASK_W])) e[i] = 1;
+      }
+    }
     masks[k] = m;
+    shores[k] = e;
   };
 
   // Surf weight per view; the bay fades out over whichever coast view sits fully opaque beneath it.
   const opacityOf = (layer) => (layer === 0 ? 1 - Math.abs(pos) : Math.max(0, pos * layer));
   // Layers slide the way the camera turns: toward the left coast, the scene moves right.
-  const shiftOf = (layer, W) => -(pos - layer) * TURN * W;
+  const shiftOf = (layer, W) => -(pos + drift - layer) * TURN * W;
   const leftOf = (w, layer, g) => -g.slack - w * g.W + shiftOf(layer, g.W);
 
   const place = () => {
     const g = layout();
+    // Two different images cross-fading read as two objects; a touch of blur at the midpoint
+    // lets the eye take it as one scene changing.
+    const m = Math.abs(pos);
+    const blur = m > 0.02 && m < 0.98 ? `blur(${(10 * m * (1 - m)).toFixed(2)}px)` : "";
     imgs.forEach((row, w) =>
       row.forEach((img, k) => {
         const layer = LAYERS[k];
+        img.style.filter = blur;
         img.style.width = `${g.imgW}px`;
         img.style.height = `${g.imgH}px`;
         img.style.left = `${leftOf(w, layer, g)}px`;
@@ -91,6 +109,7 @@ if (root) {
       LAYERS.forEach((layer, k) => {
         const alpha = opacityOf(layer);
         const mask = masks[k];
+        const shore = shores[k];
         if (alpha < 0.03 || !mask) return;
         const left = leftOf(w, layer, g);
         for (let cy = 0; cy < rows; cy++) {
@@ -101,8 +120,16 @@ if (root) {
             const u = (cx * CELL + CELL / 2 - left) / g.imgW;
             if (u < 0 || u > 1) continue;
             const mx = Math.min(MASK_W - 1, (u * MASK_W) | 0);
-            if (!mask[my * MASK_W + mx]) continue;
-            const s = Math.sin(u * 70 - dir * t * 1.6 + Math.sin(v * 22 + u * 9) * 1.4 + v * 40 * depth);
+            const mi = my * MASK_W + mx;
+            if (!mask[mi]) continue;
+            if (shore[mi]) {
+              // foam lapping the sand: each stretch of shore breathes on its own phase
+              const lap = 0.5 + 0.5 * Math.sin(t * 0.9 + u * 55 + v * 30);
+              x.fillStyle = `rgba(236,232,222,${(0.25 + 0.5 * lap) * alpha})`;
+              x.fillRect(cx, cy, 1, 1);
+              continue;
+            }
+            const s =Math.sin(u * 70 - dir * t * 1.6 + Math.sin(v * 22 + u * 9) * 1.4 + v * 40 * depth);
             if (s > 0.92) {
               x.fillStyle = `rgba(236,232,222,${0.7 * alpha})`;
               x.fillRect(cx, cy, 1, 1);
@@ -122,9 +149,15 @@ if (root) {
   const frame = (now) => {
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
-    pos += (target - pos) * Math.min(1, dt * (leaving ? 3.2 : 4));
+    // Critically damped spring: no overshoot, and it keeps its velocity when retargeted.
+    // The committed turn is slower and deliberate; the hover lean is quick.
+    const k = leaving ? 55 : 110;
+    const c = 2 * Math.sqrt(k) * 0.95;
+    vel += ((target - pos) * k - vel * c) * dt;
+    pos += vel * dt;
     speed += (speedTarget - speed) * Math.min(1, dt * 3);
     t += dt * speed * 10;
+    drift = reduced || leaving ? drift * 0.9 : Math.sin(t * 0.06) * 0.025;
     acc += dt;
     const g = place();
     if (acc > 1 / 30) {
@@ -136,9 +169,10 @@ if (root) {
 
   panels.forEach((panel, i) => {
     const side = i === 0 ? -1 : 1;
-    const enter = () => { if (!leaving) target = side * 0.3; };
+    const enter = () => { if (!leaving && !reduced) target = side * 0.3; };
     const leave = () => { if (!leaving) target = 0; };
-    panel.addEventListener("pointerenter", enter);
+    // Touch fires pointerenter on tap, so only a real mouse leans; the click carries the turn.
+    panel.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") enter(); });
     panel.addEventListener("focus", enter);
     panel.addEventListener("pointerleave", leave);
     panel.addEventListener("blur", leave);
@@ -151,7 +185,7 @@ if (root) {
       dir = -side; // click Art: the surf runs out to the right, and the other way for Tech
       speedTarget = 2.2;
       root.classList.add("is-turning");
-      setTimeout(() => { location.href = panel.href; }, 950);
+      setTimeout(() => { location.href = panel.href; }, 800);
     });
   });
 
@@ -159,7 +193,7 @@ if (root) {
     if (!e.persisted) return;
     leaving = false;
     target = 0;
-    speedTarget = 0.35;
+    speedTarget = IDLE;
     dir = 1;
     root.classList.remove("is-turning");
   });

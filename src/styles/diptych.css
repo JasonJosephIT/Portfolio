@@ -317,10 +317,12 @@ body.home { position: relative; }
   height: 100%;
   pointer-events: none;
   image-rendering: pixelated;
+  z-index: 5; /* above the three view layers (z 1 to 3) that home-scene.js stacks */
 }
 
-[data-scene].is-turning .caption { opacity: 0; transition: opacity 0.4s ease; }
-.caption { transition: opacity 0.4s ease; }
+/* Captions leave fast (the system is responding) and return slowly on a cancelled turn */
+[data-scene].is-turning .caption { opacity: 0; transition: opacity 0.2s cubic-bezier(0.23, 1, 0.32, 1); }
+.caption { transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
 
 /* The light on the hovered half comes up */
 .panel:hover .window img,
