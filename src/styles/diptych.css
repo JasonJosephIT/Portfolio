@@ -290,8 +290,8 @@ body.home { position: relative; }
 .window {
   position: relative;
   overflow: hidden;
-  width: min(calc(clamp(300px, 100svh - var(--nav-height) - var(--name-h) * 1.15 - var(--mat) * 2 - 196px, 760px) * 0.7), 46vw);
-  aspect-ratio: 7 / 10;
+  width: min(calc(clamp(300px, 100svh - var(--nav-height) - var(--name-h) * 1.15 - var(--mat) * 2 - 196px, 760px) * 1.18), 46vw);
+  aspect-ratio: 118 / 100;
   background: #000;
 }
 
@@ -306,9 +306,21 @@ body.home { position: relative; }
   object-position: 50% 38%;
   filter: brightness(1) saturate(1);
   transition: filter 0.9s var(--ease-out);
+  image-rendering: pixelated;
 }
 
-.panel-tech .window img { left: -100%; }
+/* The panorama is placed by home-scene.js (width, height, left, top); the surf canvas rides on top. */
+.window .surf {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+
+[data-scene].is-turning .caption { opacity: 0; transition: opacity 0.4s ease; }
+.caption { transition: opacity 0.4s ease; }
 
 /* The light on the hovered half comes up */
 .panel:hover .window img,

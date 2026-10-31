@@ -2,7 +2,7 @@
 import { Image } from "astro:assets";
 import Diptych from "@/layouts/Diptych.astro";
 import bard from "@/assets/bard-mark.png";
-import hero from "@/assets/hero.jpg";
+import pano from "@/assets/waves/panorama-bay.png";
 ---
 
 <Diptych title="Jason · Man is not truly one, but truly two." description="Jason's portfolio home, linking to the Art and Tech sections." bodyClass="home">
@@ -18,10 +18,10 @@ import hero from "@/assets/hero.jpg";
   </nav>
 
   <main class="wall" id="main">
-    <div class="diptych">
+    <div class="diptych" data-scene>
       <h1 class="wall-name">JASON</h1>
       <a class="panel panel-art" href="/art">
-        <span class="window"><Image src={hero} alt="" width={1194} height={1600} loading="eager" fetchpriority="high" /></span>
+        <span class="window"><Image class="scene" src={pano} alt="" width={2400} height={1018} loading="eager" fetchpriority="high" /><canvas class="surf" aria-hidden="true"></canvas></span>
         <span class="caption">
           <span class="label">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -34,7 +34,7 @@ import hero from "@/assets/hero.jpg";
       <span class="hinge" aria-hidden="true"></span>
 
       <a class="panel panel-tech" href="/tech">
-        <span class="window"><Image src={hero} alt="" width={1194} height={1600} loading="eager" /></span>
+        <span class="window"><Image class="scene" src={pano} alt="" width={2400} height={1018} loading="eager" /><canvas class="surf" aria-hidden="true"></canvas></span>
         <span class="caption">
           <span class="label">
             Tech
@@ -79,4 +79,5 @@ import hero from "@/assets/hero.jpg";
       <p class="frame-copy">&copy; 2026 Jason. Man is not truly one, but truly two.</p>
     </div>
   </footer>
+<script>import "../scripts/home-scene.js";</script>
 </Diptych>
