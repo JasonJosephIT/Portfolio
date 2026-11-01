@@ -9,7 +9,11 @@ const { pos } = Astro.props;
 const poster = { "-1": "left", "0": "mid", "1": "right" }[String(pos) as "-1" | "0" | "1"];
 ---
 
-<div class="backdrop" data-pos={pos} aria-hidden="true">
+<!-- transition:persist keeps this element, its video and its canvas alive across page navigations. -->
+<div class="backdrop" transition:persist="bay" aria-hidden="true">
   <video class="pan" muted playsinline preload="auto" poster={`/media/bay-pan-poster-${poster}.webp`} src="/media/bay-pan.mp4"></video>
   <canvas class="foam"></canvas>
 </div>
+<!-- Where this page wants the camera; read by backdrop.js on every page load. -->
+<i hidden data-bay-pos={pos}></i>
+<script>import "../scripts/backdrop.js";</script>

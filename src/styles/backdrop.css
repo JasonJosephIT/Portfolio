@@ -1,12 +1,12 @@
 /* The bay scene is the page background: fixed behind everything, graded into the board palette.
-   Home scrubs it with home-scene.js; Art and Tech rest it at one end with backdrop-rest.js. */
+   One persistent element (see Backdrop.astro); backdrop.js moves the camera, home-scene.js drives it on Home. */
 .backdrop {
   position: fixed;
   inset: 0;
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  background: var(--bg);
+  background: #000; /* solid black behind the translucent scene */
 }
 
 /* One clip, scrubbed by script: its start is the left coast, its middle the open sea looking
@@ -19,10 +19,14 @@
   object-fit: cover;
   object-position: 50% 100%;
   image-rendering: pixelated;
+  opacity: 0.2; /* content pages */
+  transition: opacity 1.2s ease;
 }
 
 /* Foamy waves drawn over the water by backdrop-foam.js */
 .backdrop .foam {
+  opacity: 0.2; /* content pages */
+  transition: opacity 1.2s ease;
   position: absolute;
   inset: 0;
   width: 100%;
@@ -36,27 +40,24 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  opacity: 0.22;
+  opacity: 0.3;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   background-size: 220px 220px;
 }
 
-/* Black translucent overlay on every page: the scene stays visible, content sits on top of it. The
-   edges are left a little lighter than the centre so the coast and the figure still read. */
+/* Transparent black in front of the scene: a flat tint, so the image still shows through and is only
+   a little darker. Same on every page. */
 .backdrop::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 2;
-  background:
-    radial-gradient(ellipse at 50% 45%, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.38) 100%),
-    rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.15);
 }
 
-/* Content pages carry more text over it, so the overlay is heavier there. */
-body:not(.home) .backdrop::after {
-  background:
-    radial-gradient(ellipse at 50% 40%, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.58) 100%),
-    rgba(0, 0, 0, 0.12);
+/* Home shows the scene brighter; the backdrop persists across pages, so it fades down to the content-page level. */
+body.home .backdrop .pan,
+body.home .backdrop .foam {
+  opacity: 0.6;
 }
