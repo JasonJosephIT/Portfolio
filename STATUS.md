@@ -14,7 +14,7 @@ updated: 2026-11-02
 ## Next
 1. Jason tops up Higgsfield credits (budget about $15, up to $20). Then: drawings for the other demos, then short Seedance 2.5 videos from them, product-demo style aimed at engineers.
 2. Hercules: Jason is making his own drawing. Use it as the video input.
-3. Aristocrat: reuse the existing design and the phone demo as video input. Find the design folder (not in ~/Projects).
+3. Aristocrat: reuse the existing design and the phone demo as video input. Design found 2026-11-02: `~/.ao/data/artifacts/aristocrat-2/art` (hero, seal, wax, logo) plus `design-direction.md`. Phone demo still to locate.
 4. Know Your Vote: capture screens from https://knowyour.vote (done, scratchpad `shots/kyv/`), then video.
 5. Apply the content edits below to the Open Thoughts drafts (they are not published; the public feed has 0 records).
 
@@ -30,8 +30,7 @@ updated: 2026-11-02
 
 ## Open items / waiting on
 - Higgsfield credits (Jason).
-- Hercules drawing (Jason).
-- Aristocrat design file location (Jason).
+- Hercules drawing: Jason's own is pending; AO has crest/hydra art to start from (`~/.ao/data/artifacts/hercules-platform-10`).
 - Hercules release-plan link, if one exists (Jason).
 - Close PR #12 and draft PR #13 once #14 merges.
 
