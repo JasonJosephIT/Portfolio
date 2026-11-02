@@ -19,6 +19,7 @@ updated: 2026-11-02
 5. Apply the content edits below to the Open Thoughts drafts (they are not published; the public feed has 0 records).
 
 ## Decisions (newest first)
+- 2026-11-02 Demo videos: storyboard and build them with ComfyUI (comfy-bridge), not one-off OpenRouter clips. Herculean video (not Hercules): 30-40 s, voiced, about using the AI model and how it supports compliance, not training. OpenRouter spend so far about $6.47 (Aristocrat test clips plus 4 Herculean crest clips).
 - 2026-11-02 Know Your Vote: no eval results. Instead describe the eval process for the news intake, and that Jason set the standard through iterative review and verification.
 - 2026-11-02 It is Know Your Vote, not "Kylene" (a dictation error).
 - 2026-11-02 Outcome for the agent orchestrator: point to the projects it was used to build (Hercules, Know Your Vote, Aristocrat) as the evidence. Know Your Vote has a separate code path because it is a course. Do not explain every use case; most are private.
