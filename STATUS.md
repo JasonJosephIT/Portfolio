@@ -9,6 +9,7 @@ updated: 2026-11-02
 
 ## Now
 - PR #14 (https://github.com/JasonJosephIT/Portfolio/pull/14) combines PR #12, the explorer branch and the design pass. Auto-fix is watching it. 16 chat tests could not run locally (Playwright build mismatch); CI is their first run.
+- Herculean demo draft (30 s, voiced) done 2026-11-02 at /private/tmp/claude-501/gen/herculean-demo-draft.mp4; shots 2, 3, 5 are still pans because the Comfy spend gate ($10 default) ran out.
 - Demo drawings and videos: one orchestrator drawing done (scratchpad, 2026-11-02). Higgsfield balance 2.08 credits; a Seedance 2.5 clip costs 35.
 
 ## Next
