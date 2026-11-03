@@ -64,17 +64,35 @@ All Art browsing images (Selected Works, project covers, and Explore) appear bla
 - Reduced-motion mode switches filters immediately. Filter only image elements, never text, controls, or the entire page.
 - These rules apply to Art previews. Do not apply them to the existing Home hero or Tech screenshots without a later request.
 
-### Selected brand assets: Bard logo and repeating wave
+### Selected brand assets: Bard logo and Atlantic current field
 
-Jason has selected a Bard logo and `assets/wave-pattern.svg` (supplied as “Painted Wave Stroke Pattern.svg”) as the repeating Art background. These choices supersede the plain-black-only instruction and the hold on implementing a background asset below. Keep the black canvas underneath.
+Jason has selected the Bard logo and, on 2026-10-19, replaced the repeating Art-only pattern, the first smooth-current draft, and the single-ribbon draft with site-wide pixelated open-water swells. Keep the black canvas underneath. Broad smile-shaped wave fronts move continuously downward, one behind the next, using navy depth, metallic silver, and broken coral seams. Home carries the strongest treatment; Art and Tech use a quieter version so work and text remain dominant.
 
 **Logo asset, updated 2026-09-10.** The mark is `assets/bard-mark.png`. It replaced the original `assets/bard.svg`, which Jason had removed: that file was 1,000,965 bytes — a base64 raster plus C2PA metadata wrapped in SVG — and every generated page paid it to draw a 36px figure. `bard-mark.png` is 23,918 bytes, already bone-coloured for the dark board, and is what Home was using. The old file is recoverable from git history if it is ever needed.
 
 Use Bard beside JASON in the shared navigation and the Art rail. Render at 36px square with preserved aspect ratio, with the intrinsic `width`/`height` attributes matching that rendered size. The adjacent name supplies the link’s accessible name, so the logo image has empty alt text.
 
-Tile the wave at an initial 552×304px, in white/silver at 4% opacity, behind Art content only. Use a decorative, noninteractive background layer; never overlay it on photographs or apply its opacity to text. Keep the hero and Tech backgrounds unchanged. Check tile joins and visibility in the final gallery composition; do not claim that the supplied artwork is seamless without visual verification. Tune scale/opacity conservatively if needed for readability.
+Updated visual reference: Jason supplied `pxArt.png` and `pxArt (1).png`, pixelated grayscale photographs of aerial foam. They supersede the parallel-line wave treatment. The latest iteration uses only the first image, `pxArt (1).png` (540×360, copied unchanged as `src/assets/ocean/swell-pixel.png`), for one isolated wave washing diagonally from right to left. Keep the reference's upper-left-to-lower-right crest angle rather than a horizontal bowed band. Preserve its foam and grain, with dark space ahead and behind; do not tile multiple wave bands.
 
-These are the user-selected assets, not verified examples of a particular Caribbean textile tradition. Cultural provenance research remains deferred; do not attach an invented origin or symbolism to the pattern.
+Animate the reference in a dependency-free WebGL shader (`src/scripts/ocean-waves.ts`). Move one diagonal front toward the lower-left at 64 document pixels/sec along its normal, with low-amplitude sine-based eddies and cross-currents; avoid per-frame random noise. Use a normal of (0.5547002, -0.8320503) and decreasing projected position, retaining the photograph's angle and aspect ratio without rotation or shearing. Mirror texture detail along the front while masking it to one feathered band. Restart only after the whole wash has cleared the lower-left footer. Keep the field anchored at document top through the footer, drawing only a viewport-sized canvas at half CSS resolution. Scroll updates document coordinates without resetting time. Pause while hidden and freeze for reduced motion. Keep one non-repeating tinted still as a CSS fallback if WebGL cannot initialize or its context is lost. Source images remain unchanged.
+
+This is an abstract ocean-current reference to Jason's Caribbean heritage, not a verified example of a particular island's textile or symbolic tradition. Cultural provenance research remains deferred; do not attach an invented origin or symbolism to the field.
+
+Latest mixed-current iteration: retain the first image's large diagonal right-to-left front, and add the second image (`foam-pixel.png`) as a smaller downward-moving wash. Mask a 100–220px slice without squashing the portrait image, moving at 36 document pixels/sec with a soft bowed edge and 65% strength relative to the main wave. Both share the same renderer, document anchoring, visibility pause, and reduced-motion freeze. Blend by maximum channel intensity rather than adding brightness where they cross; retain the overall 25% water opacity and existing page-specific palettes. Each front loops independently only after clearing the full document. The non-WebGL fallback remains the single first-image still.
+
+Calm-water refinement: keep both wave movements unchanged, but replace the empty black between them with faint stationary water detail from the second image. Its UVs depend only on document coordinates, never elapsed time, offsets, or eddy distortion. Use low-contrast navy depth on Home/Tech and warm dark coral depth on Art; keep the 25% wrapper opacity. The fallback also gets a still dark-water backing.
+
+Repeating-wave refinement (supersedes single-front/footer reset above): both wave directions now recur in a steady sequence across the document. Diagonal fronts are spaced by max(95% of texture scale, 560px); the smaller downward fronts by max(80% of texture scale, 480px). Wrap the masked distance in the shader while advancing time continuously, rather than waiting for a wave to clear the entire page. Leave stationary water between fronts and preserve palettes, speeds, and 25% opacity.
+
+Four-version refinement: alternate two distinct versions in each direction, not only one texture per direction. Diagonal A uses the first coarse reference at the broader width; diagonal B uses the finer second reference with a narrower, more broken edge. Downward A uses the second reference; downward B uses the first with a 25% narrower mask and a different source crop. Select stable front parity in document space so a moving crest retains its own version, and preserve each source's aspect ratio. Repeat A/B in both directions while leaving still water, existing speeds, palettes, and 25% opacity intact.
+
+Selected direction: Jason chose diagonal after comparing isolated directions. Default to diagonal-only across all pages; keep `?wave=down` solely as a comparison option. Enhance diagonal fronts with smooth interpolated value noise: a stable seed per crest drives slow edge billowing, width changes, texture warping, and foam growth/dissipation. Avoid per-frame randomness, sudden pattern swaps, or a global brightness pulse. Keep repeating diagonal travel, stationary water outside the masks, blue/coral palettes, 25% opacity, and reduced-motion freezing unchanged.
+
+Box surfaces: use 75% background opacity on shared mats, cards, Home panels, Art frames, Tech explorer panels/dialogs, and their cover surfaces. Use translucent background colors (`--surface-board` / `--surface-bg`), not element opacity, so text, controls, and images stay fully opaque. The wave field's separate 25% opacity remains unchanged.
+
+Leading foam: concentrate denser, brighter pixel foam on the negative-normal (lower-left-facing) leading side of each diagonal wave. Use a feathered asymmetric band and fine reference-image texture to create broken clusters, not a solid line. Let the existing smooth time-driven deformation carry the foam with the crest; keep the trailing body darker. Preserve blue/coral tints and the 25% overall wave opacity.
+
+Use 25% overall water opacity across all pages. Home and Tech use ocean-blue foam (#549edd) over deep navy shadows. Art uses less luminous, muted coral foam (#a85e54) over dark warm shadows, selected by `tone="coral"` in Rail.astro. The CSS still-image fallback receives the corresponding tint as well. Preserve 2px rendering and continuous movement, without applying the field opacity to foreground content.
 
 ### Deferred research: Caribbean tapestry background
 
@@ -251,7 +269,7 @@ Page agents can work in parallel after shared contracts exist. Assign a single o
 - [ ] Art has a plain black canvas, desktop left rail, two-column desktop gallery, and responsive wrapping navigation.
 - [ ] Art previews restore original color on hover and keyboard focus; touch detail access and the color toggle work without simulated hover.
 - [ ] Uploads retain their original color data; monochrome originals are never artificially colorized.
-- [ ] Bard is the shared logo and the supplied wave repeats subtly behind Art content; cultural tapestry research remains deferred.
+- [ ] Bard is the shared logo and the Atlantic current moves behind all public sections, quieter on Art and Tech; cultural tapestry research remains deferred.
 - [ ] Art Favorites can mix projects and pieces and resolve to the correct canonical detail.
 - [ ] Tech has Starred Projects → Projects, with simple image-led cards.
 - [ ] Favorites/starred entries retain independent curated order without duplicating records.

@@ -1,0 +1,128 @@
+{
+  "slug": "harbor",
+  "name": "Harbor",
+  "summary": "A field-notes app that keeps working with no signal and syncs when the tide comes back in.",
+  "tags": [
+    "web",
+    "typescript",
+    "offline-first"
+  ],
+  "description": "A field-notes app that keeps working with no signal and syncs when the tide comes back in. This is placeholder copy for layout review.",
+  "media": [
+    {
+      "key": "sample-media/harbor/main.svg",
+      "kind": "image",
+      "checksum": "sha256-sample",
+      "poster_key": null,
+      "caption": "Harbor: main view"
+    },
+    {
+      "key": "sample-media/harbor/detail.svg",
+      "kind": "image",
+      "checksum": "sha256-sample",
+      "poster_key": null,
+      "caption": "Harbor: detail view"
+    }
+  ],
+  "part_of": null,
+  "approved_at": "2026-10-22T00:00:00Z",
+  "source_hash": "5a5a5a5a5a5a5a5a",
+  "portfolio": {
+    "schema_version": "1.0.0",
+    "sections": {
+      "overview": {
+        "fields": {
+          "name": "Harbor",
+          "description": "A field-notes app that keeps working with no signal and syncs when the tide comes back in.",
+          "demo_or_image": "https://example.com/harbor"
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "approved:harbor"
+        ],
+        "missing_fields": []
+      },
+      "problem_audience": {
+        "fields": {
+          "audience": "Researchers and surveyors who take notes outdoors",
+          "problem": "Note apps assume a connection. In the field they lose entries, or hold up work waiting for sync.",
+          "goal": "Capture a note in under three seconds anywhere, and never lose one."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:harbor"
+        ],
+        "missing_fields": []
+      },
+      "role_scope": {
+        "fields": {
+          "ownership": "Designed and built it end to end: interface, local store and sync.",
+          "team": "Solo project",
+          "timeline": "Eight weeks, evenings"
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:harbor"
+        ],
+        "missing_fields": []
+      },
+      "approach_decisions": {
+        "fields": {
+          "approach": "Local-first: every write lands in an on-device store, and a background queue replays it to the server.",
+          "tools": "TypeScript, IndexedDB, a small service worker, Playwright for the offline tests.",
+          "decisions": "Last-writer-wins per field, not per note, because two people rarely edit the same sentence.\nPlain text first; attachments are a later layer."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:harbor"
+        ],
+        "missing_fields": []
+      },
+      "challenges_solutions": {
+        "fields": {
+          "challenge": "Two devices edit the same note while both are offline.",
+          "solution": "Merge by field with a visible history, so nothing is silently overwritten.",
+          "tradeoff": "More bookkeeping per note, in exchange for never losing an edit."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:harbor"
+        ],
+        "missing_fields": []
+      },
+      "outcome_evidence": {
+        "fields": {
+          "result": "Notes save in about 40 ms offline and sync within seconds of reconnecting.",
+          "evidence": "A scripted airplane-mode test suite and a two-week field trial with three testers.",
+          "limitations": "Three testers is a small sample, and no one tested on very slow networks."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:harbor"
+        ],
+        "missing_fields": []
+      },
+      "reflection": {
+        "fields": {
+          "learned": "Conflict rules belong in the first design doc, not after launch.",
+          "next_steps": "Attachments, and a shared read-only link for collaborators."
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:harbor"
+        ],
+        "missing_fields": []
+      },
+      "links": {
+        "fields": {
+          "resources": "https://example.com/harbor"
+        },
+        "status": "reviewed",
+        "source_refs": [
+          "author:harbor"
+        ],
+        "missing_fields": []
+      }
+    }
+  }
+}

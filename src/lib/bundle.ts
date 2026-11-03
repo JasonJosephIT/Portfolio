@@ -17,13 +17,16 @@ export const manifest = JSON.parse(readFileSync(join(root, "bundle.json"), "utf8
   schema_version: number;
   approval: "approved" | "pending";
   generated_at: string;
+  records: { projects: string[] };
 };
 export const profile = JSON.parse(readFileSync(join(root, "profile.json"), "utf8")) as Profile;
 export const isDraft = manifest.approval !== "approved";
 
 /** Projects in a stable order: parents first, then by name. */
 export async function projects() {
-  const all = (await getCollection("projects")).map((p) => p.data);
+  // Full-snapshot membership comes from the manifest, including after a cached build.
+  const included = new Set(manifest.records.projects);
+  const all = (await getCollection("projects")).map((p) => p.data).filter((p) => included.has(p.slug));
   return all.sort((a, b) => Number(!!a.part_of) - Number(!!b.part_of) || a.name.localeCompare(b.name));
 }
 

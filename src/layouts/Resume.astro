@@ -1,0 +1,52 @@
+---
+import Head from "@/layouts/Head.astro";
+import "@/styles/tokens.css";
+import { isDraft, manifest } from "@/lib/bundle";
+interface Props { title: string; description: string; showCareer: boolean; }
+const { title, description, showCareer } = Astro.props;
+---
+<html lang="en">
+  <Head title={title} description={description} />
+  <body class="resume-site">
+    <a href="#main" class="resume-skip">Skip to content</a>
+    <header class="resume-site-header">
+      <nav aria-label="Resume navigation" class="resume-site-nav">
+        <a href="/" class="resume-brand">Jason <span>Joseph</span></a>
+        <div class="resume-site-links">
+          {showCareer && <a href="#experience">Experience</a>}
+          <a href="#selected-projects">Projects</a>
+          {showCareer && <a href="#education">Education</a>}
+          <a href="/tech">Portfolio</a>
+          <button id="print-resume" type="button">Print full resume</button>
+        </div>
+      </nav>
+    </header>
+    {isDraft && <p class="resume-bundle-note">Preview: drafts from Open Thoughts, not yet approved ({manifest.generated_at.slice(0, 10)}).</p>}
+    <main id="main" class="resume-site-main"><slot /></main>
+    <footer class="resume-site-footer"><a href="/tech">Back to the portfolio</a></footer>
+  </body>
+</html>
+<style is:global>
+  .resume-site { --resume-bg:var(--bg); --resume-card:var(--surface-board); --resume-border:rgba(236,232,222,.12); --resume-text:var(--text); --resume-muted:var(--muted); --resume-accent:var(--accent-tech); margin:0; background:var(--resume-bg); color:var(--resume-text); font-family:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; isolation:isolate; position:relative; min-height:100dvh; }
+  .resume-site *, .resume-site *::before, .resume-site *::after { box-sizing:border-box; }
+  .resume-site h1,.resume-site h2,.resume-site h3,.resume-site p,.resume-site ul { margin:0; }
+  .resume-site a { color:inherit; text-decoration:none; }
+  .resume-site a:hover { color:var(--resume-accent); text-decoration:underline; text-underline-offset:3px; }
+  .resume-site button { font:inherit; cursor:pointer; }
+  .resume-site :focus-visible { outline:2px solid var(--resume-accent); outline-offset:4px; }
+  .resume-site-header { position:sticky; top:0; z-index:10; border-bottom:1px solid var(--resume-border); background:color-mix(in srgb,var(--resume-bg) 90%,transparent); backdrop-filter:blur(8px); }
+  .resume-site-nav { max-width:848px; margin:auto; padding:14px 24px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px 20px; }
+  .resume-brand { font-weight:800; font-size:.9rem; letter-spacing:.24em; text-transform:uppercase; font-variation-settings:"wdth" 125; }
+  .resume-brand span { color:var(--resume-muted); }
+  .resume-site-links { display:flex; flex-wrap:wrap; align-items:center; gap:8px 22px; font-size:12px; letter-spacing:.16em; text-transform:uppercase; font-variation-settings:"wdth" 108; }
+  .resume-site-links a { padding-block:7px; }
+  .resume-site-links button { border:1px solid color-mix(in srgb,var(--resume-accent) 58%,transparent); border-radius:2px; padding:8px 14px; color:var(--resume-text); background:transparent; font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; transition:background-color .25s ease; }
+  .resume-site-links button:hover { background:color-mix(in srgb,var(--resume-accent) 14%,transparent); }
+  .resume-site-main { max-width:848px; margin:auto; padding:32px 24px 56px; }
+  .resume-bundle-note { max-width:848px; margin:18px auto 0 !important; padding-inline:24px; color:var(--resume-muted); font-size:12px; }
+  .resume-site-footer { max-width:848px; margin:0 auto; padding:0 24px 40px; color:var(--resume-muted); font-size:14px; }
+  .resume-skip { position:absolute; left:16px; top:-100px; z-index:50; padding:8px; background:var(--board); }
+  .resume-skip:focus { top:8px; }
+  @media(max-width:600px) { .resume-site-nav,.resume-site-main { padding-inline:16px; } .resume-site-links { gap:6px 16px; } .resume-site-main { padding-top:24px; } }
+  @media print { @page { size:letter; margin:.65in; } .resume-site { background:white; color:black; font-family:Arial,sans-serif; font-size:10pt; line-height:1.35; } .resume-site-header,.resume-site-footer,.resume-skip { display:none !important; } .resume-site-main { max-width:none; padding:0; } .resume-site * { color:black !important; box-shadow:none !important; } .resume-bundle-note { padding:0; margin:0 0 10px !important; } }
+</style>

@@ -1,6 +1,7 @@
 ---
 import { marked } from "marked";
 import Tech from "@/layouts/Tech.astro";
+import PortfolioCaseStudy from "@/components/PortfolioCaseStudy.astro";
 import { builds, DOC_TITLE, docsFor, projects, relationsFor } from "@/lib/bundle";
 
 export async function getStaticPaths() {
@@ -58,6 +59,7 @@ const next = all[(index + 1) % all.length];
         {/* Unsanitised markdown: safe only because the bundle is reviewed and merged by PR. */}
         <div class="prose-board max-w-[62ch] text-[1.03rem]" set:html={html} />
       </article>
+      <PortfolioCaseStudy record={p} />
     </div>
 
     <aside aria-label="Project details" class="lg:sticky lg:top-[104px] lg:self-start">

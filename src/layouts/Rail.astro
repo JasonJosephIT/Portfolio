@@ -16,7 +16,7 @@ const { title, description, returnPage } = Astro.props;
 <!DOCTYPE html>
 <html lang="en">
 <Head title={title} description={description} />
-<body class="gallery-page gallery-page--art art patterned" data-return-page={returnPage}>
+<body class="gallery-page gallery-page--art art" data-return-page={returnPage}>
   <a class="skip-link" href="#main">Skip to content</a>
   <Backdrop pos={-1} />
   <slot />
