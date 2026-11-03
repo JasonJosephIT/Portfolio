@@ -20,13 +20,13 @@
   object-position: 50% 100%;
   image-rendering: pixelated;
   opacity: 0.2; /* content pages */
-  transition: opacity 1.2s ease;
+  transition: opacity 2s ease;
 }
 
 /* Foamy waves drawn over the water by backdrop-foam.js */
 .backdrop .foam {
   opacity: 0.2; /* content pages */
-  transition: opacity 1.2s ease;
+  transition: opacity 2s ease;
   position: absolute;
   inset: 0;
   width: 100%;
@@ -54,10 +54,39 @@
   inset: 0;
   z-index: 2;
   background: rgba(0, 0, 0, 0.15);
+  transition: opacity 2s ease;
 }
 
-/* Home shows the scene brighter; the backdrop persists across pages, so it fades down to the content-page level. */
+/* Home shows the scene at full strength with no tint; the backdrop persists across pages, so it fades
+   down to the content-page level. */
 body.home .backdrop .pan,
 body.home .backdrop .foam {
-  opacity: 0.6;
+  opacity: 1;
+}
+body.home .backdrop::after {
+  opacity: 0;
+}
+
+/* Page swaps are instant: the default root cross-fade double-exposed the old and new content and
+   flashed the scene bright (the grain's blend mode has nothing to blend with inside a snapshot).
+   The backdrop gets its own snapshot layer so it carries straight through. */
+.backdrop {
+  view-transition-name: bay;
+}
+::view-transition-group(root),
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-group(bay),
+::view-transition-old(bay),
+::view-transition-new(bay) {
+  animation: none;
+}
+::view-transition-old(bay) {
+  display: none;
+}
+::view-transition-new(bay) {
+  mix-blend-mode: normal;
 }

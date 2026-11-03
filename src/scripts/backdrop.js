@@ -38,12 +38,11 @@ if (video) {
     requestAnimationFrame(frame);
   };
 
-  // Every page load: a content page sends the camera to its coast the first time, or when it comes
-  // from Home. Home steers the camera itself (home-scene.js).
+  // Every page load: a content page snaps the camera to its coast the first time, and pans it there
+  // from wherever it was after that. Home steers the camera itself (home-scene.js).
   document.addEventListener("astro:page-load", () => {
     const marker = document.querySelector("[data-bay-pos]");
     const here = marker ? Number(marker.dataset.bayPos) : 0;
-    const wasHome = bay.mode === "home";
     if (here === 0) {
       bay.mode = "home";
       bay.ready = true;
@@ -51,11 +50,11 @@ if (video) {
     }
     bay.mode = "rest";
     bay.busy = false;
-    bay.k = 28;
+    bay.k = 14; // a deliberate pan, the same pace as leaving Home
     if (!bay.ready) {
       bay.pos = bay.target = here;
       bay.vel = 0;
-    } else if (wasHome) {
+    } else {
       bay.target = here;
     }
     bay.ready = true;

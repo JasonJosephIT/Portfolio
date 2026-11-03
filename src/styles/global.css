@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "./tokens.css";
-@import "./backdrop.css";
 
 @theme inline {
     --color-background: var(--background);
