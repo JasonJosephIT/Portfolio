@@ -270,7 +270,7 @@ body.home { position: relative; }
   display: flex;
   flex-direction: column;
   padding: calc(var(--mat) + var(--name-h) * 1.15) 0 var(--mat);
-  background: var(--board);
+  background: var(--surface-board);
   color: var(--text);
   text-decoration: none;
   box-shadow:
@@ -386,7 +386,7 @@ body.home { position: relative; }
   max-width: 62ch;
   margin: 0 auto;
   padding: clamp(24px, 3vw, 36px) clamp(24px, 3.4vw, 44px) clamp(22px, 3vw, 32px);
-  background: var(--board);
+  background: var(--surface-board);
   box-shadow:
     0 0 0 1px var(--bevel),
     inset 0 1px 0 rgba(255, 255, 255, 0.035),

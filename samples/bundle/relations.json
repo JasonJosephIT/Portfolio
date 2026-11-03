@@ -1,0 +1,14 @@
+[
+  {
+    "from": "tidepool",
+    "to": "harbor",
+    "type": "uses",
+    "evidence": "Tidepool volunteers log readings in Harbor"
+  },
+  {
+    "from": "lumen",
+    "to": "ledger",
+    "type": "built-with",
+    "evidence": "Lumen reuses the plain-text parser from Ledger"
+  }
+]

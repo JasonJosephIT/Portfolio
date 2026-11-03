@@ -1,0 +1,75 @@
+---
+interface Props { quiet?: boolean; tone?: "bone" | "cyan" | "coral"; }
+const { quiet = false, tone = "bone" } = Astro.props;
+import foam from "@/assets/ocean/swell-pixel.png?url";
+---
+
+<div class:list={["current-field", { "current-field--quiet": quiet }]} data-current-field data-tone={tone} aria-hidden="true">
+  <div class="current-field__water" data-current-water style={`--ocean-still: url("${foam}")`}>
+    <canvas data-ocean-canvas></canvas>
+  </div>
+</div>
+
+<script>
+  import "../scripts/ocean-waves";
+</script>
+
+<style>
+  :global(body:has(> .current-field)) {
+    position: relative;
+    isolation: isolate;
+    min-height: 100svh;
+  }
+
+  .current-field {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background: #06080b;
+  }
+
+  .current-field__water {
+    position: absolute;
+    inset: 0;
+    opacity: 0.10;
+    background-color: #071322;
+  }
+
+  .current-field[data-tone="coral"] .current-field__water { background-color: #1a1118; }
+  .current-field[data-tone="cyan"] .current-field__water { background-color: #08161b; }
+  .current-field[data-tone="bone"] .current-field__water { background-color: #101012; }
+
+  .current-field__water::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--ocean-still);
+    background-size: 270px auto;
+    background-position: left top;
+    background-repeat: repeat-x;
+    mask-image: linear-gradient(to bottom, #000, transparent 180px);
+    image-rendering: pixelated;
+    filter: sepia(1) saturate(2.4) hue-rotate(170deg) brightness(0.85);
+  }
+
+  .current-field[data-tone="coral"] .current-field__water::before {
+    filter: sepia(1) saturate(2) hue-rotate(325deg) brightness(0.58);
+  }
+
+  .current-field__water[data-renderer="webgl"]::before { display: none; }
+
+  .current-field__water :global(canvas) {
+    /* Fixed, not sticky: .current-field clips overflow, which would make a
+       sticky canvas stick to that box instead of the viewport. */
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: block;
+    image-rendering: pixelated;
+    visibility: hidden;
+  }
+
+  .current-field__water[data-renderer="webgl"] :global(canvas) { visibility: visible; }
+</style>

@@ -1,0 +1,19 @@
+{
+  "headline": "Builds careful, small software",
+  "bio": "Placeholder biography for layout review. I make small tools that do one job well, and I write down why I made each choice.\n\nBy way of contrast, I also photograph people and light.",
+  "skills": [
+    "TypeScript",
+    "Python",
+    "Rust",
+    "React",
+    "SQLite",
+    "Design systems"
+  ],
+  "interests": [
+    "Photography",
+    "Maps",
+    "Coastlines"
+  ],
+  "approved_at": "2026-10-22T00:00:00Z",
+  "source_hash": "0123456789abcdef"
+}

@@ -19,6 +19,12 @@
   --muted: #a5a197;         /* graphite */
   --pencil: #8a8479;        /* soft pencil */
   --hairline: rgba(236, 232, 222, 0.07);
+  --muted-text: var(--muted);
+  --surface-board: color-mix(in srgb, var(--board) 75%, transparent);
+  --surface-bg: color-mix(in srgb, var(--bg) 75%, transparent);
+  --accent-navy: #173a5f;   /* Atlantic depth */
+  --accent-sky: #8fa8ff;    /* periwinkle: a fourth explorer accent that reads on the board */
+  --accent-coral: #ff7668;  /* warm current highlight */
   --accent-art: #e98a3e;    /* amber core */
   --accent-tech: #48c4dc;   /* ice-cyan core */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
