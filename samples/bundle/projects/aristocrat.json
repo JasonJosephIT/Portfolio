@@ -14,9 +14,10 @@
       "kind": "video",
       "checksum": "sha256-sample",
       "poster_key": "sample-media/aristocrat/poster.jpg",
-      "caption": "Aristocrat: product demo (placeholder clip)",
+      "caption": "Aristocrat: 55-second product demo, narrated, covering the AI tutor and its teacher, student and observer training loop",
       "role": "demo",
-      "captions_key": "sample-media/aristocrat/demo.vtt"
+      "captions_key": "sample-media/aristocrat/demo.vtt",
+      "aspect": "16/9"
     }
   ],
   "part_of": null,

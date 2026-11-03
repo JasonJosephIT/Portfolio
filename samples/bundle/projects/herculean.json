@@ -14,7 +14,7 @@
       "kind": "video",
       "checksum": "sha256-sample",
       "poster_key": "sample-media/herculean/poster.jpg",
-      "caption": "Herculean: product demo (placeholder clip)",
+      "caption": "Herculean: 43-second product demo, narrated, covering continuous compliance checks and SOC 2 readiness",
       "role": "demo",
       "captions_key": "sample-media/herculean/demo.vtt",
       "aspect": "16/9"
