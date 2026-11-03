@@ -48,6 +48,9 @@ export function validateBundle(dir, { allowPending = false } = {}) {
       if (error) problems.push(`projects/${f}.json: ${error}`);
     }
     if (r.slug !== f) problems.push(`projects/${f}.json: slug ${JSON.stringify(r.slug)} != filename stem`);
+    const demos = (r.media ?? []).filter((m) => m.role === "demo");
+    if (demos.length > 1) problems.push(`projects/${f}.json: more than one demo media entry`);
+    if (demos.some((m) => m.kind !== "video")) problems.push(`projects/${f}.json: a demo media entry must be a video`);
   }
   const profile = load("profile.json");
   if (profile) problems.push(...shape("profile", profile, "profile.json"));

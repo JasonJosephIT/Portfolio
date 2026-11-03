@@ -83,6 +83,15 @@ export function initProjectExplorer(root: HTMLElement) {
   if (aboutButton) aboutButton.onclick = () => about.showModal();
   const lightbox = document.querySelector<HTMLDialogElement>("[data-media-dialog]")!;
   root.querySelectorAll<HTMLButtonElement>("[data-expand-image]").forEach(button => button.onclick = () => { const img = lightbox.querySelector("img")!; img.src = button.dataset.src!; img.alt = button.dataset.caption!; lightbox.querySelector("p")!.textContent = button.dataset.caption!; lightbox.showModal(); });
+  // Demo videos: a silent looping preview on mouse hover (not with reduced motion); playing from the controls turns the sound on.
+  const still = matchMedia("(prefers-reduced-motion: reduce)");
+  root.querySelectorAll<HTMLVideoElement>("[data-demo] video").forEach(video => {
+    let preview = false;
+    video.addEventListener("pointerenter", e => { if (e.pointerType !== "mouse" || still.matches || !video.paused) return; preview = true; video.play().catch(() => { preview = false; }); });
+    video.addEventListener("pointerleave", () => { if (preview) { video.pause(); preview = false; } });
+    video.addEventListener("play", () => { if (!preview) video.muted = false; });
+    video.addEventListener("volumechange", () => { if (!video.muted) preview = false; }); // unmuting keeps it playing
+  });
   [about, lightbox].forEach(dialog => dialog.querySelector<HTMLButtonElement>("[data-close]")!.onclick = () => dialog.close());
   if (panels.length) { const slug = decodeURIComponent(location.hash.replace(/^#project=/, "")); const initial = panels.findIndex(p => p.dataset.slug === slug); active = Math.max(0, initial); scroll(panels[active]).scrollTop = positions[panels[active].dataset.slug!] ?? 0; go(active, true); }
   else { previous.disabled = next.disabled = true; }

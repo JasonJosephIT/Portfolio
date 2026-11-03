@@ -145,3 +145,35 @@ test("draft banner shows only in a PREVIEW build of a pending bundle", () => {
   });
   assert.match(page(o, "tech/index.html"), /not yet approved/);
 });
+
+const withDemo = (d) => editJson(join(d, "projects/beta-site.json"), (r) => {
+  r.media = [{ key: "sample-media/herculean/demo.mp4", kind: "video", checksum: "sha256-x", poster_key: "sample-media/herculean/poster.jpg", caption: "Demo clip", role: "demo", captions_key: "sample-media/herculean/demo.vtt", aspect: "16/9" }];
+});
+const panelOf = (html, slug) => html.split(`data-slug="${slug}"`)[1].split("</article>")[0];
+
+test("a project with a demo renders a lazy, captioned, muted video with a poster", () => {
+  const html = page(build({ edit: withDemo }), "tech/index.html");
+  const panel = panelOf(html, "beta-site");
+  assert.match(panel, /<figure class="pe-demo"/);
+  assert.match(panel, /<video[^>]*preload="none"/);
+  assert.match(panel, /<video[^>]* muted[ >]/);
+  assert.match(panel, /poster="\/sample-media\/herculean\/poster\.jpg"/);
+  assert.match(panel, /<track kind="captions" src="\/sample-media\/herculean\/demo\.vtt"/);
+  assert.match(panel, /aria-label="Beta Site demo: Demo clip"/);
+});
+
+test("a project without a demo renders no demo slot", () => {
+  const html = page(out, "tech/index.html");
+  assert.doesNotMatch(html.split("<script")[0].replace(/<style[\s\S]*?<\/style>/g, ""), /class="pe-demo"/);
+  assert.equal(panelOf(page(build({ edit: withDemo }), "tech/index.html"), "alpha-tool").includes("pe-demo"), false);
+});
+
+test("the validator accepts bundles with and without a demo, and rejects a non-video or second demo", () => {
+  validateBundle(fixture);
+  const ok = copyFixture(withDemo);
+  validateBundle(ok);
+  const bad = copyFixture((d) => editJson(join(d, "projects/beta-site.json"), (r) => {
+    r.media = [{ key: "a.png", kind: "image", checksum: "c", role: "demo" }, { key: "b.mp4", kind: "video", checksum: "c", role: "demo" }];
+  }));
+  assert.throws(() => validateBundle(bad), /must be a video|more than one demo/);
+});

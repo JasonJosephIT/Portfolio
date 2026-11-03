@@ -1,0 +1,24 @@
+{
+  "slug": "agent-orchestrator",
+  "name": "Agent Orchestrator",
+  "summary": "Runs a team of coding agents in parallel and keeps their work reviewable.",
+  "tags": [
+    "agents",
+    "developer-tools"
+  ],
+  "description": "Runs a team of coding agents in parallel and keeps their work reviewable. This is placeholder copy for layout review.",
+  "media": [
+    {
+      "key": "sample-media/agent-orchestrator/demo.mp4",
+      "kind": "video",
+      "checksum": "sha256-sample",
+      "poster_key": "sample-media/agent-orchestrator/poster.jpg",
+      "caption": "Agent Orchestrator: product demo (placeholder clip)",
+      "role": "demo",
+      "captions_key": "sample-media/agent-orchestrator/demo.vtt"
+    }
+  ],
+  "part_of": null,
+  "approved_at": "2026-10-22T00:00:00Z",
+  "source_hash": "5a5a5a5a5a5a5a5a"
+}

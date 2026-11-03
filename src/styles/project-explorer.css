@@ -207,3 +207,9 @@ body.tech-explorer { height: 100dvh; min-height: 0; display: flex; flex-directio
   .tech-explorer button[popovertarget] { bottom: 8px; right: 3vw; }
   .pe-bottom nav { max-width: calc(100% - 340px); margin-right: 260px; }
 }
+
+/* Demo video: takes the cover's place in the intro. */
+.pe-demo { margin: 0; align-self: center; }
+.pe-demo video { display: block; width: 100%; aspect-ratio: var(--pe-demo-aspect, 16 / 9); max-height: 62vh; object-fit: contain; background: #000; border-radius: 10px; box-shadow: 0 0 0 1px var(--hairline); }
+.pe-demo video:focus-visible { outline: 2px solid var(--pe-accent); outline-offset: 3px; }
+.pe-demo figcaption { font-size: 11px; letter-spacing: 0.06em; color: var(--muted-text); margin-top: 10px; }
