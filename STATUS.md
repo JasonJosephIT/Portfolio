@@ -20,6 +20,7 @@ updated: 2026-11-02
 5. Apply the content edits below to the Open Thoughts drafts (they are not published; the public feed has 0 records).
 
 ## Decisions (newest first)
+- 2026-11-02 Herculean script v2 from Jason's notes (compliance at AI speed; load and compliance in one layer; Iolaus model for continuous observability and verification; evidence as proof; SOC 2, GDPR, HIPAA): /private/tmp/claude-501/gen/vo-he2.txt. The public README only claims SOC 2 readiness and says it does not certify.
 - 2026-11-02 Aristocrat demo v1 rejected. New script from Jason's notes (AI-augmented learning; methods of the best places of thought; teacher-student-observer training loop; low cost, many regions; "aristocrats of thought"), draft at /private/tmp/claude-501/gen/vo-ar2.txt. Jason is adding UI and product reference images to ~/.ao/data/artifacts.
 - 2026-11-02 Aristocrat demo made on Comfy only (6 frames + 6 Kling clips, $3.48) with the GPT cedar voice: /private/tmp/claude-501/gen/aristocrat-demo.mp4 (44 s). Frames are drawn from the design art, not real app screens. Herculean cut left as is.
 - 2026-11-02 Herculean demo: Veo 3.1 shots and the GPT "cedar" voice (OpenRouter). Latest cut /private/tmp/claude-501/gen/herculean-demo-veo.mp4. OpenRouter key hit its $20 weekly limit (resets 2026-11-09); shots 1 and 5 are not on Veo yet. ElevenLabs is blocked by an unpaid invoice.
