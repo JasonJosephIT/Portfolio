@@ -20,6 +20,7 @@ updated: 2026-11-02
 5. Apply the content edits below to the Open Thoughts drafts (they are not published; the public feed has 0 records).
 
 ## Decisions (newest first)
+- 2026-11-02 Aristocrat demo made on Comfy only (6 frames + 6 Kling clips, $3.48) with the GPT cedar voice: /private/tmp/claude-501/gen/aristocrat-demo.mp4 (44 s). Frames are drawn from the design art, not real app screens. Herculean cut left as is.
 - 2026-11-02 Herculean demo: Veo 3.1 shots and the GPT "cedar" voice (OpenRouter). Latest cut /private/tmp/claude-501/gen/herculean-demo-veo.mp4. OpenRouter key hit its $20 weekly limit (resets 2026-11-09); shots 1 and 5 are not on Veo yet. ElevenLabs is blocked by an unpaid invoice.
 - 2026-11-02 Demo videos: storyboard and build them with ComfyUI (comfy-bridge), not one-off OpenRouter clips. Herculean video (not Hercules): 30-40 s, voiced, about using the AI model and how it supports compliance, not training. OpenRouter spend so far about $6.47 (Aristocrat test clips plus 4 Herculean crest clips).
 - 2026-11-02 Know Your Vote: no eval results. Instead describe the eval process for the news intake, and that Jason set the standard through iterative review and verification.
