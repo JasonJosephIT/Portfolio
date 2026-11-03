@@ -226,9 +226,9 @@ body.home { position: relative; }
 .wall {
   min-height: 100svh;
   display: grid;
-  grid-template-rows: 1fr auto;
-  align-content: center;
-  padding: calc(var(--nav-height) + clamp(8px, 2vh, 20px)) var(--mat) clamp(20px, 3vh, 32px);
+  grid-template-rows: auto 1fr;
+  align-content: start;
+  padding: calc(var(--nav-height) + 4px) var(--mat) clamp(20px, 3vh, 32px);
 }
 
 .wall-name {
@@ -246,6 +246,7 @@ body.home { position: relative; }
 }
 
 .wall-title {
+  align-self: end; /* sits at the foot of the screen, clear of the figure's head */
   margin: clamp(14px, 2.4vh, 24px) 0 0;
   color: var(--muted);
   font-size: 0.95rem;
@@ -262,66 +263,23 @@ body.home { position: relative; }
   justify-content: center;
   align-items: stretch;
   align-self: center;
-  perspective: 1800px;
+  gap: clamp(60px, 11vw, 170px); /* the wordmark sits between Art and Tech */
 }
 
 .panel {
   --accent: var(--accent-art);
   display: flex;
   flex-direction: column;
-  padding: calc(var(--mat) + var(--name-h) * 1.15) 0 var(--mat);
-  background: var(--surface-board);
+  padding: calc(var(--mat) + var(--name-h) * 1.15) var(--mat) var(--mat);
   color: var(--text);
   text-decoration: none;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.035),
-    0 1px 0 var(--board-edge),
-    0 40px 60px -40px rgba(0, 0, 0, 0.9);
-  transform-origin: 100% 50%;
-  transition: transform 0.9s var(--ease-out), box-shadow 0.9s var(--ease-out);
-  will-change: transform;
 }
 
-.panel-tech {
-  --accent: var(--accent-tech);
-  transform-origin: 0% 50%;
-}
+.panel-tech { --accent: var(--accent-tech); }
 
-.window {
-  position: relative;
-  overflow: hidden;
-  width: min(calc(clamp(300px, 100svh - var(--nav-height) - var(--name-h) * 1.15 - var(--mat) * 2 - 196px, 760px) * 0.7), 46vw);
-  aspect-ratio: 7 / 10;
-  background: #000;
-}
-
-.window img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 200%;
-  height: 100%;
-  max-width: none;
-  object-fit: cover;
-  object-position: 50% 38%;
-  filter: brightness(1) saturate(1);
-  transition: filter 0.9s var(--ease-out);
-}
-
-.panel-tech .window img { left: -100%; }
-
-/* The light on the hovered half comes up */
-.panel:hover .window img,
-.panel:focus-visible .window img { filter: brightness(1.7) saturate(1.25); }
-
-/* The mat casts a shadow onto the print along the top of the opening */
-.window::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  box-shadow: inset 0 10px 18px -12px rgba(0, 0, 0, 0.95);
-}
+/* Captions leave fast (the system is responding) and return slowly on a cancelled turn */
+[data-scene].is-turning .caption { opacity: 0; transition: opacity 0.2s cubic-bezier(0.23, 1, 0.32, 1); }
+.caption { transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
 
 /* The hinge is the seam itself: the two halves meet, and the amber and cyan
    bevel hairlines are the only line between them. */
@@ -363,12 +321,6 @@ body.home { position: relative; }
 }
 
 .panel-tech .caption { align-items: flex-end; text-align: right; }
-
-.panel:hover,
-.panel:focus-visible { transform: rotateY(-7deg) translateZ(6px); }
-
-.panel-tech:hover,
-.panel-tech:focus-visible { transform: rotateY(7deg) translateZ(6px); }
 
 .panel:hover .label,
 .panel:focus-visible .label { color: var(--accent); }
@@ -511,7 +463,6 @@ body.home { position: relative; }
   .panel { padding: calc(var(--mat-sm) + var(--name-h) * 1.15) 0 var(--mat-sm); }
   .wall-name { top: calc(var(--mat-sm) + 0.1em); }
   .caption { padding: 0 var(--mat-sm); }
-  .window { width: calc((100vw - var(--mat-sm) * 2) / 2); }
   .label { font-size: 1.15rem; gap: 6px; }
   .label svg { width: 18px; height: 18px; }
   .frame-back-inner { grid-template-columns: 1fr; }
@@ -525,8 +476,4 @@ body.home { position: relative; }
     transition-duration: 0.01ms !important;
     animation: none !important;
   }
-  .panel:hover,
-  .panel:focus-visible,
-  .panel-tech:hover,
-  .panel-tech:focus-visible { transform: none; }
 }

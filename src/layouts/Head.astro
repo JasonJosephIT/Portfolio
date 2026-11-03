@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from "astro:transitions";
 interface Props {
   title: string;
   description: string;
@@ -14,4 +15,5 @@ const { title, description } = Astro.props;
   <meta name="theme-color" content="#08090b" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preload" href="/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin />
+  <ClientRouter />
 </head>

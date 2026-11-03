@@ -1,7 +1,6 @@
 ---
 import "@/styles/diptych.css";
 import Head from "@/layouts/Head.astro";
-import CurrentField from "@/components/CurrentField.astro";
 
 interface Props {
   title: string;
@@ -16,7 +15,6 @@ const { title, description, bodyClass } = Astro.props;
 <Head title={title} description={description} />
 <body class={bodyClass}>
   <a class="skip-link" href="#main">Skip to content</a>
-  <CurrentField tone="bone" />
   <slot />
 </body>
 </html>

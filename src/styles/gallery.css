@@ -63,8 +63,8 @@
   }
 }
 
-/* The shared CurrentField component now supplies the site's moving water
-   ground. Art keeps its quiet treatment through the layout's `quiet` prop. */
+/* The bay backdrop (Backdrop.astro) is the site's ground: it replaced both the
+   wave pattern and the CurrentField water on Art. */
 
 /* ==========================================================================
    The type registers, shared by every component below
