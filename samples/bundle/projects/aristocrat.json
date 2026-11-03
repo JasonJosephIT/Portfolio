@@ -1,0 +1,25 @@
+{
+  "slug": "aristocrat",
+  "name": "Aristocrat",
+  "summary": "AI-augmented learning built on the methods of the best places of thought.",
+  "tags": [
+    "education",
+    "ai",
+    "mobile"
+  ],
+  "description": "AI-augmented learning built on the methods of the best places of thought. This is placeholder copy for layout review.",
+  "media": [
+    {
+      "key": "sample-media/aristocrat/demo.mp4",
+      "kind": "video",
+      "checksum": "sha256-sample",
+      "poster_key": "sample-media/aristocrat/poster.jpg",
+      "caption": "Aristocrat: product demo (placeholder clip)",
+      "role": "demo",
+      "captions_key": "sample-media/aristocrat/demo.vtt"
+    }
+  ],
+  "part_of": null,
+  "approved_at": "2026-10-22T00:00:00Z",
+  "source_hash": "5a5a5a5a5a5a5a5a"
+}

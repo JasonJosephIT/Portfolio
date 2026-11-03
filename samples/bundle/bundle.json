@@ -5,7 +5,11 @@
   "content_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   "records": {
     "projects": [
+      "agent-orchestrator",
+      "aristocrat",
       "harbor",
+      "herculean",
+      "know-your-vote",
       "ledger",
       "lumen",
       "tidepool"

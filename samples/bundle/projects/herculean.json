@@ -1,0 +1,26 @@
+{
+  "slug": "herculean",
+  "name": "Herculean",
+  "summary": "Compliance checks that keep pace with AI-built software, with SOC 2 evidence as the proof.",
+  "tags": [
+    "compliance",
+    "observability",
+    "ai"
+  ],
+  "description": "Compliance checks that keep pace with AI-built software, with SOC 2 evidence as the proof. This is placeholder copy for layout review.",
+  "media": [
+    {
+      "key": "sample-media/herculean/demo.mp4",
+      "kind": "video",
+      "checksum": "sha256-sample",
+      "poster_key": "sample-media/herculean/poster.jpg",
+      "caption": "Herculean: product demo (placeholder clip)",
+      "role": "demo",
+      "captions_key": "sample-media/herculean/demo.vtt",
+      "aspect": "16/9"
+    }
+  ],
+  "part_of": null,
+  "approved_at": "2026-10-22T00:00:00Z",
+  "source_hash": "5a5a5a5a5a5a5a5a"
+}
