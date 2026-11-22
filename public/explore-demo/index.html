@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Project explorer · JASON</title>
+  <link rel="stylesheet" href="./explorer.css">
+  <script src="./explorer.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="wordmark" href="/tech">JASON<span>Work, in every direction.</span></a>
+    <nav aria-label="Compare concepts"><a href="?view=panels" data-mode="panels">A / Project panels</a><a href="?view=rail" data-mode="rail">B / Project shelf</a></nav>
+    <span class="concept-note">Interaction study</span>
+  </header>
+  <div class="instructions"><p id="instruction">Sideways for projects. Downward for the details.</p><div class="controls"><button id="previous" aria-label="Previous project">←</button><span id="position" aria-live="polite"></span><button id="next" aria-label="Next project">→</button></div></div>
+  <nav class="shelf" aria-label="Projects" id="shelf"></nav>
+  <main class="track" id="track" aria-label="Explore projects"></main>
+  <footer class="explorer-footer"><span id="current-project"></span><nav aria-label="Project sections" id="sections"></nav><span class="footer-note">Sample visuals & content</span></footer>
+  <dialog id="demo-dialog" aria-labelledby="demo-heading"><button class="close-dialog" autofocus>Close ×</button><p class="demo-kicker">Interactive sample</p><h2 id="demo-heading"></h2><p id="demo-description"></p><div id="demo-body"></div></dialog>
+</body>
+</html>
