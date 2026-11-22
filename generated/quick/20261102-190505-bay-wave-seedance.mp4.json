@@ -1,0 +1,23 @@
+{
+  "tool": "openrouter",
+  "model": "bytedance/seedance-2.5",
+  "prompt": "Locked eye-level camera orbiting slowly around a young man seen from behind on a pixel-art Haitian coastal beach. Two smooth legs with no cut. First half: pan left to right, from the left coast with coral and blue hillside houses, past the back of his head and the open gray sea, to the right coast. Ease to a brief hold. Second half: pan back right to left at the same speed, ending on the left coast matching the first frame. His head turns slightly to follow the camera, eyes first, then head, shoulders a beat behind. One single thin white wave line enters at the mouth of the bay beside the headland tip and rolls in along the curve of the beach, following the bay's shape all the way down to the shore, with a fainter second line just behind it. Flat two-tone gray sea, otherwise calm. Same hair, skin and clothing throughout. Strict palette: black, bone white, graphite gray, coral, blue. Hard pixel edges, no anti-aliasing, no white outline around the figure, no horizontal streaks or bars, no text, no camera shake, no cuts.",
+  "inputs": [
+    {
+      "input": "image",
+      "path": "src/assets/waves/coast-left.png"
+    },
+    {
+      "input": "last_frame",
+      "path": "src/assets/waves/coast-left.png"
+    }
+  ],
+  "created": "2026-11-02T19:05:05.493Z",
+  "source_ids": {
+    "openrouter_id": "gen-vid-1793646083-G3mta48ZUasQnELZG0ZU",
+    "aspect": "21:9",
+    "duration": 10
+  },
+  "cost_if_known": 2.3268113,
+  "engine_record": null
+}

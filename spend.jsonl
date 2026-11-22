@@ -1,0 +1,15 @@
+{"ts":"2026-11-02T14:49:24.964Z","id":"sp-1a2ed2a1","job":null,"run":null,"provider":"openrouter","usd":1.16,"note":"bytedance/seedance-2.5 video","kind":"reserve"}
+{"ts":"2026-11-02T14:54:01.689Z","id":"sp-1a2ed2a1","job":null,"run":null,"provider":"openrouter","usd":1.168226,"note":"bytedance/seedance-2.5 video","kind":"actual","over":0.008226}
+{"ts":"2026-11-02T14:54:01.689Z","id":"sp-1a2ed2a1","job":null,"run":null,"provider":"openrouter","usd":1.16,"note":"bytedance/seedance-2.5 video","kind":"release"}
+{"ts":"2026-11-02T17:46:26.370Z","id":"sp-2e63353c","job":null,"run":null,"provider":"openrouter","usd":2.31,"note":"bytedance/seedance-2.5 video","kind":"reserve"}
+{"ts":"2026-11-02T17:51:14.913Z","id":"sp-2e63353c","job":null,"run":null,"provider":"openrouter","usd":2.3268113,"note":"bytedance/seedance-2.5 video","kind":"actual","over":0.016811}
+{"ts":"2026-11-02T17:51:14.914Z","id":"sp-2e63353c","job":null,"run":null,"provider":"openrouter","usd":2.31,"note":"bytedance/seedance-2.5 video","kind":"release"}
+{"ts":"2026-11-02T19:01:19.235Z","id":"sp-fa03683e","job":null,"run":null,"provider":"openrouter","usd":2.33,"note":"bytedance/seedance-2.5 video","kind":"reserve"}
+{"ts":"2026-11-02T19:01:19.258Z","id":"sp-16c905c3","job":null,"run":null,"provider":"openrouter","usd":1.68,"note":"kwaivgi/kling-v3.0-pro video","kind":"reserve"}
+{"ts":"2026-11-02T19:05:05.502Z","id":"sp-fa03683e","job":null,"run":null,"provider":"openrouter","usd":2.3268113,"note":"bytedance/seedance-2.5 video","kind":"actual"}
+{"ts":"2026-11-02T19:05:05.502Z","id":"sp-fa03683e","job":null,"run":null,"provider":"openrouter","usd":2.33,"note":"bytedance/seedance-2.5 video","kind":"release"}
+{"ts":"2026-11-02T19:08:28.620Z","id":"sp-16c905c3","job":null,"run":null,"provider":"openrouter","usd":1.12,"note":"kwaivgi/kling-v3.0-pro video","kind":"actual"}
+{"ts":"2026-11-02T19:08:28.620Z","id":"sp-16c905c3","job":null,"run":null,"provider":"openrouter","usd":1.68,"note":"kwaivgi/kling-v3.0-pro video","kind":"release"}
+{"ts":"2026-11-02T19:24:17.472Z","id":"sp-c93a212f","job":null,"run":null,"provider":"openrouter","usd":1.68,"note":"kwaivgi/kling-v3.0-pro video","kind":"reserve"}
+{"ts":"2026-11-02T19:28:42.030Z","id":"sp-c93a212f","job":null,"run":null,"provider":"openrouter","usd":1.12,"note":"kwaivgi/kling-v3.0-pro video","kind":"actual"}
+{"ts":"2026-11-02T19:28:42.030Z","id":"sp-c93a212f","job":null,"run":null,"provider":"openrouter","usd":1.68,"note":"kwaivgi/kling-v3.0-pro video","kind":"release"}

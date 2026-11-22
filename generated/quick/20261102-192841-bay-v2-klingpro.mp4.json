@@ -1,0 +1,23 @@
+{
+  "tool": "openrouter",
+  "model": "kwaivgi/kling-v3.0-pro",
+  "prompt": "Locked eye-level camera orbiting slowly around a young man seen from behind on a pixel-art Haitian coastal bay. One continuous move in two halves with no cut. First half: pan left to right, from the left coast with coral and blue hillside houses among dark tropical foliage (palms, banana leaves, bushes), past the back of his head and the open gray sea, to the right coast: a matching hillside village with coral and blue houses tucked among palms and foliage above its own small curved beach. Brief hold. Second half: pan back right to left at the same speed and return exactly to the starting view, matching the first frame. His head turns slightly to follow the camera. Waves: thin white wave lines, each with a fainter second line just behind it, roll in from the open sea in a steady rhythm; rows of them stretch back toward the horizon, smaller and fainter with distance, and the nearest ones curl into the bay and follow its curved shore down to the beach. Same hair, skin and clothing throughout. Strict palette: black, bone white, graphite gray, coral, blue, with deep muted green only for foliage. Hard pixel edges, no anti-aliasing, no white outline around the figure, no horizontal streaks or bars, no text, no camera shake, no cuts.",
+  "inputs": [
+    {
+      "input": "image",
+      "path": "src/assets/waves/coast-left.png"
+    },
+    {
+      "input": "last_frame",
+      "path": "src/assets/waves/coast-left.png"
+    }
+  ],
+  "created": "2026-11-02T19:28:42.026Z",
+  "source_ids": {
+    "openrouter_id": "gen-vid-1793647461-StLQDRI0KFQurL123f6s",
+    "aspect": "21:9",
+    "duration": 10
+  },
+  "cost_if_known": 1.12,
+  "engine_record": null
+}
