@@ -20,6 +20,8 @@ updated: 2026-11-22
 5. Apply the content edits below to the Open Thoughts drafts (they are not published; the public feed has 0 records).
 
 ## Decisions (newest first)
+- 2026-11-02 Final cuts: Aristocrat drops the seal and salon shots and ends on the logo with "aristocrats of thought"; Herculean tagline is "Designed for your greatest tasks." Web copies in /private/tmp/claude-501/gen/ship/; handed to the demo-slots session to replace PR #16 placeholders (no merge or deploy without Jason).
+- 2026-11-02 Aristocrat final cut built from aristocrat-2 assets: /private/tmp/claude-501/gen/aristocrat-final.mp4 (60 s, 1080p; Veo 3.1 hero/busts/seal, Kling 3.0 Pro salon/map, real app screens, GPT cedar voice, existing closing). A Herculean cut also exists at /private/tmp/claude-501/gen/herculean-final.mp4 but Jason asked for Aristocrat only for now.
 - 2026-11-02 Herculean script names SOC 2 only (Jason's call; replaces keeping GDPR and HIPAA).
 - 2026-11-02 Herculean script v2 from Jason's notes (compliance at AI speed; load and compliance in one layer; Iolaus model for continuous observability and verification; evidence as proof; SOC 2, GDPR, HIPAA): /private/tmp/claude-501/gen/vo-he2.txt. The public README only claims SOC 2 readiness and says it does not certify.
 - 2026-11-02 Aristocrat demo v1 rejected. New script from Jason's notes (AI-augmented learning; methods of the best places of thought; teacher-student-observer training loop; low cost, many regions; "aristocrats of thought"), draft at /private/tmp/claude-501/gen/vo-ar2.txt. Jason is adding UI and product reference images to ~/.ao/data/artifacts.
