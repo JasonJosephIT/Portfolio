@@ -106,8 +106,11 @@ function wireDetailReturn() {
  * Start
  * ------------------------------------------------------------------ */
 
-watchImages();
-wireColorToggle();
-
-if (document.body.dataset.returnPage) wireListingReturn();
-else wireDetailReturn();
+// View transitions swap the page without reloading, so wire it on every page load.
+document.addEventListener('astro:page-load', () => {
+  if (!document.body.classList.contains('gallery-page')) return;
+  watchImages();
+  wireColorToggle();
+  if (document.body.dataset.returnPage) wireListingReturn();
+  else wireDetailReturn();
+});

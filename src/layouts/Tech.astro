@@ -4,7 +4,7 @@ import Head from "@/layouts/Head.astro";
 import { Image } from "astro:assets";
 import { isDraft, manifest } from "@/lib/bundle";
 import Chat from "@/components/Chat.astro";
-import CurrentField from "@/components/CurrentField.astro";
+import Backdrop from "@/components/Backdrop.astro";
 import bard from "@/assets/bard-mark.png";
 
 interface Props {
@@ -19,8 +19,8 @@ const isResume = Astro.url.pathname.replace(/\/$/, "") === "/resume";
 <html lang="en">
   <Head title={title} description={description} />
   <body class:list={["min-h-dvh", { "tech-explorer": explorer }]}>
+    <Backdrop pos={1} />
     <a href="#main" class="label sr-only z-50 bg-board px-4 py-3 !text-foreground focus:not-sr-only focus:fixed focus:top-2 focus:left-2">Skip to content</a>
-    <CurrentField quiet tone="cyan" />
     {
       isDraft && (
         <p class="note border-b border-hairline px-4 py-2 text-center">
@@ -60,5 +60,5 @@ const isResume = Astro.url.pathname.replace(/\/$/, "") === "/resume";
       </div>
     </footer>
     <Chat />
-  </body>
+      </body>
 </html>

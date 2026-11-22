@@ -59,7 +59,10 @@ const contact = "/#about-heading";
 </div>
 
 <script>
-  const panel = document.getElementById("chat")!;
+  // View transitions swap the page, so wire the panel on every page load.
+  document.addEventListener("astro:page-load", () => {
+  const panel = document.getElementById("chat");
+  if (!panel) return;
   const form = document.getElementById("chat-form") as HTMLFormElement | null;
   if (form) {
     const $ = (id: string) => document.getElementById(id)!;
@@ -222,4 +225,5 @@ const contact = "/#about-heading";
       }
     });
   }
+  });
 </script>
