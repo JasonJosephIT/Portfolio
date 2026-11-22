@@ -1,0 +1,44 @@
+<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Portfolio x Open Thoughts map</title><style>:root{--bg:#fff;--fg:#1a1a1a;--line:#ddd}@media(prefers-color-scheme:dark){:root{--bg:#161616;--fg:#eee;--line:#333}}body{background:var(--bg);color:var(--fg);font:16px/1.5 system-ui;max-width:860px;margin:0 auto;padding:24px 16px}.i{border-left:3px solid var(--line);padding-left:10px;margin:6px 0}a{color:inherit}</style><h1>Map: Portfolio becomes an Astro site fed by Open Thoughts</h1>
+<h2>Destination</h2>
+<p>A cleared map from which one `/to-spec` can be written, phased: 1) Astro site on Cloudflare that pulls an approved, enriched bundle from Open Thoughts, 2) generated docs, 3) a safe RAG chatbot. Cleared means no open decision ticket remains.</p>
+<h2>Notes</h2>
+<p class=i>Consult `graphify-out/GRAPH_REPORT.md` and use `/graphify query` before reading code. (Open Thoughts has a graph; Portfolio has none yet.)</p>
+<p class=i>Decision tickets only, no product code. Open Thoughts is read-only unless a ticket says otherwise.</p>
+<p class=i>Settled before charting: PRD &quot;no build / no backend&quot; rule retired; Astro; Cloudflare; no Obsidian; Portfolio pulls, Open Thoughts never pushes; cards show name, summary, tags only (no status, dates, repo or URL links); prototypes on the site, video first; approval reuses Open Thoughts&#x27; review desk; the **public face** (what Jason chooses to show outwardly, enriched by Open Thoughts) is the single source for both the site and the chatbot corpus.</p>
+<p class=i>Spike: branch `spike/open-thoughts-feed`, worktree `~/Projects/Portfolio-spike`, proves card-fill from `content/portfolio-feed.json` via `scripts/sync-open-thoughts.mjs`. Proof of the card step only.</p>
+<p class=i>Tracker: local markdown. Each ticket is `tickets/&lt;slug&gt;.md`; claim by filling `claimed-by`; close by setting `status: closed`, writing the Resolution, and adding a line below.</p>
+<h2>Decisions so far</h2>
+<p class=i>Destination, tracker, approval starting point, out-of-scope list and chatbot corpus default were settled with Jason while charting (see Notes).</p>
+<p class=i>Bot check on the chatbot: Cloudflare Turnstile (Jason, 2026-10-16). Its pricing is to be confirmed in the guardrails ticket.</p>
+<p class=i><a href="tickets/cloudflare-facts.md">What do the Cloudflare pieces cost and allow?</a>: Use Workers Static Assets, not Pages, for new projects; a Worker (via @astrojs/cloudflare) is needed for the chatbot and cron.</p>
+<p class=i><a href="tickets/chatbot-safety-standards.md">What is industry standard for a public RAG chatbot&#x27;s safety?</a>: Latest OWASP LLM list is 2025; key items LLM01 injection, LLM02 disclosure, LLM08 vector weaknesses, LLM09 misinformation, LLM10 unbounded consumption; RAG alone does not stop injection.</p>
+<p class=i><a href="tickets/public-face.md">What is the public face?</a>: Items carry public/context-only/private tags (new = private); enrichment drafts a separate public record that Jason approves; grounded in the note, redaction blocks, names need a tick; a profile record too.</p>
+<p class=i><a href="tickets/bundle-format.md">What is the bundle format?</a>: Directory bundle (manifest, per-record JSON, relations.json, docs as markdown), OT owns the JSON Schema and both sides validate, full snapshots with slug ids, media by reference, integer schema_version.</p>
+<p class=i><a href="tickets/delivery.md">How does Portfolio pull the bundle?</a>: Export button in OT, scheduled local pull opens a PR, bundle committed to git; index rebuilt from it on each deploy.</p>
+<p class=i><a href="tickets/approval-flow.md">How does approval work in the review desk?</a>: One publish card per record (tag+text+relations), new `revise` kind with diff, stale records stay live until revised, human-only export gate with re-scan.</p>
+<p class=i><a href="tickets/enrichment.md">How does Open Thoughts enrich the bundle with relations?</a>: Four sources, four edge types (uses, part-of, built-with, related-to), scripts propose and Claude selects, approved with the record; tags free-form first then controlled; Jev + Claude API wanted.</p>
+<p class=i><a href="tickets/site-architecture.md">What is the site architecture on Cloudflare?</a>: One Worker with static assets, fully prerendered; separate chatbot Worker; Astro at repo root with content collections; preview per PR; workers.dev first.</p>
+<p class=i><a href="tickets/enrichment-engines.md">Which engines do the enrichment?</a>: Opus drafts with Jason&#x27;s writing skill, Jev double-checks, Haiku 5.5 high fixes issues; private never leaves without a per-item consider action; Keychain keys, monthly cap; pause rather than switch engines.</p>
+<p class=i><a href="tickets/chatbot-corpus-and-architecture.md">What does the chatbot read and how is it built?</a>: Bundle-only corpus chunked by heading, namespace per bundle hash, Workers AI behind AI Gateway, answers only from retrieved chunks with citations; conversations stored (guardrails decides retention and notice).</p>
+<p class=i><a href="tickets/chatbot-guardrails.md">What guardrails does the chatbot ship with?</a>: Chats in D1 only, 90-day retention, visible notice, Turnstile + rate/spend limits + kill switch, non-streaming with Guardrails, eval set in CI plus manual red-team gate.</p>
+<p class=i><a href="tickets/docs-generation.md">What docs does Open Thoughts generate and how do they ship?</a>: Features + decisions docs per public project, same pipeline and approval (kind doc), shipped in the bundle as markdown, stale rule as records.</p>
+<p class=i><a href="tickets/migration.md">How do we migrate from static HTML and the staged changes?</a>: Land staged changes first on a branch; phased PRs A-F; clean URLs with 301s; Art hand-managed; retire admin/Supabase/Instatic without deleting the Supabase project; static-final tag for rollback.</p>
+<p class=i><a href="tickets/prototype-hosting.md">How are prototypes hosted, video first?</a>: Deferred by Jason; see Not yet specified.</p>
+<h2>Frontier (open and unblocked)</h2>
+<p>None. The map is clear.</p>
+<h2>Not yet specified</h2>
+<p class=i>Prototype hosting (video first, JS shells later): deferred by Jason; the bundle already carries media references. Revisit as a later phase of the spec.</p>
+<p class=i>Which of Jason&#x27;s writing skills the Opus drafts follow (name it in the spec).</p>
+<p class=i>Where the scheduled pull runs on the Mac (launchd vs a local scheduled Claude task).</p>
+<p class=i>Art page: where art images and galleries come from (not in Open Thoughts today) and how they flow into Astro.</p>
+<p class=i>Porting the diptych design (DESIGN.md) into Astro components; image pipeline; accessibility and performance budgets.</p>
+<p class=i>Analytics, SEO, social previews.</p>
+<p class=i>Bundle refresh cadence and the &quot;last pulled&quot; display, once delivery is decided.</p>
+<p class=i>Chatbot quality evals and cost monitoring after launch.</p>
+<p class=i>JS prototype shells beyond the boundary decided in prototype hosting.</p>
+<p class=i>Placeholders and contact details still owed by Jason (from the diptych redesign).</p>
+<h2>Out of scope</h2>
+<p class=i>Obsidian as a view or store.</p>
+<p class=i>Open Thoughts pushing anywhere (it only exposes; Portfolio pulls).</p>
+<p class=i>A CMS or admin UI inside Portfolio; admin/, Supabase and Instatic are retired (the migration ticket decides how).</p>
+<p class=i>Any host other than Cloudflare.</p>
