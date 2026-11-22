@@ -1,0 +1,82 @@
+# Publishes the built site to GitHub Pages.
+#
+# Why this exists: Pages used to serve the repository root from `main`, which put
+# content/portfolio.json — the canonical authoring document, drafts and all —
+# plus docs/, tests/ and scripts/ on the public web. This workflow deploys
+# `--out` instead, which is built from an explicit allowlist, so drafts and
+# source cannot ship.
+#
+# SITE_BASE is the path the site is served from. A project site lives at
+# jasonjosephit.github.io/Portfolio/, so it is /Portfolio/. If a custom domain is
+# ever added, change it to / and redeploy — it is used for 404.html, whose links
+# cannot be relative because a static host serves it at the requested address.
+
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it midway.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  SITE_BASE: /Portfolio/
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # No dependencies to install: the project is deliberately dependency-free
+      # and has no package.json.
+      - name: Test
+        run: node --test tests/*.test.mjs
+
+      # Fails the deploy if the committed pages have drifted from the content,
+      # so the live site can never disagree with the canonical document.
+      - name: Check generated pages are current
+        run: node scripts/build-portfolio.mjs --check
+
+      - name: Build public site
+        run: node scripts/build-portfolio.mjs --out _site --site-base "$SITE_BASE"
+
+      # Belt and braces: the allowlist should already exclude these, so if any of
+      # them appears in the output the build contract has regressed.
+      - name: Assert no source in the output
+        run: |
+          for path in content docs tests scripts .env; do
+            if [ -e "_site/$path" ]; then
+              echo "::error::$path leaked into the public build"
+              exit 1
+            fi
+          done
+          echo "No canonical source, tests, docs or dotfiles in the output."
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
