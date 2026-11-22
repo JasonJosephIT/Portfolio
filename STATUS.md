@@ -20,6 +20,7 @@ updated: 2026-11-22
 5. Apply the content edits below to the Open Thoughts drafts (they are not published; the public feed has 0 records).
 
 ## Decisions (newest first)
+- 2026-11-22: consolidated leftover branches via consolidate/2026-11-22, reviewed by Fable. Merged the two STATUS entries from the ui-visual-appeal local branch; skipped deploy-built-site, portfolio-remove-editor and spike/open-thoughts-feed as superseded; the four wip snapshot branches stay unmerged. Details in CONSOLIDATION-2026-11-22.md.
 - 2026-11-02 Final cuts: Aristocrat drops the seal and salon shots and ends on the logo with "aristocrats of thought"; Herculean tagline is "Designed for your greatest tasks." Web copies in /private/tmp/claude-501/gen/ship/; handed to the demo-slots session to replace PR #16 placeholders (no merge or deploy without Jason).
 - 2026-11-02 Aristocrat final cut built from aristocrat-2 assets: /private/tmp/claude-501/gen/aristocrat-final.mp4 (60 s, 1080p; Veo 3.1 hero/busts/seal, Kling 3.0 Pro salon/map, real app screens, GPT cedar voice, existing closing). A Herculean cut also exists at /private/tmp/claude-501/gen/herculean-final.mp4 but Jason asked for Aristocrat only for now.
 - 2026-11-02 Herculean script names SOC 2 only (Jason's call; replaces keeping GDPR and HIPAA).
