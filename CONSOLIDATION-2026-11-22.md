@@ -31,3 +31,25 @@
 | Chatbot typecheck | `pnpm --dir chatbot exec tsc --noEmit` | **PASS** | Exit 0, no type errors. |
 | Chatbot tests | `pnpm --dir chatbot test` | **PASS** | 96/96 Vitest tests across 3 files + 11/11 `node --test test/index-build.test.mjs` (**107/107 passed**). |
 | Site tests | `pnpm test` | **90 passed / 16 failed** | Identical 16 pre-existing Playwright failures in `tests/site-chat.test.mjs` (`chromium_headless_shell-1234` missing locally). **0 new failures** vs `origin/main`. |
+
+## Reviewer addendum (Fable, 2026-11-22)
+
+Decision: **MERGE**. The diff against `origin/main` is two files (`STATUS.md` +2 lines, this report). Re-run on the branch: fixture build passes (19 pages), chatbot typecheck passes, chatbot tests 107/107, site tests 90/106. The 16 failures are the `tests/site-chat.test.mjs` browser tests, which need `chromium_headless_shell-1234` in the local Playwright cache; the CI `test` job passes on `origin/main` @ `25f70c0`, whose code is identical.
+
+The three skips were checked against `origin/main` and stand: every script or page those branches touch is gone from main, and the two surviving docs carry no editor text.
+
+### Snapshot branches not covered above
+
+Four `wip/*-2026-11-22` branches hold snapshots of uncommitted work taken on 2026-11-22. None is merged; all stay on origin.
+
+| branch | contents | why not merged |
+| --- | --- | --- |
+| `origin/wip/claude-interactive-background-waves-8140ef-2026-11-22` (`a9ae570`) | Five generated bay videos under `generated/quick/` (about 53 MB), their metadata, `spend.jsonl` | Large generated binaries and a spend log; the chosen backdrop is already on main (`5159608`). |
+| `origin/wip/claude-portfolio-astro-tickets-32543e-2026-11-22` (`e5d1877`) | `.agents/skills/source-command-place-image/SKILL.md` | The place-image command is retired (ticket P12). |
+| `origin/wip/codex-portfolio-explorer-review-2026-11-22` (`0b2e78e`) | An early `STATUS.md` (2026-10-25), preview screenshots, a `public/explore-demo/` prototype | The explorer shipped in PR #14 (`src/components/ProjectExplorer.astro`); main's `STATUS.md` is newer. |
+| `origin/wip/main-2026-11-22` (`7c165d1`) | The dropped Phase A staged changes on the old static site (63 files, base `static-final`) | Phase A was dropped on 2026-10-16; the Astro port replaced those files. |
+
+### Left for Jason
+
+- PR #9 (`claude/deploy-built-site`) is still open and superseded; close it.
+- GitHub Pages is still enabled, and its `pages-build-deployment` run fails on every push to main. This predates the consolidation.

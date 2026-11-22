@@ -1,6 +1,6 @@
 ---
 status: active
-progress: PR #14 open (explorer + enrichment + design pass); project demo videos and real project copy pending
+progress: PRs #14, #15 and #16 merged (explorer + enrichment + design pass, bay backdrop, demo-video slots); project demo videos and real project copy pending
 next_date: 2026-11-03
 updated: 2026-11-22
 ---
@@ -8,7 +8,7 @@ updated: 2026-11-22
 # Portfolio status
 
 ## Now
-- PR #14 (https://github.com/JasonJosephIT/Portfolio/pull/14) combines PR #12, the explorer branch and the design pass. Auto-fix is watching it. 16 chat tests could not run locally (Playwright build mismatch); CI is their first run.
+- PRs #14 (explorer + enrichment + design pass), #16 (demo-video slot per project) and #15 (bay backdrop) are merged to main; PR #12 merged and PR #13 closed. The 16 chat tests still cannot run locally (Playwright cache lacks chromium_headless_shell-1234); they pass in CI.
 - Herculean demo draft (30 s, voiced) done 2026-11-02 at /private/tmp/claude-501/gen/herculean-demo-draft.mp4; shots 2, 3, 5 are still pans because the Comfy spend gate ($10 default) ran out.
 - Demo drawings and videos: one orchestrator drawing done (scratchpad, 2026-11-02). Higgsfield balance 2.08 credits; a Seedance 2.5 clip costs 35.
 
@@ -41,7 +41,9 @@ updated: 2026-11-22
 - Higgsfield credits (Jason).
 - Hercules drawing: Jason's own is pending; AO has crest/hydra art to start from (`~/.ao/data/artifacts/hercules-platform-10`).
 - Hercules release-plan link, if one exists (Jason).
-- Close PR #12 and draft PR #13 once #14 merges.
+- Close PR #9 (Pages deploy of the old static site; superseded by the Astro site on Cloudflare Workers Builds) (Jason).
+- GitHub Pages is still switched on: its `pages-build-deployment` run fails on every push to main. Turn Pages off in the repo settings (Jason).
+- Four `wip/*-2026-11-22` snapshot branches are kept on origin, unmerged (see CONSOLIDATION-2026-11-22.md). Jason decides whether to keep them.
 
 ## Idea Shelf
 - Photography page with the sliding panel explorer (see docs/photography-sliding-bookmark.md in the Astro checkout).
