@@ -1,6 +1,6 @@
 # Tickets: Portfolio becomes an Astro site fed by Open Thoughts
 
-Spec: [`../specs/portfolio-astro-site.md`](../specs/portfolio-astro-site.md). Decisions: [`../wayfinder/open-thoughts-feed/map.md`](../wayfinder/open-thoughts-feed/map.md). Terms: [`../../CONTEXT.md`](../../CONTEXT.md).
+Spec: [`../specs/portfolio-astro-site.md`](../specs/portfolio-astro-site.md). Decisions: [`../wayfinder/open-thoughts-feed/map.md`](../wayfinder/open-thoughts-feed/map.md). Terms: [`../../GLOSSARY.md`](../../GLOSSARY.md).
 
 Each ticket is a tracer-bullet vertical slice. Build each in its own `git worktree add` cut from its phase's integration-branch tip once all its blockers are merged. Close a ticket by ticking its criteria and setting `status: closed`. Nothing is pushed or merged to `main` by an agent; phase PRs are opened for Jason.
 

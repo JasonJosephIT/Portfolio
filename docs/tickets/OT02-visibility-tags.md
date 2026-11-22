@@ -12,7 +12,7 @@ claimed-by:
 
 **Target repo:** `~/Projects/Open Thoughts`, worktree cut from `build/enrichment`.
 **Blocked by:** —
-**Spec:** story 15, 21; public-face and approval-flow tickets; CONTEXT.md → visibility tag.
+**Spec:** story 15, 21; public-face and approval-flow tickets; GLOSSARY.md → visibility tag.
 
 ## What to build
 Tags live in `public/visibility.json` (`{"<slug>": "public" | "context-only" | "private"}`); a missing file or slug means `private`. (Decided at build time, 2026-10-16: notes have no frontmatter and `build.py` renders them as is, and proposals can only target `notes/*.md`, so a sidecar keeps agents out structurally.) The Output view shows the tag on each project. Jason can **lower** a tag (to `context-only` or `private`) directly from the view; it takes effect at the next export. Raising to `public` is not possible here: it only happens by approving a publish card (OT03). Agents never write the field.

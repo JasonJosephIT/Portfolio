@@ -2,7 +2,7 @@
 status: active
 progress: PR #14 open (explorer + enrichment + design pass); project demo videos and real project copy pending
 next_date: 2026-11-03
-updated: 2026-11-02
+updated: 2026-11-22
 ---
 
 # Portfolio status

@@ -7,7 +7,7 @@ sibling: Open Thoughts spec (not yet written; shares the bundle contract)
 ---
 # Spec: Portfolio becomes an Astro site fed by Open Thoughts
 
-Uses the terms in `CONTEXT.md`: visibility tag, public record, bundle, profile.
+Uses the terms in `GLOSSARY.md`: visibility tag, public record, bundle, profile.
 
 ## Problem Statement
 
